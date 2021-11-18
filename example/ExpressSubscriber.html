@@ -1,0 +1,226 @@
+<!--
+© 2015 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Phenix WebSDK Publish/Subscribe Example</title>
+
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="animate.css/animate.min.css">
+
+    <style>
+        .local {
+            position: relative;
+            border: solid thin grey;
+            border-radius: 10px;
+            overflow: hidden;
+            -webkit-transform: scale(-1, 1);
+            transform: scale(-1, 1);
+        }
+
+        .remote {
+            border: solid thin grey;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        object {
+            z-index: -1;
+        }
+
+        video {
+            z-index: -2;
+        }
+
+        input {
+            width: 240px;
+        }
+
+        input[name="option"] {
+            margin: 10px 0 0;
+            width: inherit;
+        }
+
+        .row:not(:first-child) {
+            margin-top: 15px;
+        }
+
+        .client {
+            background-color: rgba(204, 153, 51, 0.25);
+            border-radius: 25px 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .server {
+            background-color: rgba(102, 153, 204, 0.25);
+            border-radius: 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .action {
+            font-size: 300%;
+        }
+
+        .badge {
+            font-size: 200%;
+            background-color: #cc6633;
+        }
+
+        .disabled, .step-disabled, .option-disabled {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .step-active {
+            border: 2px solid #892b60;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .hidden-no-space {
+            display: none;
+        }
+
+        .video-container, .video-controls {
+            display: block;
+            clear: both;
+        }
+
+        .video-control {
+            top: 1px;
+            cursor: pointer;
+            padding: 10px;
+            background: grey;
+            border-radius: 6px;
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 200%;
+            vertical-align: text-top;
+        }
+
+        .video-control:hover {
+            color:white;
+        }
+
+        .toggle-off.glyphicon-facetime-video:before {
+            opacity: .4;
+        }
+        .required-field{
+            text-align: left;
+            width: 100%;
+            padding-left: 12px;
+        }
+        .required-field-input-container{
+            padding: 0;
+        }
+        .required-field-input{
+            width: 100%;
+        }
+
+        .form-select-control {
+            margin-bottom: 10px;
+        }
+
+        .form-select-control button {
+            border-radius: 5px;
+            margin: 2px 2px 2px 2px;
+        }
+
+        .form-select-control button.clicked{
+            background-color: black;
+            color: white;
+        }
+    </style>
+
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script data-main="express-subscriber-app" src="requirejs/require.js"></script>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <h1><span id="browserName"></span>
+                        <small id="browserVersion"></small>
+                    </h1>
+                </td>
+                <td id="webrtc">
+                    <h1>WebRTC</h1>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-2 col-md-offset-5 text-center">
+            <div class="form-group">
+                <label for="environment">PCast&trade;</label>
+                <select class="form-control" id="environment"></select>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row text-center">
+    <div class="col-md-2 col-md-offset-5 text-center">
+        <div class="row required-field">
+            <div class="col-md-5">
+                <span>Application ID</span>
+            </div>
+            <div class="col-md-7 required-field-input-container">
+                <input id="applicationId" class="required-field-input" type="text" placeholder="applicationId"/>
+            </div>
+        </div>
+        <div class="row required-field">
+            <div class="col-md-5">
+                <span>Secret</span>
+            </div>
+            <div class="col-md-7 required-field-input-container">
+                <input id="secret" class="required-field-input" type="password" placeholder="secret"/>
+            </div>
+        </div>
+        <div class="row required-field">
+            <div class="col-md-5">
+                <span>Publisher Stream ID</span>
+            </div>
+            <div class="col-md-7 required-field-input-container">
+                <input class="streamIdForPublishing required-field-input" type="text" placeholder="streamId"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row step step-1">
+    <div class="col-md-4 col-md-offset-4 text-center client">
+        <p>Subscribe to a stream.</p>
+        <div class="form-multi-button-control form-select-control" id="subscriber-mode"></div>
+        <p>Choose <strong>DRM modifiers</strong></p>
+        <div class="form-multi-button-control form-select-control" id="subscriber-drm-capabilities"></div>
+        <input id="subscribe" type="button" value="Subscribe To Stream"/>
+        <input id="stopSubscriber" class="disabled" type="button" value="Stop Subscriber"/>
+    </div>
+</div>
+
+<div class="row text-center">
+    <h1>Video Stream</h1>
+    <div class="row text-center">
+        <div class="col-md-8 col-md-offset-2 text-center">
+            <div id="videoListRemote" class="row text-center">
+                <video id="remoteVideo" class="remote" width="640" height="480" playsinline autoplay></video>
+                <video id="remoteVideoSecondary" class="remote hidden" width="640" height="480" playsinline autoplay></video>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

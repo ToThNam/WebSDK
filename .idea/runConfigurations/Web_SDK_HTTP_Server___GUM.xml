@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Web SDK HTTP Server + GUM" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/versions/node/v10.15.3/bin/node" path-to-js-file="example/httpserver.js" working-dir="$PROJECT_DIR$">
+    <envs>
+      <env name="NODE_ENV" value="development" />
+    </envs>
+    <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSStartBrowserRunConfigurationExtension">
+      <browser start="true" url="https://local.phenixrts.com:8843/GetUserMedia.html?url=https://local.phenixrts.com:8443&amp;applicationId=admin&amp;secret=secret" />
+    </EXTENSION>
+    <method />
+  </configuration>
+</component>

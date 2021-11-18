@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            height: 100%
+        }
+
+        video {
+            width: 20%;
+            height: 20%;
+            object-fit: cover;
+        }
+
+        .room {
+            height: 50%;
+        }
+
+        .members {
+            justify-content: space-between;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .quarter {
+            width: 25%;
+        }
+
+        .full {
+            width: 100%;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script type="text/javascript">
+
+        // To be shared with customers. Remove the uncommented dependencies and uncomment the commented ones
+        requirejs.config({
+            paths: {
+//                'phenix-web-sdk': '3p/phenix-web-sdk/dist/phenix-web-sdk.min'
+                'phenix-web-sdk': '../phenix-web-sdk'
+            }
+        });
+
+        requirejs([
+            'phenix-web-sdk'
+        ], function (sdk) {
+            var adminApiProxyClient = new sdk.net.AdminApiProxyClient();
+
+            adminApiProxyClient.setBackendUri('https://phenixrts.com/demo');
+
+            var expressRoom = new sdk.express.RoomExpress({adminApiProxyClient: adminApiProxyClient});
+            var defaultPCastStreamPrefix = 'pcast://phenixrts.com/';
+            var joinRoomButton = document.getElementById('joinRoomButton');
+            var stopButton = document.getElementById('stopButton');
+            var videoList = document.getElementById('videoList');
+            var roomService = null;
+            var roomAlias = 'MyRoomAlias';
+            var screenName = 'ScreenName';
+            var memberRole = 'Audience';
+            var membersStore = [];
+            var memberSubscriptions = {};
+
+            function displayElement(element) {
+                element.className = element.className.substring(0, element.className.indexOf(' hide'));
+            }
+
+            function hideElement(element) {
+                if (element.className.indexOf('hide') === -1) {
+                    element.className += ' hide';
+                }
+            }
+
+            function leaveRoom() {
+                if (roomService) {
+                    roomService.leaveRoom();
+
+                    roomService = null;
+                }
+
+                removeOldMembers([]);
+                hideElement(stopButton);
+                displayElement(joinRoomButton);
+                setUserMessage('');
+            }
+
+            function joinRoom() {
+                expressRoom.joinRoom({
+                    alias: roomAlias,
+                    screenName: screenName,
+                    role: memberRole // Set your role for yourself. Audience will view all other Participant/Presenter members but not interact themselves (may text chat though)
+                }, function joinRoomCallback(error, response) {
+                    if (error) {
+                        setUserMessage('Unable to publish to Room: ' + error.message);
+                        leaveRoom();
+
+                        throw error;
+                    }
+
+                    if (response.status !== 'ok' && response.status !== 'ended') {
+                        setUserMessage('New Status: ' + response.status);
+
+                        throw new Error(response.status);
+                    }
+
+                    if (response.status === 'ok') {
+                        roomService = response.roomService;
+
+                        hideElement(joinRoomButton);
+                        displayElement(stopButton);
+                    }
+                }, function membersChangedCallback(members) { // This is triggered every time a member joins or leaves
+                    if (roomService) { // else left room
+                        removeOldMembers(members);
+                        addNewMembers(members);
+                    }
+
+                    if (members.length === 0) {
+                        setUserMessage('Waiting for Participants to join');
+                    } else {
+                        setUserMessage(members.length.toString() + ' Participants in Room');
+                    }
+                });
+            }
+
+            function removeOldMembers(members) {
+                var membersThatLeft = membersStore.filter(function (member) {
+                    return !members.includes(member);
+                });
+
+                membersThatLeft.forEach(function (memberThatLeft) {
+                    var memberSubscription = memberSubscriptions[memberThatLeft.getSessionId()];
+
+                    if (memberSubscription) {
+                        memberSubscription.forEach(function (subscription) {
+                            removeMemberStream(subscription.memberStream, memberThatLeft.getSessionId());
+                        })
+                    }
+
+                    delete memberSubscriptions[memberThatLeft.getSessionId()];
+                });
+
+                membersStore = membersStore.filter(function (member) {
+                    return !membersThatLeft.includes(member);
+                });
+            }
+
+            function removeMemberStream(memberStream, memberSessionId) {
+                var memberSubscriptionToRemove = memberSubscriptions[memberSessionId].find(function (memberSubscription) {
+                    return parseStreamUri(memberStream.getUri()).streamId === parseStreamUri(memberSubscription.memberStream.getUri()).streamId;
+                });
+
+                memberSubscriptions[memberSessionId] = memberSubscriptions[memberSessionId].filter(function (memberSubscription) {
+                    return parseStreamUri(memberStream.getUri()).streamId !== parseStreamUri(memberSubscription.memberStream.getUri()).streamId;
+                });
+
+                if (memberSubscriptionToRemove) {
+                    memberSubscriptionToRemove.mediaStream.stop();
+                    memberSubscriptionToRemove.videoElement.remove();
+                }
+            }
+
+            function addNewMembers(members) {
+                var membersThatJoined = members.filter(function (member) {
+                    return !membersStore.includes(member);
+                });
+
+                membersThatJoined.forEach(function (newMember) {
+                    var memberSessionId = newMember.getSessionId();
+
+                    memberSubscriptions[memberSessionId] = [];
+
+                    // Listen for changes to member streams. This will happen when the publisher fails and it recovers, or when adding or removing a screen share
+                    var memberStreamSubscription = newMember.getObservableStreams().subscribe(function (memberStreams) {
+                        if (!memberSubscriptions[memberSessionId]) {
+                            return memberStreamSubscription.dispose();
+                        }
+
+                        // Remove old streams
+                        memberSubscriptions[memberSessionId].forEach(function (memberSubscription) {
+                            var shouldRemoveMember = !memberStreams.find(function (stream) {
+                                return parseStreamUri(stream.getUri()).streamId === parseStreamUri(memberSubscription.memberStream.getUri()).streamId;
+                            });
+
+                            if (shouldRemoveMember) {
+                                removeMemberStream(memberSubscription.memberStream, memberSessionId);
+                            }
+                        });
+
+                        // Subscribe to new streams
+                        memberStreams.filter(function (memberStream) {
+                            return !memberSubscriptions[memberSessionId].find(function (memberSubscription) {
+                                return parseStreamUri(memberStream.getUri()).streamId === parseStreamUri(memberSubscription.memberStream.getUri()).streamId;
+                            });
+                        }).forEach(function (memberStream) {
+                            subscribeToMemberStream(memberStream, memberSessionId);
+                        })
+                    });
+
+                    newMember.getObservableStreams().getValue().forEach(function (memberStream) {
+                        subscribeToMemberStream(memberStream, memberSessionId);
+                    })
+                });
+
+                membersStore = members;
+            }
+
+            function subscribeToMemberStream(memberStream, sessionId) {
+                var streamUri = memberStream.getUri();
+                var videoElement = createVideo();
+
+                var subscribeOptions = {
+                    videoElement: videoElement,
+                    streamId: parseStreamUri(streamUri).streamId,
+                    streamToken: parseStreamUri(streamUri).streamToken,
+                    capabilities: [],
+                    monitor: {callback: onMonitorEvent}
+                };
+                var handleSubscribe = function (error, response) {
+                    if (!response.mediaStream) {
+                        return;
+                    }
+
+                    memberSubscriptions[sessionId].push({
+                        mediaStream: response.mediaStream,
+                        videoElement: videoElement,
+                        memberStream: memberStream
+                    });
+
+                    videoList.append(videoElement);
+                };
+
+                if (memberStream.getType() === 'Presentation') {
+                    return expressRoom.getPCastExpress().subscribeToScreen(subscribeOptions, handleSubscribe);
+                }
+
+                expressRoom.getPCastExpress().subscribe(subscribeOptions, handleSubscribe);
+            }
+
+            function setUserMessage(message) {
+                var userMessageElement = document.getElementById('userMessage');
+
+                userMessageElement.innerText = message;
+            }
+
+            function parseStreamUri(uri) {
+                var response = {};
+
+                if (uri.indexOf(defaultPCastStreamPrefix) > -1) {
+                    uri = uri.substring(defaultPCastStreamPrefix.length, uri.length);
+                }
+
+                var uriSplitByQueryParams = uri.split('?');
+                var tokens = uriSplitByQueryParams[1].split('&');
+
+                response.streamId = uriSplitByQueryParams[0];
+
+                // We generate a viewing token for you to ensure you subscribe as quickly as possible
+                tokens.forEach(function (token) {
+                    response[token.split('=')[0]] = token.split('=')[1];
+                });
+
+                return response;
+            }
+
+            // This will get called when the stream fails to recover from an issue
+            function onMonitorEvent(error, response) {
+                if (error) {
+                    return; // May want to display something indicating failure for member
+                }
+
+                if (response.status !== 'ok') {
+                    console.log('Member stream subscription failed [%s]', response.status); // May want to display something indicating failure for member
+                }
+
+                // You may have the option to automatically retry
+                if (response.retry) {
+                    console.log('Attempting to redo member stream subscription after failure'); // May want to display something indicating failure for member
+
+                    response.retry();
+                }
+            }
+
+            function createVideo() {
+                var videoElement = document.createElement('video');
+
+                videoElement.setAttribute('playsline', ''); // For Safari and IOS
+                videoElement.setAttribute('autoplay', ''); // For Safari and IOS + Mobile
+
+                // To resolve unintended pauses
+                videoElement.onpause = function () {
+                    setTimeout(function () {
+                        videoElement.play();
+                    }, 10);
+                };
+
+                return videoElement;
+            }
+
+            joinRoomButton.onclick = joinRoom;
+            stopButton.onclick = leaveRoom;
+        })
+    </script>
+</head>
+<body>
+<div class="row room">
+    <div class="column full members">
+        <div id="videoList"></div>
+        <span>Participants</span>
+    </div>
+</div>
+<div class="row">
+    <button id="joinRoomButton">Join Room</button>
+    <button id="stopButton" class="hide">Stop</button>
+    <h2 id="userMessage"></h2>
+</div>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!--
+© 2015 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Phenix WebSDK Publish/Subscribe Example</title>
+
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="animate.css/animate.min.css">
+
+    <style>
+        .local {
+            position: relative;
+            border: solid thin grey;
+            border-radius: 10px;
+            overflow: hidden;
+            -webkit-transform: scale(-1, 1);
+            transform: scale(-1, 1);
+        }
+
+        .remote {
+            border: solid thin grey;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        object {
+            z-index: -1;
+        }
+
+        video {
+            z-index: -2;
+            width:100%;
+        }
+
+        input {
+            width: 240px;
+        }
+
+        input[name="option"] {
+            margin: 10px 0 0;
+            width: inherit;
+        }
+
+        .row:not(:first-child) {
+            margin-top: 15px;
+        }
+
+        .client {
+            background-color: rgba(204, 153, 51, 0.25);
+            border-radius: 25px 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .server {
+            background-color: rgba(102, 153, 204, 0.25);
+            border-radius: 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .action {
+            font-size: 300%;
+        }
+
+        .badge {
+            font-size: 200%;
+            background-color: #cc6633;
+        }
+
+        .disabled, .step-disabled, .option-disabled {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .step-active {
+            border: 2px solid #892b60;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .hidden-no-space {
+            display: none;
+        }
+
+        .video-container, .video-controls {
+            display: block;
+            clear: both;
+        }
+
+        .video-control {
+            top: 1px;
+            cursor: pointer;
+            padding: 10px;
+            background: grey;
+            border-radius: 6px;
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 200%;
+            vertical-align: text-top;
+        }
+
+        .video-control:hover {
+            color:white;
+        }
+
+        .toggle-off.glyphicon-facetime-video:before {
+            opacity: .4;
+        }
+    </style>
+
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script data-main="channel-app" src="requirejs/require.js"></script>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <h1><span id="browserName"></span>
+                        <small id="browserVersion"></small>
+                    </h1>
+                </td>
+                <td id="webrtc">
+                    <h1>WebRTC</h1>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-2 col-md-offset-5 text-center">
+            <div class="form-group">
+                <label for="environment">PCast&trade;</label>
+                <select class="form-control" id="environment"></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 col-md-offset-4 text-center">
+            <div class="form-group">
+                <input id="applicationId" type="text" placeholder="applicationId"/>
+                <input id="secret" type="password" placeholder="secret"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 col-md-offset-4 text-center client">
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <p>Enter the <strong>Channel Alias</strong> then join the channel. </p>
+                    <input id="alias" />
+                    <input id="joinChannel" type="button" value="Join Channel"/>
+                    <input id="leaveChannel" class="disabled" type="button" value="Leave Channel"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div id="videoList" class="col-md-4 col-md-offset-3 text-center">
+            <video id="channelVideo" class="remote" width="1280" height="960" playsinline autoplay controls></video>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

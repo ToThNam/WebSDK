@@ -1,0 +1,248 @@
+<!--
+© 2015 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Phenix WebSDK Simplified Publish/Subscribe Example</title>
+
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="animate.css/animate.min.css">
+
+    <style>
+        .local {
+            position: relative;
+            border: solid thin grey;
+            border-radius: 10px;
+            overflow: hidden;
+            -webkit-transform: scale(-1, 1);
+            transform: scale(-1, 1);
+        }
+
+        .remote {
+            border: solid thin grey;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        object {
+            z-index: -1;
+        }
+
+        video {
+            z-index: 20;
+        }
+
+        input {
+            width: 240px;
+        }
+
+        input[name="option"] {
+            margin: 10px 0 0;
+            width: inherit;
+        }
+
+        .row:not(:first-child) {
+            margin-top: 15px;
+        }
+
+        .client {
+            background-color: rgba(204, 153, 51, 0.25);
+            border-radius: 25px 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .server {
+            background-color: rgba(102, 153, 204, 0.25);
+            border-radius: 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .action {
+            font-size: 300%;
+        }
+
+        .badge {
+            font-size: 200%;
+            background-color: #cc6633;
+        }
+
+        .disabled, .step-disabled, .option-disabled {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .step-active {
+            border: 2px solid #892b60;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .hidden-no-space {
+            display: none;
+        }
+
+        .video-container, .video-controls {
+            display: block;
+            clear: both;
+        }
+
+        .video-control {
+            top: 1px;
+            cursor: pointer;
+            padding: 10px;
+            background: grey;
+            border-radius: 6px;
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 200%;
+            vertical-align: text-top;
+        }
+
+        .video-control:hover {
+            color:white;
+        }
+
+        .toggle-off.glyphicon-facetime-video:before {
+            opacity: .4;
+        }
+
+        .form-select-control {
+            margin-bottom: 10px;
+        }
+
+        .form-select-control button {
+            border-radius: 5px;
+            margin: 2px 2px 2px 2px;
+        }
+
+        .form-select-control button.clicked{
+            background-color: black;
+            color: white;
+        }
+    </style>
+
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script data-main="simplified-app" src="requirejs/require.js"></script>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <h1><span id="browserName"></span>
+                        <small id="browserVersion"></small>
+                    </h1>
+                </td>
+                <td id="webrtc">
+                    <h1>WebRTC</h1>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-2 col-md-offset-5 text-center">
+            <div class="form-group">
+                <label for="environment">PCast&trade;</label>
+                <select class="form-control" id="environment"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-4 col-md-offset-4 text-center">
+            <div class="form-group">
+                <input id="applicationId" type="text" placeholder="applicationId"/>
+                <input id="secret" type="password" placeholder="secret"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center step step-1">
+        <div class="col-md-1 text-center">
+            <span class="badge">1</span>
+        </div>
+        <div class="col-md-4 col-md-offset-3 text-center client">
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <p>Select <strong>User Media</strong> and <strong>Capabilities</strong>, then click Publish. </p>
+                    <select class="form-control" id="gum-quality">
+                        <option value="144">144p</option>
+                        <option value="180">180p</option>
+                        <option value="240">240p</option>
+                        <option value="360">360p</option>
+                        <option value="480">480p</option>
+                        <option value="720" selected>720p</option>
+                        <option value="1080">1080p</option>
+                    </select>
+                    <select class="form-control" id="gum-source">
+                        <option value="cameraAndMicrophone">Camera & Microphone</option>
+                        <option value="screen">Screen</option>
+                        <option value="camera">Camera</option>
+                        <option value="microphone">Microphone</option>
+                        <option value="cameraMicrophoneAndScreen">Camera & Microphone & Screen</option>
+                        <option value="screenAndScreenAudio">Screen & Audio (Chrome - Windows or Chrome OS)</option>
+                        <option value="screenAndMicrophone">Screen & Microphone</option>
+                        <option value="desktop">Screen (Desktop-FF)</option>
+                        <option value="application">Screen (Application-FF)</option>
+                    </select>
+                    <div class="form-multi-button-control form-select-control" id="publish-capabilities"></div>
+                    <p>Choose <strong>Quality</strong></p>
+                    <div class="form-single-button-control form-select-control" id="publish-audio-quality"></div>
+                    <div class="form-single-button-control form-select-control" id="publish-video-quality"></div>
+                    <input id="publish" type="button" value="Publish Local User Media"/>
+                    <input id="stopPublisher" class="disabled" type="button" value="Stop Publisher"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div id="videoListLocal" class="col-md-4 col-md-offset-4 text-center">
+            <video id="localVideo" class="local" width="160" height="120" muted="true"></video>
+            <video id="localVideoSecondary" class="local hidden" width="160" height="120" muted="true"></video>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <span>Publisher Stream Id</span>
+        <input class="streamIdForPublishing" type="text" placeholder="streamId" readonly/>
+    </div>
+
+    <div class="row step step-2">
+        <div class="col-md-1 text-center">
+            <span class="badge">2</span>
+        </div>
+        <div class="col-md-4 col-md-offset-3 text-center client">
+            <p>Subscribe to a stream using the <strong>streamToken</strong>.</p>
+            <div class="form-multi-button-control form-select-control" id="subscriber-mode"></div>
+            <p>Choose <strong>DRM modifiers</strong></p>
+            <div class="form-multi-button-control form-select-control" id="subscriber-drm-capabilities"></div>
+            <input id="subscribe" type="button" value="Subscribe To Stream"/>
+            <input id="stopSubscriber" class="disabled" type="button" value="Stop Subscriber"/>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <h1>Video Stream</h1>
+        <div class="row text-center">
+            <div class="col-md-8 col-md-offset-2 text-center">
+                <div id="videoListRemote" class="row text-center">
+                    <video id="remoteVideo" class="remote" width="640" height="480" playsinline autoplay controls></video>
+                    <video id="remoteVideoSecondary" class="remote hidden" width="640" height="480" playsinline autoplay></video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

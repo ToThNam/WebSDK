@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "PCast屏幕共享",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "此扩展程序让用户能够与其他用户共享屏幕。",
+    "description": "Extension description"
+  },
+  "extShortName": {
+    "message": "屏幕共享",
+    "description": "Short extension name"
+  }
+}

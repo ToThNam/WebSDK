@@ -1,0 +1,14 @@
+{
+    "extName": {
+        "message": "Трансляция экрана PCast",
+        "description": "Extension name"
+    },
+    "extDescription": {
+        "message": "Это расширение позволяет пользователям транслировать изображение со своего экрана другим пользователям.",
+        "description": "Extension description"
+    },
+    "extShortName": {
+        "message": "Трансляция экрана",
+        "description": "Short extension name"
+    }
+}

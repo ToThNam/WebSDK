@@ -1,0 +1,357 @@
+<!--
+© 2015 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Phenix WebSDK Stream URI Example</title>
+
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="animate.css/animate.min.css">
+
+    <style>
+        .local {
+            position: relative;
+            border: solid thin grey;
+            border-radius: 10px;
+            overflow: hidden;
+            -webkit-transform: scale(-1, 1);
+            transform: scale(-1, 1);
+        }
+
+        .remote {
+            border: solid thin grey;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        object {
+            z-index: -1;
+        }
+
+        video {
+            z-index: -2;
+        }
+
+        input {
+            width: 240px;
+        }
+
+        input[name="option"] {
+            margin: 10px 0 0;
+            width: inherit;
+        }
+
+        .row:not(:first-child) {
+            margin-top: 15px;
+        }
+
+        .client {
+            background-color: rgba(204, 153, 51, 0.25);
+            border-radius: 25px 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .server {
+            background-color: rgba(102, 153, 204, 0.25);
+            border-radius: 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .action {
+            font-size: 300%;
+        }
+
+        .badge {
+            font-size: 200%;
+            background-color: #cc6633;
+        }
+
+        .disabled, .step-disabled, .option-disabled {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .step-active {
+            border: 2px solid #892b60;
+        }
+
+        .wide-input {
+            width: 100%
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .video-container, .video-controls {
+            display: block;
+            clear: both;
+        }
+
+        .video-control {
+            top: 1px;
+            cursor: pointer;
+            padding: 10px;
+            background: grey;
+            border-radius: 6px;
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 200%;
+            vertical-align: text-top;
+        }
+
+        .video-control:hover {
+            color:white;
+        }
+
+        .toggle-off.glyphicon-facetime-video:before {
+            opacity: .4;
+        }
+
+        .form-select-control {
+            margin-bottom: 10px;
+        }
+
+        .form-select-control button {
+            border-radius: 5px;
+            margin: 2px 2px 2px 2px;
+        }
+
+        .form-select-control button.clicked{
+            background-color: black;
+            color: white;
+        }
+    </style>
+
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script data-main="stream-uri-app" src="requirejs/require.js"></script>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <h1><span id="browserName"></span>
+                        <small id="browserVersion"></small>
+                    </h1>
+                </td>
+                <td id="webrtc">
+                    <h1>WebRTC</h1>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-2 col-md-offset-5 text-center">
+            <div class="form-group">
+                <label for="environment">PCast&trade;</label>
+                <select class="form-control" id="environment"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row page-header">
+        <div class="col-md-4 col-md-offset-1 text-center server">
+            <h1><strong>Backend</strong></h1>
+            <p>Operations require your application's <strong>secret</strong>. Thus they must be performed on your
+                backend.</p>
+        </div>
+        <div class="col-md-4 col-md-offset-2 text-center client">
+            <h1><strong>Client</strong></h1>
+            <p>Operations require session-specific <strong>tokens</strong>.</p>
+        </div>
+    </div>
+    <div class="row step step-1">
+        <div class="col-md-1 text-center">
+            <span class="badge">1</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Create an <strong>authenticationToken</strong> using the application's
+                <strong>applicationId</strong> and
+                <strong>secret</strong>.</p>
+            <input id="applicationId" type="text" placeholder="applicationId"/>
+            <input id="secret" type="password" placeholder="secret"/>
+            <input id="createAuthToken" type="button" value="Create Authentication Token"/>
+        </div>
+    </div>
+    <div class="row step step-2">
+        <div class="col-md-1 text-center">
+            <span class="badge">2</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Pass <strong>authenticationToken</strong> to client.</p>
+            <input class="authToken" type="text" placeholder="authenticationToken" readonly/>
+        </div>
+        <div class="col-md-2 text-center action">
+            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"
+                  aria-label="Pass authenticationToken to client"></span>
+        </div>
+        <div class="col-md-4 text-center client">
+            <input id="authToken" class="authToken" type="text" placeholder="authenticationToken"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">2</span>
+        </div>
+    </div>
+    <div class="row step step-3">
+        <div class="col-md-4 col-md-offset-7 text-center client">
+            <p>Connect to PCast&trade; using the <strong>authenticationToken</strong>.</p>
+            <input id="start" type="button" value="Connect"/>
+            <input id="stop" class="disabled" type="button" value="Stop"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">3</span>
+        </div>
+    </div>
+    <div class="row step step-4">
+        <div class="col-md-1 text-center">
+            <span class="badge">4</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <input id="sessionId" class="sessionId" type="text" placeholder="sessionId"/>
+        </div>
+        <div class="col-md-2 text-center action">
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"
+                  aria-label="Pass sessionId to server"></span>
+        </div>
+        <div class="col-md-4 text-center client">
+            <p>Pass <strong>sessionId</strong> to server.</p>
+            <input class="sessionId" type="text" placeholder="sessionId" readonly/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">4</span>
+        </div>
+    </div>
+    <div class="row step step-5">
+        <div class="col-md-1 text-center">
+            <span class="badge">5</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Create a publish <strong>streamToken</strong> using the <strong>sessionId</strong>.</p>
+            <div class="form-multi-button-control form-select-control" id="publish-capabilities"></div>
+            <p>Choose <strong>Quality</strong></p>
+            <div class="form-single-button-control form-select-control" id="publish-audio-quality"></div>
+            <div class="form-single-button-control form-select-control" id="publish-video-quality"></div>
+            <input id="sessionIdForPublishing" class="sessionId" type="text" placeholder="sessionId"/>
+            <input id="originStreamIdForPublishing" class="originStreamId" type="text" placeholder="originStreamId"/>
+            <input id="createStreamTokenForPublishing" type="button" value="Create Publish Stream Token"/>
+        </div>
+    </div>
+    <div class="row step step-6">
+        <div class="col-md-1 text-center">
+            <span class="badge">6</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Pass <strong>streamToken</strong> to client.</p>
+            <input class="streamTokenForPublishing" type="text" placeholder="streamToken" readonly/>
+        </div>
+        <div class="col-md-2 text-center action">
+            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"
+                  aria-label="Pass streamToken to client"></span>
+        </div>
+        <div class="col-md-4 text-center client">
+            <input id="streamTokenForPublishing" class="streamTokenForPublishing" type="text"
+                   placeholder="streamToken"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">6</span>
+        </div>
+    </div>
+    <div class="row step step-7">
+        <div class="col-md-4 col-md-offset-7 text-center client">
+            <p>Publish stream URI using <strong>streamToken</strong>.</p>
+            <input id="sourceUriForPublishing" class="wide-input" type="text" placeholder="https://example.org/my-awesome.mp4"/>
+            <textarea id="sourceOptionsForPublishing" name="SourceOptionsForPublishing" class="wide-input" rows="5" placeholder="room-id=us-central#app#test&#10;screen-name=StreamFromURI"></textarea>
+            <input id="publish" type="button" value="Publish URI"/>
+            <input id="stopPublisher" class="disabled" type="button" value="Stop Publisher"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">7</span>
+        </div>
+    </div>
+    <div class="row step step-8">
+        <div class="col-md-1 text-center">
+            <span class="badge">8</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Pass <strong>streamId</strong> to server.</p>
+            <input class="streamIdForPublishing" type="text" placeholder="streamId" readonly/>
+        </div>
+        <div class="col-md-2 text-center action">
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"
+                  aria-label="Pass streamId to server"></span>
+        </div>
+        <div class="col-md-4 text-center client">
+            <input id="streamIdForPublishing" class="streamIdForPublishing" type="text"
+                   placeholder="streamId"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">8</span>
+        </div>
+    </div>
+    <div class="row step step-9">
+        <div class="col-md-1 text-center">
+            <span class="badge">9</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Create a viewing <strong>streamToken</strong> using the <strong>sessionId</strong> and
+                <strong>originStreamId</strong>.</p>
+            <div class="form-multi-button-control form-select-control" id="subscriber-mode"></div>
+            <p>Choose <strong>DRM modifiers</strong></p>
+            <div class="form-multi-button-control form-select-control" id="subscriber-drm-capabilities"></div>
+            <input id="sessionIdForViewing" class="sessionId" type="text" placeholder="sessionId"/>
+            <input id="originStreamId" type="text" placeholder="originStreamId"/>
+            <input id="createStreamTokenForViewing" type="button" value="Create Viewing Stream Token"/>
+        </div>
+    </div>
+    <div class="row step step-10">
+        <div class="col-md-1 text-center">
+            <span class="badge">10</span>
+        </div>
+        <div class="col-md-4 text-center server">
+            <p>Pass <strong>streamToken</strong> to client.</p>
+            <input class="streamTokenForViewing" type="text" placeholder="streamToken" readonly/>
+        </div>
+        <div class="col-md-2 text-center action">
+            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"
+                  aria-label="Pass streamToken to client"></span>
+        </div>
+        <div class="col-md-4 text-center client">
+            <input id="streamTokenForViewing" class="streamTokenForViewing" type="text" placeholder="streamToken"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">10</span>
+        </div>
+    </div>
+    <div class="row step step-11">
+        <div class="col-md-4 col-md-offset-7 text-center client">
+            <p>Subscribe to a stream using the <strong>streamToken</strong>.</p>
+            <input id="subscribe" type="button" value="Subscribe To Stream"/>
+            <input id="stopSubscriber" class="disabled" type="button" value="Stop Subscriber"/>
+        </div>
+        <div class="col-md-1 text-center">
+            <span class="badge">11</span>
+        </div>
+    </div>
+    <div class="row text-center">
+        <h1>Video Stream</h1>
+        <div class="row text-center">
+            <div class="col-md-8 col-md-offset-2 text-center">
+                <div id="videoList" class="row text-center">
+                    <video id="remoteVideo" class="remote" width="640" height="480" playsinline autoplay></video>
+                    <video id="remoteVideoSecondary" class="remote hidden" width="640" height="480" playsinline autoplay></video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

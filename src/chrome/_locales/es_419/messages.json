@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Pantalla Compartida PCast",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Esta extensión permite a los usuarios compartir su pantalla con otros usuarios.",
+    "description": "Extension description"
+  },
+  "extShortName": {
+    "message": "Pantalla Compartida",
+    "description": "Short extension name"
+  }
+}

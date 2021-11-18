@@ -1,0 +1,33 @@
+{
+  "name": "phenix-web-sdk",
+  "description": "Phenix WebSDK",
+  "keywords": [
+    "WebRTC",
+    "Video",
+    "Real-time"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://phenixrts.com/docs",
+  "private": false,
+  "main": [
+    "dist/phenix-web-sdk.min.js"
+  ],
+  "moduleType": [
+    "globals",
+    "amd"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PhenixRTS/WebSDK.git"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "ignore": [
+    "src",
+    "test",
+    "coverage",
+    "scripts",
+    "Gruntfile.js",
+    ".*"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "שיתוף מסך PCast",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "הרחבה זו מאפשרת למשתמשים לשתף את המסך שלהם עם משתמשים אחרים.",
+    "description": "Extension description"
+  },
+  "extShortName": {
+    "message": "שיתוף מסך",
+    "description": "Short extension name"
+  }
+}

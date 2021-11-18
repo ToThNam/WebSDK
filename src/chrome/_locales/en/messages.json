@@ -1,0 +1,14 @@
+{
+    "extName": {
+        "message": "PCast Screen Sharing",
+        "description": "Extension name"
+    },
+    "extDescription": {
+        "message": "This extension enables users to share their screen with other users.",
+        "description": "Extension description"
+    },
+    "extShortName": {
+        "message": "Screen Sharing",
+        "description": "Short extension name"
+    }
+}

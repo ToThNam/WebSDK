@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Web SDK Tests (Browsers)" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/versions/node/v10.15.3/bin/node" path-to-js-file="scripts/test-browsers.js" working-dir="$PROJECT_DIR$">
+    <envs>
+      <env name="NODE_ENV" value="development" />
+      <env name="PHENIX_APPLICATION_ID" value="test" />
+      <env name="PHENIX_SECRET" value="secret" />
+    </envs>
+    <method />
+  </configuration>
+</component>

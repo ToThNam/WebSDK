@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Web SDK Bundle" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$USER_HOME$/.nvm/versions/node/v10.15.3/bin/node" path-to-js-file="scripts/ci-bundle.js" working-dir="$PROJECT_DIR$">
+    <method />
+  </configuration>
+</component>

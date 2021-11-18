@@ -1,0 +1,14 @@
+{
+    "extName": {
+        "message": "PCast Bildschirm Teilen",
+        "description": "Name der Erweiterung"
+    },
+    "extDescription": {
+        "message": "Diese Erweiterung ermöglicht Benutzern ihren Bildschirm mit anderen Benutzern zu teilen.",
+        "description": "Beschreibung der Erweiterung"
+    },
+    "extShortName": {
+        "message": "Bildschirm Teilen",
+        "description": "Kurzer Name der Erweiterung"
+    }
+}

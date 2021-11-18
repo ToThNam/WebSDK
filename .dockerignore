@@ -1,0 +1,11 @@
+*/.idea/
+*/node_modules/
+*/3p/
+*/build/
+*/coverage/
+*/logs/
+*/npm-debug.log
+*.html
+*.css
+*.zip
+*/Thumbs.db

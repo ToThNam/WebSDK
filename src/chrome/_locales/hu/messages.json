@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "PCast Képernyőmegosztó",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Ez a kiterjesztés lehetővé teszi a felhasználók számára, hogy megosszák a képernyőjüket más felhasználókkal.",
+    "description": "Extension description"
+  },
+  "extShortName": {
+    "message": "Képernyőmegosztás",
+    "description": "Short extension name"
+  }
+}

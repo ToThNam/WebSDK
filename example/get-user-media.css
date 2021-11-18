@@ -1,0 +1,114 @@
+.local {
+    position: relative;
+    border: solid thin grey;
+    border-radius: 10px;
+    overflow: hidden;
+    -webkit-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+}
+
+.remote {
+    border: solid thin grey;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+object {
+    z-index: -1;
+}
+
+video {
+    z-index: -2;
+}
+
+input {
+    width: 240px;
+}
+
+input[name="option"] {
+    margin: 10px 0 0;
+    width: inherit;
+}
+
+.row:not(:first-child) {
+    margin-top: 15px;
+}
+
+.client {
+    background-color: rgba(204, 153, 51, 0.25);
+    border-radius: 25px 5px 25px 15px;
+    padding: 5px;
+    min-height: 75px;
+}
+
+.server {
+    background-color: rgba(102, 153, 204, 0.25);
+    border-radius: 5px 25px 15px;
+    padding: 5px;
+    min-height: 75px;
+}
+
+.action {
+    font-size: 300%;
+}
+
+.badge {
+    font-size: 200%;
+    background-color: #cc6633;
+}
+
+.disabled, .step-disabled, .option-disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+.step-active {
+    border: 2px solid #892b60;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.video-container, .video-controls {
+    display: block;
+    clear: both;
+}
+
+.video-control {
+    top: 1px;
+    cursor: pointer;
+    padding: 10px;
+    background: grey;
+    border-radius: 6px;
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+    font-size: 200%;
+    vertical-align: text-top;
+}
+
+.video-control:hover {
+    color:white;
+}
+
+.toggle-off.glyphicon-facetime-video:before {
+    opacity: .4;
+}
+
+.hidden {
+    display: none;
+}
+
+.form-select-control {
+    margin-bottom: 10px;
+}
+.form-select-control button {
+    border-radius: 5px;
+    margin: 2px 2px 2px 2px;
+}
+
+.form-select-control button.clicked{
+    background-color: black;
+    color: white;
+}

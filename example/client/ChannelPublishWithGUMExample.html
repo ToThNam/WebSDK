@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .main {
+            text-align: center;
+        }
+
+        .channel-view {
+            background-color: black;
+        }
+
+        video {
+            width: 50%;
+            height: 50%;
+            object-fit: cover;
+        }
+
+        #videoContainer {
+            width: 50%;
+            display: inline-block;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script type="text/javascript">
+
+        // To be shared with customers. Remove the uncommented dependencies and uncomment the commented ones
+        requirejs.config({
+            paths: {
+//                'phenix-web-sdk': '3p/phenix-web-sdk/dist/phenix-web-sdk.min',
+//                'phenix-gum-configuration': '3p/phenix-react-gum-configuration/dist/phenix-gum-configuration.min'
+                'phenix-web-sdk': '../phenix-web-sdk',
+                'phenix-gum-configuration': 'phenix-gum-configuration/dist/phenix-gum-configuration.min'
+            }
+        });
+
+        requirejs([
+            'phenix-web-sdk',
+            'phenix-gum-configuration'
+        ], function (sdk, GumConf) {
+            var adminApiProxyClient = new sdk.net.AdminApiProxyClient();
+
+            adminApiProxyClient.setBackendUri('https://phenixrts.com/demo');
+
+            var expressChannel = new sdk.express.ChannelExpress({adminApiProxyClient: adminApiProxyClient});
+            var videoElement = document.getElementById('myVideoId');
+            var stopButton = document.getElementById('stopButton');
+            var publisher = null;
+            var channelAlias = 'MyChannelAlias';
+            var channelName = 'Channel Name';
+            var gumConfOptions = {
+                confirmUserMedia: publish,
+                confirmButtonText: 'Publish',
+                resolution: 1080,
+                aspectRatio: '16x9',
+                storeLocalStateKey: channelAlias
+            };
+            var localUserMediaStream;
+
+            function createGumConf() {
+                var gumConf = new GumConf('#videoContainer', gumConfOptions);
+            }
+
+            function destroyGumConf() {
+                var videoContainer = document.getElementById('videoContainer');
+
+                videoContainer.removeChild(videoContainer.children[0]);
+
+                displayElement(videoElement);
+                displayElement(stopButton);
+            }
+
+            function displayElement(element) {
+                element.className = element.className.substring(0, element.className.indexOf(' hide'));
+            }
+
+            function hideElement(element) {
+                if (element.className.indexOf('hide') === -1) {
+                    element.className += ' hide';
+                }
+            }
+
+            function prepareGetUserMedia() {
+                if (publisher) {
+                    publisher.stop();
+
+                    publisher = null;
+                }
+
+                if (localUserMediaStream) {
+                    localUserMediaStream.getTracks().forEach(function (track) {
+                        track.stop();
+                    });
+
+                    localUserMediaStream = null;
+                }
+
+                createGumConf();
+                hideElement(videoElement);
+                hideElement(stopButton);
+            }
+
+            function publish(userMediaStream) {
+                var publishOptions = {
+                    capabilities: ['fhd', 'streaming'],
+                    room: {alias: channelAlias, name: channelName},
+                    userMediaStream: userMediaStream,
+                    videoElement: videoElement
+                };
+
+                localUserMediaStream = userMediaStream;
+
+                expressChannel.publishToChannel(publishOptions, function subscriberCallback(error, response) {
+                    if (error) {
+                        setUserMessage('Unable to publish to Channel: ' + error.message);
+                        prepareGetUserMedia();
+
+                        throw error;
+                    }
+
+                    if (response.status !== 'ok' && response.status !== 'ended') {
+                        setUserMessage('New Status: ' + response.status);
+
+                        throw new Error(response.status);
+                    }
+
+                    if (response.status === 'ok') {
+                        publisher = response.publisher;
+
+                        destroyGumConf();
+                    }
+                });
+            }
+
+            function setUserMessage(message) {
+                var userMessageElement = document.getElementById('userMessage');
+
+                userMessageElement.innerText = message;
+            }
+
+            stopButton.onclick = prepareGetUserMedia;
+
+            prepareGetUserMedia();
+        })
+    </script>
+</head>
+<body>
+<div class="main">
+    <div id="videoContainer">
+
+    </div>
+    <video id="myVideoId" width="640" height="480" muted class="channel-view hide"></video>
+    <br/>
+    <button id="stopButton" class="stop-publisher hide">Stop</button>
+    <h2 id="userMessage"></h2>
+</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+/**
+ * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All Rights Reserved.
+ */
+{
+    "extends": ["../.eslintrc"],
+    "env": {
+        "browser": true,
+        "amd": true,
+        "mocha": false,
+        "es6": false
+    },
+    "parserOptions": {
+        "ecmaVersion": 3,
+        "sourceType": "script"
+    }
+}

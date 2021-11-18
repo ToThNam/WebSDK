@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "PCast Scherm Delen",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Deze extensie stelt gebruikers in staat om hun scherm te delen met andere gebruikers.",
+    "description": "Extension description"
+  },
+  "extShortName": {
+    "message": "Scherm Delen",
+    "description": "Short extension name"
+  }
+}

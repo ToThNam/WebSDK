@@ -1,0 +1,262 @@
+<!--
+© 2015 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Phenix WebSDK Publish/Subscribe Example</title>
+
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="animate.css/animate.min.css">
+
+    <style>
+        .local {
+            position: relative;
+            border: solid thin grey;
+            border-radius: 10px;
+            overflow: hidden;
+            -webkit-transform: scale(-1, 1);
+            transform: scale(-1, 1);
+        }
+
+        .remote {
+            border: solid thin grey;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        object {
+            z-index: -1;
+        }
+
+        video {
+            z-index: -2;
+        }
+
+        input {
+            width: 240px;
+        }
+
+        input[name="option"] {
+            margin: 10px 0 0;
+            width: inherit;
+        }
+
+        .row:not(:first-child) {
+            margin-top: 15px;
+        }
+
+        .client {
+            background-color: rgba(204, 153, 51, 0.25);
+            border-radius: 25px 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .server {
+            background-color: rgba(102, 153, 204, 0.25);
+            border-radius: 5px 25px 15px;
+            padding: 5px;
+            min-height: 75px;
+        }
+
+        .action {
+            font-size: 300%;
+        }
+
+        .badge {
+            font-size: 200%;
+            background-color: #cc6633;
+        }
+
+        .disabled, .step-disabled, .option-disabled {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .step-active {
+            border: 2px solid #892b60;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        .hidden-no-space {
+            display: none;
+        }
+
+        .video-container, .video-controls {
+            display: block;
+            clear: both;
+        }
+
+        .video-control {
+            top: 1px;
+            cursor: pointer;
+            padding: 10px;
+            background: grey;
+            border-radius: 6px;
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 200%;
+            vertical-align: text-top;
+        }
+
+        .video-control:hover {
+            color:white;
+        }
+
+        .toggle-off.glyphicon-facetime-video:before {
+            opacity: .4;
+        }
+
+        .room {
+            height: 50%;
+        }
+
+        .members {
+            justify-content: flex-start;
+        }
+
+        .members video {
+            max-width:70%;
+            position: relative;
+        }
+
+        .self-view {
+            background-color: black;
+            width: 100%;
+            height: 100%;
+        }
+
+        .self-view video {
+            width: 50%;
+            height: 50%;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .quarter {
+            width: 25%;
+        }
+
+        .full {
+            width: 100%;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .high {
+            border: 3px solid blue;
+        }
+
+        .low {
+            border: 3px solid orange;
+        }
+
+        .status-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status-container div {
+            padding: 5px;
+        }
+
+
+    </style>
+
+    <script>
+        var __phenixPageLoadTime = new Date().getTime();
+    </script>
+    <script data-main="multi-party-chat-app" src="requirejs/require.js"></script>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row text-center">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    <h1><span id="browserName"></span>
+                        <small id="browserVersion"></small>
+                    </h1>
+                </td>
+                <td id="webrtc">
+                    <h1>WebRTC</h1>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-2 col-md-offset-5 text-center">
+            <div class="form-group">
+                <label for="environment">PCast&trade;</label>
+                <select class="form-control" id="environment"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-4 col-md-offset-4 text-center">
+            <div class="form-group">
+                <input id="applicationId" type="text" placeholder="applicationId"/>
+                <input id="secret" type="password" placeholder="secret"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 col-md-offset-4 text-center client">
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <p>Enter the <strong>Room Alias</strong> and select <strong>Capabilities</strong>, then join the room. </p>
+                    <input id="alias" />
+                    <button id="publishAndJoinRoomButton">Publish And Join Room</button>
+                    <button id="stopButton" class="hide">Leave Room</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="row room">
+            <div class="column full members">
+                <div id="videoList"></div>
+                <span>Other Members</span>
+            </div>
+            <div>
+                <button id="muteAudio">Mute Audio</button>
+                <button id="muteVideo">Mute Video</button>
+            </div>
+            <div class="column quarter self">
+                <div id="selfVideoList" class="self-view"></div>
+                <span>Self</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 col-md-offset-4 text-center">
+            <button id="publishScreenButton" class="hide">Screen Share</button>
+            <button id="stopPublishScreenButton" class="hide">Stop Screen Share</button>
+            <h2 id="userMessage"></h2>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

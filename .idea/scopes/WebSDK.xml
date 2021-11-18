@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="WebSDK" pattern="file[WebSDK]:*/&amp;&amp;!file[WebSDK]:.idea//*&amp;&amp;!file[WebSDK]:3p//*&amp;&amp;!file[WebSDK]:dist//*&amp;&amp;!file[WebSDK]:coverage//*" />
+</component>
