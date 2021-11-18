@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert'
 ], function(_, assert) {
@@ -95,7 +95,7 @@ define([
         }
     };
 
-    function ResolutionProvider(options) {
+    function ResolutionProvider(this: any, options: { resolutionSelectionStrategy: string; aspectRatio: string; resolution: string; frameRate: number; }) {
         assert.isObject(options, 'options');
 
         if (options.resolutionSelectionStrategy) {
@@ -151,7 +151,7 @@ define([
         return this._defaultFrameRate;
     };
 
-    ResolutionProvider.prototype.getNextResolution = function getNextResolution(height, aspectRatio) {
+    ResolutionProvider.prototype.getNextResolution = function getNextResolution(height: number, aspectRatio: any) {
         assert.isNumber(height, 'height');
         assert.isStringNotEmpty(aspectRatio, 'aspectRatio');
 
@@ -184,7 +184,7 @@ define([
         return this._resolutionSelectionStrategy !== resolutionSelectionStrategies.exact.name;
     };
 
-    ResolutionProvider.prototype.calculateLongerDimensionByAspectRatio = function calculateLongerDimensionByAspectRatio(shorterDimension, aspectRatio) {
+    ResolutionProvider.prototype.calculateLongerDimensionByAspectRatio = function calculateLongerDimensionByAspectRatio(shorterDimension: number, aspectRatio: any) {
         switch (aspectRatio) {
         case '16x9':
         case '9x16':
@@ -197,7 +197,7 @@ define([
         }
     };
 
-    function roundUpToNearestEvenNumber(value) {
+    function roundUpToNearestEvenNumber(value: number) {
         assert.isNumber(value, 'value');
 
         return 2 * Math.floor((value + 1) / 2);
