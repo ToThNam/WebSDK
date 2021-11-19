@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
+import { Ioption } from "../../../typescript/src/userMedia/resolutionProvider";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert'
 ], function(_, assert) {
     'use strict';
 
-    var aspectRatios = [
+        var aspectRatios = [
         {
             '9x16': [
                 {3840: 2160}, // 4k (UHD)
@@ -95,7 +97,7 @@ define('',[
         }
     };
 
-    function ResolutionProvider(this: any, options: { resolutionSelectionStrategy: string; aspectRatio: string; resolution: string; frameRate: number; }) {
+    function ResolutionProvider(this: any, options: Ioption) {
         assert.isObject(options, 'options');
 
         if (options.resolutionSelectionStrategy) {
@@ -151,7 +153,7 @@ define('',[
         return this._defaultFrameRate;
     };
 
-    ResolutionProvider.prototype.getNextResolution = function getNextResolution(height: number, aspectRatio: any) {
+    ResolutionProvider.prototype.getNextResolution = function getNextResolution(height: number, aspectRatio: string) {
         assert.isNumber(height, 'height');
         assert.isStringNotEmpty(aspectRatio, 'aspectRatio');
 
@@ -184,7 +186,7 @@ define('',[
         return this._resolutionSelectionStrategy !== resolutionSelectionStrategies.exact.name;
     };
 
-    ResolutionProvider.prototype.calculateLongerDimensionByAspectRatio = function calculateLongerDimensionByAspectRatio(shorterDimension: number, aspectRatio: any) {
+    ResolutionProvider.prototype.calculateLongerDimensionByAspectRatio = function calculateLongerDimensionByAspectRatio(shorterDimension: number, aspectRatio: string) {
         switch (aspectRatio) {
         case '16x9':
         case '9x16':
@@ -203,7 +205,7 @@ define('',[
         return 2 * Math.floor((value + 1) / 2);
     }
 
-    function calculateHeight(aspectRatio, resolution) {
+    function calculateHeight(aspectRatio: string, resolution: number) {
         assert.isStringNotEmpty(aspectRatio, 'aspectRatio');
         assert.isNumber(resolution, 'resolution');
 
@@ -220,7 +222,7 @@ define('',[
         }
     }
 
-    function getNextHighestResolution(height, aspectRatio) {
+    function getNextHighestResolution(this: any, height: number, aspectRatio: string) {
         var aspectRatioHeights = getObjectValueInArray(aspectRatio, aspectRatios);
         var aspectRatioIndex = getIndexInArray(aspectRatio, aspectRatios);
         var heightIndex = getIndexInArray(height.toString(), aspectRatioHeights);
@@ -281,7 +283,7 @@ define('',[
         };
     }
 
-    function getNextLowestResolution(height, aspectRatio) {
+    function getNextLowestResolution(this: any, height: number, aspectRatio: string) {
         var aspectRatioHeights = getObjectValueInArray(aspectRatio, aspectRatios);
         var aspectRatioIndex = getIndexInArray(aspectRatio, aspectRatios);
         var heightIndex = getIndexInArray(height.toString(), aspectRatioHeights);
@@ -335,38 +337,38 @@ define('',[
         };
     }
 
-    function getObjectValueInArray(value, collection) {
-        var valueObject = _.find(collection, function(item) {
+    function getObjectValueInArray(value: string | number | symbol, collection:any) {
+        var valueObject = _.find(collection, function(item: any) {
             return Object.prototype.hasOwnProperty.call(item, value);
         });
 
         return valueObject ? valueObject[value] : null;
     }
 
-    function getIndexInArray(value, collection) {
-        return _.findIndex(collection, function(item) {
+    function getIndexInArray(value: string | number | symbol, collection: any) {
+        return _.findIndex(collection, function(item: any) {
             return Object.prototype.hasOwnProperty.call(item, value);
         });
     }
 
-    function getIndexKey(index, collection) {
+    function getIndexKey(index: string | number, collection:any) {
         var keys = _.keys(collection[index]);
 
         return keys[0];
     }
 
-    function getIndexValue(index, collection) {
+    function getIndexValue(index: string | number, collection:any) {
         var keys = _.keys(collection[index]);
 
         return collection[index][keys[0]];
     }
 
-    function getNextHighestKeyIndex(value, collection) {
+    function getNextHighestKeyIndex(value: number , collection: any[]) {
         if ( _.keys(collection[0])[0] < value) {
             return -1;
         }
 
-        return _.reduce(collection, function(closestIndex, nextItem, index) {
+        return _.reduce(collection, function(closestIndex:any, nextItem: any, index: any) {
             if (!closestIndex) {
                 return index;
             }
@@ -382,12 +384,12 @@ define('',[
         });
     }
 
-    function getNextLowestKeyIndex(value, collection) {
+    function getNextLowestKeyIndex(value: number, collection: string | any[]) {
         if ( _.keys(collection[collection.length - 1])[0] > value) {
             return null;
         }
 
-        return _.reduce(collection, function(closestIndex, nextItem, index) {
+        return _.reduce(collection, function(closestIndex: any, nextItem: any, index: any) {
             if (!closestIndex) {
                 return index;
             }

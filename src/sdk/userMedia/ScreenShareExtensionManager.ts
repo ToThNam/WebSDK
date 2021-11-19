@@ -15,7 +15,8 @@
  */
 
 /* global chrome */
-define([
+import { Ioption, Iresponse } from "../../../typescript/src/userMedia/ScreenShareExtensionManager";
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-observable',
@@ -26,7 +27,7 @@ define([
     var defaultChromePCastScreenSharingExtensionId = 'icngjadgidcmifnehjcielbmiapkhjpn';
     var minimumSupportFirefoxVersionForUnWhiteListedScreenShare = 52;
 
-    function ScreenShareExtensionManager(options, logger) {
+    function ScreenShareExtensionManager(this: any, options: Ioption, logger: any) {
         options = options || {};
 
         assert.isObject(options, 'options');
@@ -45,15 +46,15 @@ define([
         }
     }
 
-    ScreenShareExtensionManager.prototype.checkForScreenSharingCapability = function(callback) {
-        return checkForScreenSharingCapability.call(this, function(isEnabled) {
+    ScreenShareExtensionManager.prototype.checkForScreenSharingCapability = function(callback: (arg0: any) => void) {
+        return checkForScreenSharingCapability.call(this, (isEnabled: any) => {
             handleCheckForScreenSharing.call(this, isEnabled);
 
             callback(isEnabled);
         });
     };
 
-    ScreenShareExtensionManager.prototype.isScreenSharingEnabled = function(callback) {
+    ScreenShareExtensionManager.prototype.isScreenSharingEnabled = function(callback: (arg0: any) => void) {
         var that = this;
 
         return waitForInitialized.call(this, function() {
@@ -61,7 +62,7 @@ define([
                 return callback(that._screenSharingAvailable);
             }
 
-            checkForScreenSharingCapability.call(that, function(isEnabled) {
+            checkForScreenSharingCapability.call(that, function(isEnabled: any) {
                 that._screenSharingAvailable = isEnabled;
 
                 callback(isEnabled);
@@ -69,7 +70,7 @@ define([
         });
     };
 
-    ScreenShareExtensionManager.prototype.getScreenSharingConstraints = function(options, callback) {
+    ScreenShareExtensionManager.prototype.getScreenSharingConstraints = function(options: any, callback: any) {
         return waitForInitialized.call(this, _.bind(getScreenSharingConstraints, this, options, callback));
     };
 
@@ -77,13 +78,13 @@ define([
         return 'ScreenShareExtensionManager[' + phenixRTC.browser + ']';
     };
 
-    function handleCheckForScreenSharing(isEnabled) {
+    function handleCheckForScreenSharing(this: any, isEnabled: any) {
         this._isInitializedObservable.setValue(true);
 
         this._screenSharingAvailable = isEnabled;
     }
 
-    function checkForScreenSharingCapability(callback) {
+    function checkForScreenSharingCapability(this: any, callback: (arg0: boolean) => void) {
         var that = this;
 
         if (phenixRTC.browser === 'Chrome' && that._screenSharingExtensionId) {
@@ -94,7 +95,7 @@ define([
             }
 
             try {
-                runtimeEnvironment.sendMessage(that._screenSharingExtensionId, {type: 'version'}, function(response) {
+                runtimeEnvironment.sendMessage(that._screenSharingExtensionId, {type: 'version'}, function(response: Iresponse) {
                     if (runtimeEnvironment.lastError || !response || response.status !== 'ok') {
                         that._logger.info('Screen sharing NOT available');
                         callback(false);
@@ -105,7 +106,7 @@ define([
                     that._logger.info('Screen sharing enabled using version [%s]', response.version);
                     callback(true);
                 });
-            } catch (e) {
+            } catch (e: any ) {
                 if (e.message) {
                     that._logger.warn(e.message, e);
                 }
@@ -121,7 +122,7 @@ define([
         }
     }
 
-    function waitForInitialized(callback) {
+    function waitForInitialized(this: any, callback: () => void) {
         if (this._isInitializedObservable.getValue()) {
             return callback();
         }
@@ -133,10 +134,10 @@ define([
         });
     }
 
-    function getScreenSharingConstraints(options, callback) {
+    function getScreenSharingConstraints(this: any, options: any, callback: (arg0: Error |string | null, arg1: { status: string; constraints?: any | { video: {}; }; }) => void) {
         switch (phenixRTC.browser) {
         case 'Chrome':
-            return requestMediaSourceIdWithRuntime.call(this, function(error, response) {
+            return requestMediaSourceIdWithRuntime.call(this, function(error : Error |string | null, response: any) {
                 if (error || (response && response.status !== 'ok')) {
                     return callback(error, response);
                 }
@@ -166,7 +167,7 @@ define([
         }
     }
 
-    function requestMediaSourceIdWithRuntime(callback) {
+    function requestMediaSourceIdWithRuntime(this: any, callback:  any) {
         var that = this;
         var runtimeEnvironment = getRuntime.call(this);
 
@@ -178,7 +179,7 @@ define([
             runtimeEnvironment.sendMessage(that._screenSharingExtensionId, {
                 type: 'get-desktop-media',
                 sources: ['screen', 'window', 'tab', 'audio']
-            }, function(response) {
+            }, function(response: { status: string; }) {
                 var shouldCheckIfScreenShareStillInstalled = runtimeEnvironment.lastError || !response;
 
                 if (shouldCheckIfScreenShareStillInstalled) {
@@ -197,7 +198,7 @@ define([
 
                 callback(null, response);
             });
-        } catch (e) {
+        } catch (e: any) {
             if (e.message) {
                 that._logger.warn(e.message);
             }
@@ -206,8 +207,8 @@ define([
         }
     }
 
-    function mapChromeConstraints(options, id, captureOptions) {
-        var constraints = {};
+    function mapChromeConstraints(options: { screen: boolean; screenAudio: boolean; }, id: string, captureOptions: { canRequestAudioTrack: any; }) {
+        var constraints :any = {};
 
         if (_.isObject(options) && _.isObject(options.screen)) {
             constraints.video = options.screen;
@@ -234,8 +235,8 @@ define([
         return constraints;
     }
 
-    function mapNewerConstraints(options, id) {
-        var constraints = {video: {}};
+    function mapNewerConstraints(options: { screen: boolean; }, id?: string) {
+        var constraints : any = {video: {}};
 
         if (_.isObject(options) && _.isObject(options.screen)) {
             constraints.video = options.screen;
@@ -250,7 +251,7 @@ define([
         return constraints;
     }
 
-    function getRuntime() {
+    function getRuntime(this: any, chrome?: any) {
         var that = this;
 
         switch (phenixRTC.browser) {
@@ -280,3 +281,4 @@ define([
 
     return ScreenShareExtensionManager;
 });
+

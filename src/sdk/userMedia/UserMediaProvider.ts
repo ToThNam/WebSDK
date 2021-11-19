@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-rtc'
@@ -23,7 +23,7 @@ define([
 
     var listenForMediaStreamTrackChangesTimeout = 2000;
 
-    function UserMediaProvider(logger, screenShareExtensionManager, onScreenShare) {
+    function UserMediaProvider(this: any, logger: any, screenShareExtensionManager: any, onScreenShare: any) {
         assert.isObject(logger, 'logger');
         assert.isObject(screenShareExtensionManager, 'screenShareExtensionManager');
 
@@ -36,17 +36,17 @@ define([
         this._onScreenShare = onScreenShare;
     }
 
-    UserMediaProvider.prototype.getUserMedia = function(options, callback) {
+    UserMediaProvider.prototype.getUserMedia = function(options: any, callback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 
         getUserMedia.call(this, options, callback);
     };
 
-    function getUserMedia(options, callback) {
+    function getUserMedia(this: any, options: { screenAudio: boolean; screen: boolean; video: boolean; audio: boolean; }, callback: any) {
         var that = this;
 
-        var onUserMediaSuccess = function onUserMediaSuccess(status, stream) {
+        var onUserMediaSuccess = function onUserMediaSuccess(status: string, stream: any) {
             if (that._gumStreams) {
                 that._gumStreams.push(stream);
             }
@@ -54,7 +54,7 @@ define([
             callback(that, status, stream);
         };
 
-        var onUserMediaFailure = function onUserMediaFailure(status, stream, error) {
+        var onUserMediaFailure = function onUserMediaFailure(status: string, stream: any, error: string) {
             if (options.screenAudio) {
                 that._logger.warn('Screen capture with audio is only supported on Windows or Chrome OS.');
             }
@@ -69,15 +69,15 @@ define([
             return getUserMediaStream.call(that, options, onUserMediaSuccess, onUserMediaFailure);
         }
 
-        return getUserMediaStream.call(that, {screen: options.screen}, function success(status, screenStream) {
+        return getUserMediaStream.call(that, {screen: options.screen}, function success(status: string, screenStream: { getTracks: () => void; }) {
             return getUserMediaStream.call(that, {
                 audio: options.audio,
                 video: options.video
-            }, function screenSuccess(status, stream) {
+            }, function screenSuccess(status: string, stream: any) {
                 addTracksToWebRTCStream(stream, screenStream.getTracks());
 
                 onUserMediaSuccess(status, stream);
-            }, function failure(status, stream, error) {
+            }, function failure(status: string, stream: any, error: string) {
                 stopWebRTCStream(screenStream);
 
                 onUserMediaFailure(status, stream, error);
@@ -85,24 +85,24 @@ define([
         }, onUserMediaFailure);
     }
 
-    function getUserMediaStream(options, successCallback, failureCallback) {
+    function getUserMediaStream(this: any, options:any, successCallback: (arg0: string, arg1: any) => void, failureCallback: any) {
         var that = this;
 
         var onUserMediaCancelled = function onUserMediaCancelled() {
             failureCallback('cancelled', null);
         };
 
-        var onUserMediaFailure = function onUserMediaFailure(e) {
+        var onUserMediaFailure = function onUserMediaFailure(e:any) {
             failureCallback(getUserMediaErrorStatus(e), undefined, e);
         };
 
-        var onUserMediaSuccess = function onUserMediaSuccess(stream) {
+        var onUserMediaSuccess = function onUserMediaSuccess(stream: { getTracks: any; id?: any; }) {
             wrapNativeMediaStream.call(that, stream);
 
             successCallback('ok', stream);
         };
 
-        return getUserMediaConstraints.call(this, options, function(error, response) {
+        return getUserMediaConstraints.call(this, options, function(error: any, response: { status: string; constraints: any; }) {
             if (_.get(response, ['status']) !== 'ok') {
                 return onUserMediaFailure(error);
             }
@@ -129,11 +129,11 @@ define([
         });
     }
 
-    function getUserMediaConstraints(options, callback) {
+    function getUserMediaConstraints(this: any, options: { screen: boolean; audio: boolean; video: boolean; }, callback: any) {
         var that = this;
 
         if (options.screen) {
-            return that._screenShareExtensionManager.isScreenSharingEnabled(function(isEnabled) {
+            return that._screenShareExtensionManager.isScreenSharingEnabled(function(isEnabled: any) {
                 if (isEnabled) {
                     return that._screenShareExtensionManager.getScreenSharingConstraints(options, callback);
                 }
@@ -153,7 +153,7 @@ define([
         });
     }
 
-    var getUserMediaErrorStatus = function getUserMediaErrorStatus(e) {
+    var getUserMediaErrorStatus = function getUserMediaErrorStatus(e: { code: string; message: string; name: string; }) {
         var status;
 
         if (e.code === 'unavailable') {
@@ -175,9 +175,9 @@ define([
         return status;
     };
 
-    function wrapNativeMediaStream(stream) {
-        var lastTrackEnabledStates = {};
-        var lastTrackReadyStates = {};
+    function wrapNativeMediaStream(this: any, stream: { getTracks: any; id?: string; }) {
+        var lastTrackEnabledStates: any = {};
+        var lastTrackReadyStates: any = {};
         var that = this;
 
         setTimeout(function listenForTrackChanges() {
@@ -185,7 +185,7 @@ define([
                 return;
             }
 
-            _.forEach(stream.getTracks(), function(track) {
+            _.forEach(stream.getTracks(), function(track: { id: string | number; enabled: any; dispatchEvent: (arg0: any) => void; readyState: any; }) {
                 if (rtc.global.Event && _.hasIndexOrKey(lastTrackEnabledStates, track.id) && lastTrackEnabledStates[track.id] !== track.enabled) {
                     var trackEnabledChangeEvent = new rtc.global.Event('trackenabledchange');
 
@@ -214,29 +214,29 @@ define([
         }, listenForMediaStreamTrackChangesTimeout);
     }
 
-    function addTracksToWebRTCStream(stream, tracks) {
+    function addTracksToWebRTCStream(stream: { addTrack: (arg0: any) => void; }, tracks: any) {
         if (!stream || !_.isFunction(stream.addTrack)) {
             return;
         }
 
-        _.forEach(tracks, function(track) {
+        _.forEach(tracks, function(track: any) {
             stream.addTrack(track);
         });
     }
 
-    function isStreamStopped(stream) {
-        return _.reduce(stream.getTracks(), function(isStopped, track) {
+    function isStreamStopped(stream: { getTracks: () => void; }) {
+        return _.reduce(stream.getTracks(), function(isStopped: any, track: { readyState: string; }) {
             return isStopped && isTrackStopped(track);
         }, true);
     }
 
-    function isTrackStopped(track) {
+    function isTrackStopped(track: { readyState: string; }) {
         assert.isNotUndefined(track, 'track');
 
         return track.readyState === 'ended';
     }
 
-    function stopWebRTCStream(stream) {
+    function stopWebRTCStream(stream: { getTracks: any; stop?: any; }) {
         if (stream && _.isFunction(stream.stop)) {
             stream.stop();
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-rtc',
@@ -411,12 +411,12 @@ define([
         return constraints;
     }
 
-    function getUserMediaWithOptions(deviceOptions, resolution, frameRate, resolutionProvider, callback) {
+    function getUserMediaWithOptions(this: any, deviceOptions: any, resolution: { height: number; aspectRatio: string;width: number }, frameRate: number | null, resolutionProvider: { canResolveNextResolution: () => any; getNextResolution: (arg0: number, arg1: string) => any; calculateLongerDimensionByAspectRatio: (arg0: any, arg1: any) => any; }, callback: (arg0: null | string, arg1: { userMedia: any; options: { frameRate: number | null; resolution: number; aspectRatio: string; }; } ) => any) {
         var constraints = this.getVendorSpecificConstraints(deviceOptions, resolution || {}, frameRate);
         var hasVideo = !!constraints.video;
         var that = this;
 
-        this._pcast.getUserMedia(constraints, function(pcast, status, userMedia, error) {
+        this._pcast.getUserMedia(constraints, function(pcast: any, status: string, userMedia: any, error: { name?: any; constructor?: any; code?: any; constraintName?: string; constraint?: any; } | null) {
             if (status === 'ok') {
                 that._logger.info('Acquired user media with constraints [%s]', constraints);
 
@@ -480,7 +480,7 @@ define([
             that._logger.error('Unable to get user media with status [%s]', status, error);
 
             return callback(error);
-        }, function(constraints) {
+        }, function(this : any, constraints: any) {
             var clientConstraints = constraints;
 
             if (that._onScreenShare && RTC.browser === 'Chrome') {
@@ -521,7 +521,7 @@ define([
         });
     }
 
-    function normalizeChromeScreenShareConstraints(constraints) {
+    function normalizeChromeScreenShareConstraints(constraints: any) {
         var chromeVideoSource = _.get(constraints, ['video', 'mandatory', 'chromeMediaSource']);
         var chromeAudioSource = _.get(constraints, ['audio', 'mandatory', 'chromeMediaSource']);
         var chromeVideoSourceId = _.get(constraints, ['video', 'mandatory', 'chromeMediaSourceId']);
@@ -541,7 +541,7 @@ define([
         return normalizedConstraints;
     }
 
-    function getChromeScreenShareConstraints(constraints, resolution, frameRate) {
+    function getChromeScreenShareConstraints(this: any, constraints: any, resolution: any, frameRate: any) {
         var screenShareConstraints = this.getVendorSpecificConstraints(constraints, resolution, frameRate);
 
         if (screenShareConstraints.screen) {
@@ -576,7 +576,7 @@ define([
         return screenShareConstraints;
     }
 
-    function getConstraintNameFromError(error) {
+    function getConstraintNameFromError(error: any | { constraintName: string; constraint: any; }) {
         if (error.constraintName) {
             return error.constraintName;
         }
