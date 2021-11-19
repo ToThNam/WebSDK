@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-logging',
@@ -27,7 +27,7 @@ define([
 
     }
 
-    PCastLoggerFactory.prototype.createPCastLogger = function createPCastLogger(baseUri, disableConsole, loggingLevel) {
+    PCastLoggerFactory.prototype.createPCastLogger = function createPCastLogger(baseUri: string, disableConsole: any, loggingLevel: any) {
         if (baseUri) {
             assert.isStringNotEmpty(baseUri, 'baseUri');
         }
@@ -55,5 +55,5 @@ define([
         return logger;
     };
 
-    return new PCastLoggerFactory();
+    return new (PCastLoggerFactory as any) ();
 });

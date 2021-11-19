@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     '../environment',
     './TelemetryAppender'
 ], function(_, assert, environment, TelemetryAppender) {
-    function TelemetryAppenderFactory() {
+    function TelemetryAppenderFactory(this: any) {
         this._telemetryAppenders = {};
     }
 
-    TelemetryAppenderFactory.prototype.getAppender = function getAppender(pcastBaseUri) {
+    TelemetryAppenderFactory.prototype.getAppender = function getAppender(pcastBaseUri: string) {
         var env = environment.getEnvironmentFromUrl(pcastBaseUri || '');
         var telemetryServerUrl = environment.getTelemetryServerUri(pcastBaseUri);
 
@@ -35,7 +35,7 @@ define([
         return this._telemetryAppenders[env];
     };
 
-    function createNewAppender(uri) {
+    function createNewAppender(uri: string) {
         var appender = new TelemetryAppender(uri);
 
         if (!uri) {
@@ -45,5 +45,5 @@ define([
         return appender;
     }
 
-    return new TelemetryAppenderFactory();
+    return new (TelemetryAppenderFactory as any)();
 });

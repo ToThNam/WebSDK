@@ -4,6 +4,9 @@ export interface Ioption {
   resolution: string; 
   frameRate: number; 
 };
+export interface ValueGetIndexInArray{
+  value: string | number | symbol
+}
 
 export declare const Icollection: {
   '9x16': ({ 3840: number; 1920?: number; 1366?: number; 1280?: number; 1024?: number; 854?: number; 640?: number; 320?: number; } | { 1920: number; 3840?: number; 1366?: number; 1280?: number; 1024?: number; 854?: number; 640?: number; 320?: number; } | { 1366: number; 3840?: number; 1920?: number; 1280?: number; 1024?: number; 854?: number; 640?: number; 320?: number; } | { 1280: number; 3840?: number; 1920?: number; 1366?: number; 1024?: number; 854?: number; 640?: number; 320?: number; } | { 1024: number; 3840?: number; 1920?: number; 1366?: number; 1280?: number; 854?: number; 640?: number; 320?: number; } | { 854: number; 3840?: number; 1920?: number; 1366?: number; 1280?: number; 1024?: number; 640?: number; 320?: number; } | { 640: number; 3840?: number; 1920?: number; 1366?: number; 1280?: number; 1024?: number; 854?: number; 320?: number; } | {

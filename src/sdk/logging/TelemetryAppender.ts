@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-rtc',
@@ -24,7 +24,7 @@ define([
 ], function(_, assert, rtc, logging, proto, telemetryProto) {
     var loggingUrl = '/logs';
 
-    function TelemetryAppender(uri) {
+    function TelemetryAppender(this: any, uri: string) {
         assert.isString(uri, 'uri');
 
         this._domain = typeof location === 'object' ? location.hostname : rtc.browser + '-' + rtc.browserVersion + '-unknown';
@@ -41,7 +41,7 @@ define([
         this._batchHttpProtocol.on('capacity', _.bind(onCapacity, this));
     }
 
-    TelemetryAppender.prototype.setThreshold = function setThreshold(level) {
+    TelemetryAppender.prototype.setThreshold = function setThreshold(level: any) {
         assert.isNumber(level, 'level');
 
         this._minLevel = level;
@@ -55,13 +55,13 @@ define([
         return this._isEnabled;
     };
 
-    TelemetryAppender.prototype.setEnabled = function setEnabled(enabled) {
+    TelemetryAppender.prototype.setEnabled = function setEnabled(enabled: any) {
         assert.isBoolean(enabled, 'enabled');
 
         this._isEnabled = enabled;
     };
 
-    TelemetryAppender.prototype.log = function log(since, level, category, messages, sessionId, userId, environment, version, context) {
+    TelemetryAppender.prototype.log = function log(since: any, level: any, category: any, messages: any, sessionId: any, userId: any, environment: any, version: any, context: { level: number; }) {
         if (context.level < this._minLevel || !this._isEnabled) {
             return;
         }
@@ -77,7 +77,7 @@ define([
         addMessagesToRecords.call(this, level, category, messages);
     };
 
-    function addMessagesToRecords(level, category, messages) {
+    function addMessagesToRecords(this: any, level: any, category: any, messages: any[]) {
         this._batchHttpProtocol.addRecord({
             level: level,
             timestamp: _.isoString(),
@@ -93,7 +93,7 @@ define([
         });
     }
 
-    function onCapacity(deleteRecords) {
+    function onCapacity(this: any, deleteRecords: string) {
         this._batchHttpProtocol.addRecordToBeginning({
             level: 'Warn',
             timestamp: _.isoString(),

@@ -22,7 +22,7 @@ define('',[
 ], function(_, assert, RTC, ResolutionProvider) {
     'use strict';
 
-    function UserMediaResolver(pcast, options) {
+    function UserMediaResolver(this: any, pcast: { getLogger: () => any; }, options: { screenShare?: any; }) {
         assert.isObject(pcast, 'pcast');
 
         if (options) {
@@ -39,7 +39,7 @@ define('',[
         this._onScreenShare = _.get(options, ['onScreenShare']);
     }
 
-    UserMediaResolver.prototype.getUserMedia = function getUserMedia(deviceOptions, callback) {
+    UserMediaResolver.prototype.getUserMedia = function getUserMedia(deviceOptions: any, callback: any) {
         assert.isObject(deviceOptions, 'deviceOptions');
 
         var resolutionProvider = new ResolutionProvider(this._options);
@@ -49,7 +49,7 @@ define('',[
         getUserMediaWithOptions.call(this, deviceOptions, resolution, frameRate, resolutionProvider, callback);
     };
 
-    UserMediaResolver.prototype.getVendorSpecificConstraints = function getVendorSpecificConstraints(deviceOptions, resolution, frameRate) {
+    UserMediaResolver.prototype.getVendorSpecificConstraints = function getVendorSpecificConstraints(deviceOptions: { audio: any; video: any; screen: any; screenAudio: any; }, resolution: any , frameRate: number) {
         resolution = resolution || {};
 
         if (!deviceOptions || (!deviceOptions.audio && !deviceOptions.video && !deviceOptions.screen && !deviceOptions.screenAudio)) {
@@ -70,14 +70,14 @@ define('',[
         return setUserMediaOptionsForOtherBrowsers(deviceOptions, resolution, frameRate);
     };
 
-    function setUserMediaOptionsForEdge(deviceOptions, resolution, frameRate) {
+    function setUserMediaOptionsForEdge(deviceOptions: { audio: any; video: any; screen: any; screenAudio?: boolean; }, resolution: { width?: number; height?: number; }, frameRate: number) {
         var video = deviceOptions.video;
         var audio = deviceOptions.audio;
         var screen = deviceOptions.screen;
         var width = resolution.width;
         var height = resolution.height;
-        var constraints = {};
-
+        // var constraints: {video?: boolean | { height?: { min?: number; max?: number; exact?: number}; width?:{min?:number; max?: number; exact?: number;  }; deviceId?: any; frameRate?: number }} = {};
+        var constraints: any={} 
         if (video) {
             constraints.video = {
                 height: {
@@ -133,14 +133,14 @@ define('',[
         return constraints;
     }
 
-    function setUserMediaOptionsForNewerBrowser(deviceOptions, resolution, frameRate) {
+    function setUserMediaOptionsForNewerBrowser(deviceOptions: { audio: any; video: any; screen: any; screenAudio: any; }, resolution: { width: number; height: number; }, frameRate: number) {
         var video = deviceOptions.video;
         var audio = deviceOptions.audio;
         var screen = deviceOptions.screen;
         var screenAudio = deviceOptions.screenAudio;
         var width = resolution.width;
         var height = resolution.height;
-        var constraints = {};
+        var constraints: any = {};
 
         if (video) {
             constraints.video = {
@@ -271,14 +271,14 @@ define('',[
         return constraints;
     }
 
-    function setUserMediaOptionsForOtherBrowsers(deviceOptions, resolution, frameRate) {
+    function setUserMediaOptionsForOtherBrowsers(deviceOptions: { video: any; audio: any; screen: any; screenAudio: any; }, resolution: { width?: number; height?: number; }, frameRate: number) {
         var video = deviceOptions.video;
         var audio = deviceOptions.audio;
         var screen = deviceOptions.screen;
         var screenAudio = deviceOptions.screenAudio;
         var width = resolution.width;
         var height = resolution.height;
-        var constraints = {};
+        var constraints : any = {};
 
         if (video) {
             constraints.video = {
@@ -411,12 +411,12 @@ define('',[
         return constraints;
     }
 
-    function getUserMediaWithOptions(this: any, deviceOptions: any, resolution: { height: number; aspectRatio: string;width: number }, frameRate: number | null, resolutionProvider: { canResolveNextResolution: () => any; getNextResolution: (arg0: number, arg1: string) => any; calculateLongerDimensionByAspectRatio: (arg0: any, arg1: any) => any; }, callback: (arg0: null | string, arg1: { userMedia: any; options: { frameRate: number | null; resolution: number; aspectRatio: string; }; } ) => any) {
+    function getUserMediaWithOptions(this: any, deviceOptions: any, resolution: { height: number; aspectRatio: string;width: number }, frameRate: number | null, resolutionProvider: { canResolveNextResolution: () => any; getNextResolution: (arg0: number, arg1: string) => any; calculateLongerDimensionByAspectRatio: (arg0: any, arg1: any) => any; }, callback: any) {
         var constraints = this.getVendorSpecificConstraints(deviceOptions, resolution || {}, frameRate);
         var hasVideo = !!constraints.video;
         var that = this;
 
-        this._pcast.getUserMedia(constraints, function(pcast: any, status: string, userMedia: any, error: { name?: any; constructor?: any; code?: any; constraintName?: string; constraint?: any; } | null) {
+        this._pcast.getUserMedia(constraints, function(pcast: any, status: string, userMedia: any, error: { name?: string; constructor?: any; code?: any; constraintName?: string; constraint?: any; } | null) {
             if (status === 'ok') {
                 that._logger.info('Acquired user media with constraints [%s]', constraints);
 
