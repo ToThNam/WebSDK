@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
+import { 
+    Constraints_SetUserMediaOptionsForEdge, 
+    Constraints_SetUserMediaOptionsForNewerBrowse, 
+    Constraints_SetUserMediaOptionsForOtherBrowsers, 
+    DeviceOptions_SetUserMediaOptionsForEdge, 
+    DeviceOptions_SetUserMediaOptionsForNewerBrowser, 
+    DeviceOptions_SetUserMediaOptionsForOtherBrowsers, 
+    Resolution_SetUserMediaOptionsForEdge, 
+    Resolution_SetUserMediaOptionsForNewerBrowse,
+    Resolution_SetUserMediaOptionsForOtherBrowsers
+} from "../../../typescript/src/userMedia/UserMediaResolver";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
@@ -70,14 +82,14 @@ define('',[
         return setUserMediaOptionsForOtherBrowsers(deviceOptions, resolution, frameRate);
     };
 
-    function setUserMediaOptionsForEdge(deviceOptions: { audio: any; video: any; screen: any; screenAudio?: boolean; }, resolution: { width?: number; height?: number; }, frameRate: number) {
+    function setUserMediaOptionsForEdge(deviceOptions: DeviceOptions_SetUserMediaOptionsForEdge, resolution: Resolution_SetUserMediaOptionsForEdge, frameRate: number) {
         var video = deviceOptions.video;
         var audio = deviceOptions.audio;
         var screen = deviceOptions.screen;
         var width = resolution.width;
         var height = resolution.height;
-        // var constraints: {video?: boolean | { height?: { min?: number; max?: number; exact?: number}; width?:{min?:number; max?: number; exact?: number;  }; deviceId?: any; frameRate?: number }} = {};
-        var constraints: any={} 
+        var constraints: Constraints_SetUserMediaOptionsForEdge = {};
+        // var constraints: any={} 
         if (video) {
             constraints.video = {
                 height: {
@@ -133,14 +145,16 @@ define('',[
         return constraints;
     }
 
-    function setUserMediaOptionsForNewerBrowser(deviceOptions: { audio: any; video: any; screen: any; screenAudio: any; }, resolution: { width: number; height: number; }, frameRate: number) {
+    function setUserMediaOptionsForNewerBrowser(deviceOptions: DeviceOptions_SetUserMediaOptionsForNewerBrowser, resolution: Resolution_SetUserMediaOptionsForNewerBrowse, frameRate: number) {
         var video = deviceOptions.video;
         var audio = deviceOptions.audio;
         var screen = deviceOptions.screen;
         var screenAudio = deviceOptions.screenAudio;
         var width = resolution.width;
         var height = resolution.height;
-        var constraints: any = {};
+        // var constraints: any = {};
+        var constraints: Constraints_SetUserMediaOptionsForNewerBrowse = {};
+
 
         if (video) {
             constraints.video = {
@@ -271,14 +285,14 @@ define('',[
         return constraints;
     }
 
-    function setUserMediaOptionsForOtherBrowsers(deviceOptions: { video: any; audio: any; screen: any; screenAudio: any; }, resolution: { width?: number; height?: number; }, frameRate: number) {
+    function setUserMediaOptionsForOtherBrowsers(deviceOptions: DeviceOptions_SetUserMediaOptionsForOtherBrowsers, resolution: Resolution_SetUserMediaOptionsForOtherBrowsers, frameRate: number) {
         var video = deviceOptions.video;
         var audio = deviceOptions.audio;
         var screen = deviceOptions.screen;
         var screenAudio = deviceOptions.screenAudio;
         var width = resolution.width;
         var height = resolution.height;
-        var constraints : any = {};
+        var constraints : Constraints_SetUserMediaOptionsForOtherBrowsers = {};
 
         if (video) {
             constraints.video = {
@@ -576,7 +590,7 @@ define('',[
         return screenShareConstraints;
     }
 
-    function getConstraintNameFromError(error: any | { constraintName: string; constraint: any; }) {
+    function getConstraintNameFromError(error: any) {
         if (error.constraintName) {
             return error.constraintName;
         }
