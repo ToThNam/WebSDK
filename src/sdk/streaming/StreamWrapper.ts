@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     './stream.json'
 ], function(_, assert, streamEnums) {
     'use strict';
 
-    function StreamWrapper(type, stream, logger) {
+    function StreamWrapper(this: any, type: string, stream: object, logger: object) {
         assert.isStringNotEmpty(type, 'type');
         assert.isObject(stream, 'stream');
         assert.isObject(logger, 'logger');
@@ -33,7 +33,7 @@ define([
 
         var that = this;
 
-        this._stream.on(streamEnums.streamEvents.playerEnded.name, function(reason) {
+        this._stream.on(streamEnums.streamEvents.playerEnded.name, function(reason: any) {
             that._logger.info('[%s] [%s] player ended.', that._stream.getStreamId(), that._type);
 
             that._playerEnded = true;
@@ -50,12 +50,12 @@ define([
         return 'Stream[' + (this._stream ? this._stream.getStreamId() : '') + ']';
     };
 
-    StreamWrapper.prototype.on = function(name, callback) {
+    StreamWrapper.prototype.on = function(name: any, callback: any) {
         return this._stream.on(name, callback);
     };
 
     // TODO(DY) Remove once 'on' is implemented on all Phenix Stream objects
-    StreamWrapper.prototype.streamErrorCallback = function(errorSource, error) {
+    StreamWrapper.prototype.streamErrorCallback = function(errorSource: any, error: any) {
         if (!_.isFunction(this._stream.streamErrorCallback)) {
             this._logger.error('[%s] [%s] stream error event [%s]', this._stream.getStreamId(), this._type, error);
         } else {
@@ -64,7 +64,7 @@ define([
         }
     };
 
-    StreamWrapper.prototype.streamEndedCallback = function(status, reason, waitForPlayerEnd) {
+    StreamWrapper.prototype.streamEndedCallback = function(status: string, reason: string, waitForPlayerEnd: any) {
         var renderer = this._stream.getRenderer();
 
         if (this._isStreamEnded) {
@@ -96,7 +96,7 @@ define([
         }
     };
 
-    StreamWrapper.prototype.dataQualityChangedCallback = function(status, reason) {
+    StreamWrapper.prototype.dataQualityChangedCallback = function(status: string, reason: string) {
         var renderer = this._stream.getRenderer();
 
         if (!renderer) {
@@ -112,7 +112,7 @@ define([
         return this._stream;
     };
 
-    StreamWrapper.getStreamEndedStatus = function getStreamEndedStatus(value) {
+    StreamWrapper.getStreamEndedStatus = function getStreamEndedStatus(value: any) {
         switch (value) {
         case '':
         case 'none':

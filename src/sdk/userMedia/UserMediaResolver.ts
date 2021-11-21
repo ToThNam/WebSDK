@@ -51,7 +51,7 @@ define('',[
         this._onScreenShare = _.get(options, ['onScreenShare']);
     }
 
-    UserMediaResolver.prototype.getUserMedia = function getUserMedia(deviceOptions: any, callback: any) {
+    UserMediaResolver.prototype.getUserMedia = function getUserMedia(deviceOptions: object, callback: any) {
         assert.isObject(deviceOptions, 'deviceOptions');
 
         var resolutionProvider = new ResolutionProvider(this._options);

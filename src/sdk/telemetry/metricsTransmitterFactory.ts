@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     '../environment',
     './MetricsTransmitter'
 ], function(_, assert, environment, MetricsTransmitter) {
-    function MetricsTransmitterFactory() {
+    function MetricsTransmitterFactory(this: any) {
         this._metricsTransmitters = {};
     }
 
-    MetricsTransmitterFactory.prototype.createMetricsTransmitter = function createMetricsTransmitter(pcastBaseUri) {
+    MetricsTransmitterFactory.prototype.createMetricsTransmitter = function createMetricsTransmitter(pcastBaseUri: string) {
         var env = environment.getEnvironmentFromUrl(pcastBaseUri || '');
 
         var telemetryServerUrl = environment.getTelemetryServerUri(pcastBaseUri);
@@ -36,7 +36,7 @@ define([
         return this._metricsTransmitters[env];
     };
 
-    function createNewTransmitter(uri, env) {
+    function createNewTransmitter(uri: string, env: any) {
         var transmitter = new MetricsTransmitter(uri, env);
 
         if (!uri) {
@@ -46,5 +46,5 @@ define([
         return transmitter;
     }
 
-    return new MetricsTransmitterFactory();
+    return new (MetricsTransmitterFactory as any) ();
 });

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { elementToAttachTo_ShakaRenderer, updatedPlayerConfig_ShakaRenderer } from "../../../typescript/src/streaming/ShakaRenderer";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -26,10 +28,10 @@ define([
 ], function(_, assert, event, http, disposable, rtc, DimensionsChangedMonitor, streamEnums) {
     'use strict';
 
-    var widevineServiceCertificate = null;
+    var widevineServiceCertificate: null = null;
     var defaultBandwidthEstimateForPlayback = 2000000; // 2Mbps will select 720p by default
 
-    function ShakaRenderer(streamId, uri, streamTelemetry, options, shaka, logger) {
+    function ShakaRenderer(this: any, streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._manifestUri = encodeURI(uri).replace(/[#]/g, '%23');
@@ -53,11 +55,11 @@ define([
         this._onEnded = _.bind(ended, this);
     }
 
-    ShakaRenderer.prototype.on = function(name, callback) {
+    ShakaRenderer.prototype.on = function(name: string, callback: any) {
         return this._namedEvents.listen(name, callback);
     };
 
-    ShakaRenderer.prototype.start = function(elementToAttachTo) {
+    ShakaRenderer.prototype.start = function(elementToAttachTo: elementToAttachTo_ShakaRenderer) {
         var that = this;
 
         that._player = new this._shaka.Player(elementToAttachTo);
@@ -84,7 +86,7 @@ define([
         if (this._options.isDrmProtectedContent) {
             checkBrowserSupportForWidevineDRM.call(that);
             unwrapLicenseResponse.call(that, that._player);
-            addDrmSpecificsToPlayerConfig.call(that, playerConfig, that._options, function(err, updatedPlayerConfig) {
+            addDrmSpecificsToPlayerConfig.call(that, playerConfig, that._options, function(err: any, updatedPlayerConfig: updatedPlayerConfig_ShakaRenderer) {
                 if (!err) {
                     loadPlayer(updatedPlayerConfig);
                 } else {
@@ -97,14 +99,14 @@ define([
             loadPlayer(playerConfig);
         }
 
-        function loadPlayer(config) {
+        function loadPlayer(this: any, config: { abr: { defaultBandwidthEstimate: number; }; manifest: { retryParameters: { timeout: number; }; }; streaming: { rebufferingGoal: number; bufferingGoal: number; bufferBehind: number; retryParameters: { timeout: number; maxAttempts: number; backoffFactor: number; }; }; }) {
             that._player.configure(config);
 
             if (that._options.receiveAudio === false) {
                 elementToAttachTo.muted = true;
             }
 
-            _.addEventListener(that._player, 'error', function(e) {
+            _.addEventListener(that._player, 'error', function(e: any) {
                 that._namedEvents.fire(streamEnums.rendererEvents.error.name, ['player', e]);
             });
 
@@ -120,7 +122,7 @@ define([
                 if (_.isFunction(elementToAttachTo.play)) {
                     elementToAttachTo.play();
                 }
-            }).catch(function(e) {
+            }).catch(function(e: any ) {
                 that._logger.error('[%s] Error while loading DASH live stream [%s]', that._streamId, e.code, e);
 
                 that._namedEvents.fire(streamEnums.rendererEvents.error.name, ['shaka', e]);
@@ -136,7 +138,7 @@ define([
         return elementToAttachTo;
     };
 
-    ShakaRenderer.prototype.stop = function(reason, waitForLastChunk) {
+    ShakaRenderer.prototype.stop = function(reason: string, waitForLastChunk: boolean) {
         var that = this;
 
         if (that._waitingForFinalization) {
@@ -178,7 +180,7 @@ define([
                     that._logger.info('[%s] Shaka live stream player has been destroyed', that._streamId);
                 }).then(function() {
                     finalizeStreamEnded();
-                }).catch(function(e) {
+                }).catch(function(e:  any) {
                     that._logger.error('[%s] Error while destroying shaka live stream player [%s]', that._streamId, e.code, e);
 
                     finalizeStreamEnded();
@@ -227,7 +229,7 @@ define([
         return stat;
     };
 
-    ShakaRenderer.prototype.setDataQualityChangedCallback = function(callback) {
+    ShakaRenderer.prototype.setDataQualityChangedCallback = function(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.dataQualityChangedCallback = callback;
@@ -237,11 +239,11 @@ define([
         return this._player;
     };
 
-    ShakaRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback, options) {
+    ShakaRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback: any, options: any) {
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function onProgress() {
+    function onProgress(this: any) {
         this._lastProgress.time = _.now();
 
         if (this._element.buffered.length === 0) {
@@ -266,7 +268,7 @@ define([
         this._lastProgress.buffered = bufferedEnd;
     }
 
-    function stalled() {
+    function stalled(this: any) {
         var that = this;
 
         that._logger.info('[%s] Loading Shaka live stream player stream stalled.', that._streamId);
@@ -282,15 +284,15 @@ define([
         }, getTimeoutOrMinimum.call(that));
     }
 
-    function getTimeoutOrMinimum() {
+    function getTimeoutOrMinimum(this: any) {
         return this._lastProgress.averageLength * 1.5 < 2000 ? 2000 : this._lastProgress.averageLength * 1.5;
     }
 
-    function ended() {
+    function ended(this: any) {
         this._logger.info('[%s] Shaka live stream player ended.', this._streamId);
     }
 
-    function checkBrowserSupportForWidevineDRM() {
+    function checkBrowserSupportForWidevineDRM(this: any) {
         var error;
 
         if (!_.isFunction(Uint8Array)) {
@@ -308,13 +310,13 @@ define([
         }
     }
 
-    function unwrapLicenseResponse(player) {
+    function unwrapLicenseResponse(this: any, player: any) {
         var that = this;
 
-        player.getNetworkingEngine().registerResponseFilter(function(type, response) {
+        player.getNetworkingEngine().registerResponseFilter(function(type: { toString: () => void; }, response: { data: any }) {
             // Only manipulate license responses:
             if (type.toString() === that._shaka.net.NetworkingEngine.RequestType.LICENSE.toString()) {
-                var binaryResponseAsTypedArray = new Uint8Array(response.data);
+                var binaryResponseAsTypedArray: any = new Uint8Array(response.data);
                 var responseAsString = String.fromCharCode.apply(null, binaryResponseAsTypedArray);
                 var parsedResponse = JSON.parse(responseAsString);
                 var base64License = parsedResponse.license;
@@ -333,7 +335,7 @@ define([
         });
     }
 
-    function addDrmSpecificsToPlayerConfig(playerConfig, options, callback) {
+    function addDrmSpecificsToPlayerConfig(this: any, playerConfig: any, options: any, callback: any) {
         if (!playerConfig.drm) {
             playerConfig.drm = {};
         }
@@ -356,8 +358,8 @@ define([
     }
 
     // ToDo pull into singleton so widevineServiceCertificate stays per browser session
-    function addWidevineConfigToPlayerConfig(playerConfig, options, callback) {
-        playerConfig['manifest']['dash']['customScheme'] = function(element) {
+    function addWidevineConfigToPlayerConfig(playerConfig: any , options: any, callback: (arg0: any, arg1?: undefined) => void) {
+        playerConfig['manifest']['dash']['customScheme'] = function(element: { getAttribute: (arg0: string) => string; }) {
             if (element.getAttribute('schemeIdUri') === 'com.phenixrts.widevine' || element.getAttribute('schemeIdUri') === 'com.phenixp2p.widevine') {
                 return [{
                     keySystem: 'com.widevine.alpha',
@@ -366,7 +368,7 @@ define([
             }
         };
 
-        function addToPlayerconfig(error, serverCertificateResponse) {
+        function addToPlayerconfig(error: any, serverCertificateResponse: any) {
             if (error) {
                 callback(error);
 
@@ -391,7 +393,7 @@ define([
         }
     }
 
-    function convertBinaryStringToUint8Array(bStr) {
+    function convertBinaryStringToUint8Array(bStr: string) {
         var len = bStr.length;
         var u8Array = new Uint8Array(len); // eslint-disable-line no-undef
 

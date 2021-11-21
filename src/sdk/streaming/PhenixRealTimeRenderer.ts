@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -34,7 +34,7 @@ define([
     // Restarts less than 100ms after foregrounding cause subsequent "pause" events on the video
     var restartRendererDelay = 200;
 
-    function PhenixRealTimeRenderer(streamId, streamSrc, streamTelemetry, options, logger) {
+    function PhenixRealTimeRenderer(this: any, streamId: string, streamSrc: any, streamTelemetry: any, options: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._streamSrc = streamSrc;
@@ -57,7 +57,7 @@ define([
         this._onEnded = _.bind(ended, this);
     }
 
-    PhenixRealTimeRenderer.prototype.on = function(name, callback) {
+    PhenixRealTimeRenderer.prototype.on = function(name: string, callback: any) {
         // TODO(sbi) Remove after users have upgraded to new API
         if (name === 'userActionRequired') {
             throw new Error('"userActionRequired is no longer supported. See https://phenixrts.com/docs/web/#view-a-channel and https://phenixrts.com/docs/web/#channel-viewer');
@@ -66,9 +66,9 @@ define([
         return this._namedEvents.listen(name, callback);
     };
 
-    PhenixRealTimeRenderer.prototype.start = function(elementToAttachTo) {
+    PhenixRealTimeRenderer.prototype.start = function(elementToAttachTo: { muted: boolean; }) {
         var that = this;
-        var hasAudioTrack = !!_.find(this._streamSrc.getTracks(), function(track) {
+        var hasAudioTrack = !!_.find(this._streamSrc.getTracks(), function(track: { kind: string; }) {
             return track.kind === 'audio';
         });
 
@@ -80,7 +80,7 @@ define([
             }
         }
 
-        this._element = rtc.attachMediaStream(elementToAttachTo, this._streamSrc, function(e) {
+        this._element = rtc.attachMediaStream(elementToAttachTo, this._streamSrc, function(e: any) {
             if (!e) {
                 that._logger.debug('[%s] Successfully started playing stream.', that._streamId);
 
@@ -102,7 +102,7 @@ define([
             that._logger.debug('[%s] Failed to start playing stream. Auto muting the playback and trying again.', that._streamId);
             elementToAttachTo.muted = true;
 
-            that._element = rtc.attachMediaStream(elementToAttachTo, that._streamSrc, function(e) {
+            that._element = rtc.attachMediaStream(elementToAttachTo, that._streamSrc, function(e: any) {
                 if (e) {
                     that._logger.warn('[%s] Failed to play even after auto muting.', that._streamId, e);
 
@@ -139,7 +139,7 @@ define([
         return elementToAttachTo;
     };
 
-    PhenixRealTimeRenderer.prototype.stop = function(reason) {
+    PhenixRealTimeRenderer.prototype.stop = function(reason: any) {
         this._dimensionsChangedMonitor.stop();
 
         this._disposables.dispose();
@@ -201,17 +201,17 @@ define([
         };
     };
 
-    PhenixRealTimeRenderer.prototype.setDataQualityChangedCallback = function(callback) {
+    PhenixRealTimeRenderer.prototype.setDataQualityChangedCallback = function(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.dataQualityChangedCallback = callback;
     };
 
-    PhenixRealTimeRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback, options) {
+    PhenixRealTimeRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback: any, options: any) {
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function stalling(event) {
+    function stalling(this: any, event: { type: string; }) {
         var isLastBackgroundingRecent = (_.now() - this._lastBackgroundingTimestamp) < listenForPauseChangeAfterForegroundInterval;
 
         if (event.type === 'pause' && isLastBackgroundingRecent) {
@@ -223,11 +223,11 @@ define([
         this._logger.info('[%s] Loading Phenix Real-Time stream player stalling caused by [%s] event.', this._streamId, event.type);
     }
 
-    function ended() {
+    function ended(this: any) {
         this._logger.info('[%s] Phenix Real-Time stream ended.', this._streamId);
     }
 
-    function checkIfWasPlayingWhenGoingToBackground() {
+    function checkIfWasPlayingWhenGoingToBackground(this: any) {
         if (!this._element) {
             return;
         }
@@ -249,7 +249,7 @@ define([
         this._lastBackgroundingTimestamp = _.now();
     }
 
-    function resumeWhenEnteringForgeround() {
+    function resumeWhenEnteringForgeround(this: any) {
         if (!this._element) {
             return;
         }
@@ -288,7 +288,7 @@ define([
             setTimeout(function() {
                 // The first video.play() typically fails with a context error.
                 // Try once so the start logic can properly handle auto muting.
-                that._element.play().catch(function(e) {
+                that._element.play().catch(function(e: any) {
                     that._logger.info('[%s] Unable to resume playback after entering foreground', that._streamId, e);
                     that._element.src = '';
 

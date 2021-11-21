@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { Record_recordMetricRecord, video,trackedVideo, Dimensions_addVideoDisplayDimensionsChangedCallback } from "../../../typescript/src/telemetry/StreamTelemetry";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-disposable',
@@ -25,7 +27,7 @@ define([
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
     var sdkVersion = '%SDKVERSION%' || '?';
 
-    function StreamTelemetry(sessionId, logger, metricsTransmitter) {
+    function StreamTelemetry(this: any, sessionId: string, logger: any, metricsTransmitter: any) {
         assert.isStringNotEmpty(sessionId, 'sessionId');
 
         this._version = sdkVersion;
@@ -43,14 +45,14 @@ define([
         logMetric.call(this, 'Stream initializing');
     }
 
-    StreamTelemetry.prototype.setProperty = function(name, value) {
+    StreamTelemetry.prototype.setProperty = function(name: string | number, value: string) {
         assert.isStringNotEmpty(name, 'name');
         assert.isStringNotEmpty(value, 'value');
 
         this._properties[name] = value;
     };
 
-    StreamTelemetry.prototype.recordMetric = function(metric, value, previousValue, additionalProperties) {
+    StreamTelemetry.prototype.recordMetric = function(metric: string, value: any, previousValue: any, additionalProperties: any) {
         assert.isStringNotEmpty(metric, 'metric');
 
         var record = _.assign({}, {
@@ -63,7 +65,7 @@ define([
         recordMetricRecord.call(this, record, since());
     };
 
-    StreamTelemetry.prototype.setStreamId = function(streamId) {
+    StreamTelemetry.prototype.setStreamId = function(streamId: string) {
         assert.isStringNotEmpty(streamId, 'streamId');
 
         if (this._streamId) {
@@ -80,7 +82,7 @@ define([
         }, since() - (now - this._start) / 1000); // Adjust for delay to get the stream ID);
     };
 
-    StreamTelemetry.prototype.setStartOffset = function(startOffset) {
+    StreamTelemetry.prototype.setStartOffset = function(startOffset: number) {
         assert.isNumber(startOffset, 'startOffset');
 
         if (this._startOffset) {
@@ -110,7 +112,7 @@ define([
         logMetric.call(this, 'Stream stopped');
     };
 
-    StreamTelemetry.prototype.recordTimeToFirstFrame = function(video) {
+    StreamTelemetry.prototype.recordTimeToFirstFrame = function(video: any) {
         var that = this;
         var startRecordingFirstFrame = _.now();
 
@@ -143,13 +145,13 @@ define([
     };
 
     // TODO(dy) Add logging for bit rate changes using PC.getStats
-    StreamTelemetry.prototype.recordVideoResolutionChanges = function(renderer, video) {
+    StreamTelemetry.prototype.recordVideoResolutionChanges = function(renderer: { addVideoDisplayDimensionsChangedCallback: (arg0: (renderer: any, dimensions: Dimensions_addVideoDisplayDimensionsChangedCallback) => void) => any; }, video: video) {
         var that = this;
         var lastResolution = {
             width: video.videoWidth,
             height: video.videoHeight
         };
-        var hasListenedToVideo = _.find(this._dimensionsTrackedVideos, function(trackedVideo) {
+        var hasListenedToVideo = _.find(this._dimensionsTrackedVideos, function(trackedVideo: trackedVideo) {
             return trackedVideo === video;
         });
 
@@ -159,7 +161,7 @@ define([
 
         this._dimensionsTrackedVideos.push(video);
 
-        var dimensionChangeDisposable = renderer.addVideoDisplayDimensionsChangedCallback(function(renderer, dimensions) {
+        var dimensionChangeDisposable = renderer.addVideoDisplayDimensionsChangedCallback(function(renderer: any, dimensions: Dimensions_addVideoDisplayDimensionsChangedCallback) {
             if (lastResolution.width === dimensions.width && lastResolution.height === dimensions.height) {
                 return;
             }
@@ -179,11 +181,11 @@ define([
         return dimensionChangeDisposable;
     };
 
-    StreamTelemetry.prototype.recordRebuffering = function(video) {
+    StreamTelemetry.prototype.recordRebuffering = function(video: { buffered: { length: number; end: (arg0: number) => boolean; }; }) {
         var that = this;
-        var videoStalled;
-        var lastProgress;
-        var hasListenedToVideo = _.find(this._rebufferingTrackedVideos, function(trackedVideo) {
+        var videoStalled: number | null;
+        var lastProgress: boolean;
+        var hasListenedToVideo = _.find(this._rebufferingTrackedVideos, function(trackedVideo: any) {
             return trackedVideo === video;
         });
 
@@ -205,7 +207,7 @@ define([
             logMetric.call(that, '[buffering] Stream has stalled');
         };
 
-        var listenForContinuation = function(event) {
+        var listenForContinuation = function(event: { type: string; }) {
             var bufferLength = video.buffered.length;
             var hasNotProgressedSinceLastProgressEvent = event.type === 'playing'
                                                         || bufferLength > 0 ? (event.type === 'progress'
@@ -252,9 +254,9 @@ define([
         return rebufferingDisposable;
     };
 
-    StreamTelemetry.prototype.recordVideoPlayingAndPausing = function(video) {
+    StreamTelemetry.prototype.recordVideoPlayingAndPausing = function(video: video) {
         var that = this;
-        var hasListenedToVideo = _.find(this._playTrackedVideos, function(trackedVideo) {
+        var hasListenedToVideo = _.find(this._playTrackedVideos, function(trackedVideo: trackedVideo) {
             return trackedVideo === video;
         });
 
@@ -285,7 +287,7 @@ define([
         return playingDisposable;
     };
 
-    function logMetric() {
+    function logMetric(this: any, arg1?: string, arg2?: any, arg3?:any) {
         var args = Array.prototype.slice.call(arguments);
 
         if (args.length === 0) {
@@ -306,7 +308,7 @@ define([
         return (now - start) / 1000;
     }
 
-    function recordMetricRecord(record, since) {
+    function recordMetricRecord(this: any, record: Record_recordMetricRecord, since: any) {
         assert.isStringNotEmpty(record.metric, 'record.metric');
 
         var annotatedRecord = _.assign({}, this._properties, record);

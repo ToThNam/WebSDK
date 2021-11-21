@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-rtc',
@@ -30,19 +30,19 @@ define([
         streamEnums.types.hls.name
     ];
 
-    function FeatureDetector(features) {
+    function FeatureDetector(this: any, features: any) {
         features = features || defaultFeatures;
 
         assert.isArray(features, 'features');
 
-        _.forEach(features, function(feature, index) {
+        _.forEach(features, function(feature: any, index: any) {
             assert.isValidType(feature, streamEnums.types, 'FeatureType[' + index + ']');
         });
 
         this._features = _.map(features, _.bind(_.getEnumName, _, streamEnums.types));
     }
 
-    FeatureDetector.isFeatureSupported = function(feature) {
+    FeatureDetector.isFeatureSupported = function(feature: string) {
         if (feature) {
             assert.isStringNotEmpty(feature, 'feature');
         }
@@ -61,7 +61,7 @@ define([
         }
     };
 
-    FeatureDetector.mapFeatureToPCastCapability = function(feature) {
+    FeatureDetector.mapFeatureToPCastCapability = function(feature: string) {
         if (feature) {
             assert.isStringNotEmpty(feature, 'feature');
         }
@@ -81,15 +81,15 @@ define([
         }
     };
 
-    FeatureDetector.mapPCastCapabilitiesToFeatures = function(capabilities) {
+    FeatureDetector.mapPCastCapabilitiesToFeatures = function(capabilities: any) {
         assert.isArray(capabilities, 'capabilities');
 
-        return _.reduce(capabilities, function(features, capability) {
+        return _.reduce(capabilities, function(features: any, capability: any) {
             return features.concat(FeatureDetector.mapPCastCapabilityToFeatures(capability));
         }, []);
     };
 
-    FeatureDetector.mapPCastCapabilityToFeatures = function(capability) {
+    FeatureDetector.mapPCastCapabilityToFeatures = function(capability: string) {
         if (capability) {
             assert.isStringNotEmpty(capability, 'capability');
         }
@@ -119,10 +119,10 @@ define([
         return _.reduce(capabilities, removeDuplicates, []);
     };
 
-    FeatureDetector.prototype.getPreferredFeatureFromPublisherCapabilities = function(capabilities, excludeRealTime) {
+    FeatureDetector.prototype.getPreferredFeatureFromPublisherCapabilities = function(capabilities: any, excludeRealTime: any) {
         assert.isArray(capabilities, 'capabilities');
 
-        var preferredFeature = _.reduce(this._features, function(candidateFeature, feature) {
+        var preferredFeature = _.reduce(this._features, function(candidateFeature: any, feature: string) {
             var featureCapability = FeatureDetector.mapFeatureToPCastCapability(feature);
             var isFeatureAvailableAndCanPlayBack = FeatureDetector.isFeatureSupported(feature) && (_.includes(capabilities, featureCapability) || (feature === 'real-time' && !excludeRealTime));
             var nextFeature = isFeatureAvailableAndCanPlayBack ? feature : null;
@@ -184,7 +184,7 @@ define([
         }
     }
 
-    function removeDuplicates(list, item) {
+    function removeDuplicates(list: any, item: any) {
         if (!_.includes(list, item)) {
             list.push(item);
         }

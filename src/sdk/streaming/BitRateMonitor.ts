@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { Arg0_Callback, Metrics } from "../../../typescript/src/streaming/BiRateMonitor";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert'
 ], function(_, assert) {
@@ -22,7 +24,7 @@ define([
 
     var maximumBitRateDefault = 3; // 3 x target bitrate
 
-    function BitRateMonitor(name, monitor, getLimit) {
+    function BitRateMonitor(this: any, name: string, monitor: object, getLimit: any ) {
         assert.isStringNotEmpty(name, 'name');
         assert.isObject(monitor, 'monitor');
         assert.isFunction(getLimit, 'getLimit');
@@ -32,12 +34,12 @@ define([
         this._getLimit = getLimit || _.noop;
     }
 
-    BitRateMonitor.prototype.addThreshold = function(threshold, callback) {
+    BitRateMonitor.prototype.addThreshold = function(threshold: any, callback: (arg0: Arg0_Callback ) => void) {
         var thresholds = getThresholdList(threshold);
-        var lastThresholdIndex = null;
+        var lastThresholdIndex: number | null = null;
         var that = this;
 
-        return that._monitor.on('calculatedmetrics', function(metrics) {
+        return that._monitor.on('calculatedmetrics', function(metrics: Metrics) {
             var limit = that._getLimit();
             var totalBitRate = metrics.videoBitRate + metrics.audioBitRate;
             var currentClosestThresholdIndex = getClosestThresholdIndexToButNotBelow(thresholds, totalBitRate / limit);
@@ -84,8 +86,8 @@ define([
         });
     };
 
-    function getClosestThresholdIndexToButNotBelow(thresholds, ratio) {
-        return _.reduce(thresholds, function(closestIndex, threshold, index) {
+    function getClosestThresholdIndexToButNotBelow(thresholds: any, ratio: number) {
+        return _.reduce(thresholds, function(closestIndex: string | number , threshold: number, index: any) {
             if (closestIndex === null && threshold >= ratio) {
                 return index;
             }
@@ -98,11 +100,11 @@ define([
         }, null);
     }
 
-    function getThresholdList(threshold) {
+    function getThresholdList(threshold: { sort: () => any[]; levels: number; }) {
         var thresholds = [];
 
         if (_.isArray(threshold)) {
-            _.forEach(threshold, function(value) {
+            _.forEach(threshold, function(value: number) {
                 assert.isNumber(value, 'threshold');
             });
 

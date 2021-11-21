@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { Options_FlashRenderer,stat } from "../../../typescript/src/streaming/FlashRenderer";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-logging',
@@ -30,13 +32,13 @@ define([
     var timeoutForStallWithoutProgressToRestart = 6000;
     var minTimeBeforeNextReload = 15000;
     var mostRecentSwfFile = 'rtmp-flash-renderer-2019.2.18.swf';
-    var defaultSwfFileSrcs = {
+    var defaultSwfFileSrcs: any = {
         local: 'https://local.phenixrts.com/public/rtmp/' + mostRecentSwfFile,
         staging: 'https://stg.phenixrts.com/public/rtmp/' + mostRecentSwfFile,
         production: 'https://phenixrts.com/public/rtmp/' + mostRecentSwfFile
     };
 
-    function FlashRenderer(streamId, streamsInfo, streamTelemetry, options, logger) {
+    function FlashRenderer(this: any, streamId: string, streamsInfo: any, streamTelemetry: any, options: Options_FlashRenderer, logger: any) {
         assert.isObject(options, 'options');
 
         if (options.env) {
@@ -47,7 +49,7 @@ define([
 
         this._logger = logger;
         this._streamId = streamId;
-        this._streamsInfo = _.map(streamsInfo, function(info) {
+        this._streamsInfo = _.map(streamsInfo, function(info: { uri: string; }) {
             info.uri = encodeURI(info.uri).replace(/[#]/g, '%23');
 
             return info;
@@ -71,11 +73,11 @@ define([
         return detectFlashPlugin();
     };
 
-    FlashRenderer.prototype.on = function(name, callback) {
+    FlashRenderer.prototype.on = function(name: any, callback: any) {
         return this._namedEvents.listen(name, callback);
     };
 
-    FlashRenderer.prototype.start = function(elementToAttachTo) {
+    FlashRenderer.prototype.start = function(elementToAttachTo: any) {
         var that = this;
         var options = {
             streamId: this._streamId,
@@ -107,7 +109,7 @@ define([
         return elementToAttachTo;
     };
 
-    FlashRenderer.prototype.stop = function(reason) {
+    FlashRenderer.prototype.stop = function(reason: any) {
         var that = this;
 
         this._disposables.dispose();
@@ -135,7 +137,7 @@ define([
                 finalizeStreamEnded();
 
                 this._logger.info('[%s] Flash player has been destroyed', this._streamId);
-            } catch (e) {
+            } catch (e: any) {
                 that._logger.error('[%s] Error while destroying Flash player [%s]', that._streamId, e.code, e);
 
                 finalizeStreamEnded();
@@ -156,7 +158,7 @@ define([
             };
         }
 
-        var stat = {};
+        var stat: any  = {};
         var currentTime = this._playerElement.currentTime;
         var trueCurrentTime = (_.now() - this._options.originStartTime) / 1000;
 
@@ -175,7 +177,7 @@ define([
         return stat;
     };
 
-    FlashRenderer.prototype.setDataQualityChangedCallback = function(callback) {
+    FlashRenderer.prototype.setDataQualityChangedCallback = function(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.dataQualityChangedCallback = callback;
@@ -185,21 +187,21 @@ define([
         return this._player;
     };
 
-    FlashRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback, options) {
+    FlashRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback: any, options: any) {
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function handleError(e) {
+    function handleError(this: any, e: any) {
         this._namedEvents.fire(streamEnums.rendererEvents.error.name, ['flash-player', e]);
     }
 
-    function reload() {
+    function reload(this: any) {
         this._phenixVideo.destroy();
 
         this.start(this._originElement);
     }
 
-    function reloadIfAble() {
+    function reloadIfAble(this: any) {
         if (!canReload.call(this)) {
             return;
         }
@@ -211,13 +213,13 @@ define([
         reload.call(this);
     }
 
-    function canReload() {
+    function canReload(this: any) {
         var hasElapsedMinTimeSinceLastReload = !this._lastReloadTime || _.now() - this._lastReloadTime > minTimeBeforeNextReload;
 
         return this._playerElement && !this._waitForLastChunk && this._player && this._playerElement.buffered.length !== 0 && hasElapsedMinTimeSinceLastReload;
     }
 
-    function stalled(event) {
+    function stalled(this: any, event: { type: any; }) {
         var that = this;
 
         that._logger.info('[%s] Loading flash player stalled caused by [%s] event.', that._streamId, event.type);
@@ -233,18 +235,18 @@ define([
         }, timeoutForStallWithoutProgressToRestart);
     }
 
-    function ended() {
+    function ended(this: any) {
         this._logger.info('[%s] Flash player ended.', this._streamId);
     }
 
-    var hasFlashPlugin = null;
+    var hasFlashPlugin: boolean | null = null;
 
     function detectFlashPlugin() {
         var defaultVersion = [10, 0, 0];
         var pluginName = 'Shockwave Flash';
         var mimeType = 'application/x-shockwave-flash';
         var activeX = 'ShockwaveFlash.ShockwaveFlash';
-        var version = [0, 0, 0];
+        var version: any = [0, 0, 0];
 
         if (_.isBoolean(hasFlashPlugin)) {
             return hasFlashPlugin;

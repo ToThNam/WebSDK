@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-define([
+import { 
+    reportToUpdate_forOwn_Edge, 
+    reportToUpdate_forOwn_Safari, 
+    report_Firefox, 
+    report_forEach_Edge, 
+    report_forEach_ReactNative, 
+    report_forEach_Safari, 
+    report_forOwn_Edge, 
+    report_ReportToUpdate, 
+    StatsReport_ConvertStats 
+} from "../../../typescript/src/streaming/PeerConnection";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-rtc'
 ], function(_, rtc) {
@@ -25,21 +37,21 @@ define([
 
     }
 
-    PeerConnection.convertPeerConnectionStats = function(stats, lastStats) {
+    PeerConnection.convertPeerConnectionStats = function(stats: any, lastStats: any) {
         return convertPeerConnectionStats(stats, lastStats);
     };
 
-    function convertPeerConnectionStats(stats, lastStats) {
+    function convertPeerConnectionStats(stats: any, lastStats: { [x: string]: any; }) {
         if (!stats) {
             return null;
         }
 
-        var newStats = [];
+        var newStats: any  = [];
         var normalizedStats = normalizeStatsReport(stats);
 
         var iteratorDidRun = false;
 
-        function convertStats(statsReport) {
+        function convertStats(statsReport: StatsReport_ConvertStats ) {
             if (!iteratorDidRun) {
                 iteratorDidRun = true;
             }
@@ -76,7 +88,7 @@ define([
                 direction: direction,
                 nativeReport: statsReport,
                 rtt: useFirstNumberValue(parseIntOrUndefined(statsReport.rtt), parseIntOrUndefined(statsReport.googRtt), parseIntOrUndefined(statsReport.roundTripTime), parseIntOrUndefined(statsReport.currentRoundTripTime)),
-                bitrateMean: parseIntOrUndefined(statsReport.bitrateMean, 10) || (isOutbound(statsReport) ? up : down) * 1000,
+                bitrateMean: parseIntOrUndefined(statsReport.bitrateMean, 10) || (isOutbound(statsReport) ? up : down)! * 1000,
                 targetDelay: parseIntOrUndefined(useFirstStringValue(statsReport.targetDelay, statsReport.googTargetDelayMs), 10),
                 currentDelay: parseIntOrUndefined(useFirstStringValue(statsReport.currentDelay, statsReport.currentDelayMs, statsReport.googCurrentDelayMs), 10)
             };
@@ -115,7 +127,7 @@ define([
         return newStats;
     }
 
-    function useFirstNumberValue(value1, value2, value3, value4, value5) {
+    function useFirstNumberValue(value1?: any , value2?: any , value3?: any , value4?: any , value5?: any) {
         if (_.isNumber(value1)) {
             return value1;
         }
@@ -135,7 +147,7 @@ define([
         return value5;
     }
 
-    function useFirstStringValue(value1, value2, value3, value4, value5) {
+    function useFirstStringValue(value1?: any, value2?: any, value3?: any, value4?: any, value5?: any) {
         if (_.isString(value1)) {
             return value1;
         }
@@ -155,7 +167,7 @@ define([
         return value5;
     }
 
-    function parseIntOrUndefined(value, radix) {
+    function parseIntOrUndefined(value?: any , radix?: any ) {
         var parsed = parseInt(value, radix);
 
         if (isNaN(parsed)) {
@@ -165,7 +177,7 @@ define([
         return parsed;
     }
 
-    function parseFloatOrUndefined(value) {
+    function parseFloatOrUndefined(value: string) {
         var parsed = parseFloat(value);
 
         if (isNaN(parsed)) {
@@ -175,7 +187,7 @@ define([
         return parsed;
     }
 
-    function calculateUploadRate(bytesSent, prevBytesSent, timeDelta) {
+    function calculateUploadRate(bytesSent: number, prevBytesSent: number, timeDelta: number) {
         if (_.isUndefined(prevBytesSent)) {
             return;
         }
@@ -189,7 +201,7 @@ define([
         return 0;
     }
 
-    function calculateDownloadRate(bytesReceived, prevBytesReceived, timeDelta) {
+    function calculateDownloadRate(bytesReceived: number, prevBytesReceived: number, timeDelta: number) {
         if (_.isUndefined(prevBytesReceived)) {
             return;
         }
@@ -203,7 +215,7 @@ define([
         return 0;
     }
 
-    function calculateFrameRate(currentFramesEncoded, lastFramesEncoded, timeDelta) {
+    function calculateFrameRate(currentFramesEncoded: number, lastFramesEncoded: number, timeDelta: number) {
         if (_.isUndefined(lastFramesEncoded)) {
             return;
         }
@@ -212,14 +224,14 @@ define([
             / (timeDelta / 1000.0);
     }
 
-    function normalizeStatsReport(stats) {
-        var normalizedReport = {};
+    function normalizeStatsReport(stats: any) {
+        var normalizedReport: any = {};
 
         switch (rtc.browser) {
         case 'Firefox':
-            _.forOwn(stats, function(report, key) {
+            _.forOwn(stats, function(report: report_Firefox , key: any) {
                 if (_.includes(key, 'rtcp')) {
-                    _.forOwn(stats, function(reportToUpdate, key) {
+                    _.forOwn(stats, function(reportToUpdate: report_ReportToUpdate, key: any) {
                         if (_.includes(key, 'rtp') && report.mediaType === reportToUpdate.mediaType) {
                             reportToUpdate.jitter = (report.jitter || reportToUpdate.jitter) * 1000;
                             reportToUpdate.roundTripTime = report.roundTripTime;
@@ -230,7 +242,7 @@ define([
 
             return stats;
         case 'IE':
-            _.forOwn(stats, function(value, key) {
+            _.forOwn(stats, function(value: { id: string ; }, key: any) {
                 if (!_.startsWith(key, 'ssrc')) {
                     return;
                 }
@@ -240,7 +252,7 @@ define([
 
             return normalizedReport;
         case 'Edge':
-            stats.forEach(function(report) {
+            stats.forEach(function(report: report_forEach_Edge) {
                 normalizedReport[report.id] = report;
 
                 if (_.hasIndexOrKey(report, 'jitter')) {
@@ -248,9 +260,9 @@ define([
                 }
             });
 
-            _.forOwn(normalizedReport, function(report) {
+            _.forOwn(normalizedReport, function(report:report_forOwn_Edge) {
                 if (report.type === 'track' && _.hasIndexOrKey(report, 'framesPerSecond')) {
-                    _.forOwn(normalizedReport, function(reportToUpdate) {
+                    _.forOwn(normalizedReport, function(reportToUpdate: reportToUpdate_forOwn_Edge) {
                         if (reportToUpdate.mediaType === 'video') {
                             reportToUpdate.framesPerSecond = parseInt(report.framesPerSecond, 10);
                         }
@@ -260,11 +272,11 @@ define([
 
             return normalizedReport;
         case 'Safari':
-            stats.forEach(function(report) {
+            stats.forEach(function(report: report_forEach_Safari) {
                 normalizedReport[report.id] = report;
             });
 
-            _.forOwn(normalizedReport, function(report) {
+            _.forOwn(normalizedReport, function(report: any) {
                 if (_.hasIndexOrKey(report, 'id') && isInbound(report)) {
                     var candidateSsrc = parseInt(_.get(report.id.split('_'), [1]), 10);
 
@@ -276,7 +288,7 @@ define([
                 }
 
                 if (report.type === 'candidate-pair') {
-                    _.forOwn(normalizedReport, function(reportToUpdate) {
+                    _.forOwn(normalizedReport, function(reportToUpdate: reportToUpdate_forOwn_Safari) {
                         if (reportToUpdate.mediaType === 'audio' || reportToUpdate.mediaType === 'video') {
                             reportToUpdate.currentRoundTripTime = report.currentRoundTripTime * 1000;
                         }
@@ -284,7 +296,7 @@ define([
                 }
 
                 if (report.type === 'track') {
-                    _.forOwn(normalizedReport, function(reportToUpdate) {
+                    _.forOwn(normalizedReport, function(reportToUpdate: any) {
                         if (reportToUpdate.mediaType === 'audio' && isInbound(reportToUpdate)) {
                             reportToUpdate.audioOutputLevel = report.audioLevel * 100000;
                         } else if (reportToUpdate.mediaType === 'audio' && isOutbound(reportToUpdate)) {
@@ -298,14 +310,14 @@ define([
         case 'ReactNative':
             var parsedStats = _.isString(stats) ? JSON.parse(stats) : stats;
 
-            parsedStats.forEach(function(report) {
-                var normalizedStatistics = {
+            parsedStats.forEach(function(report: report_forEach_ReactNative) {
+                var normalizedStatistics : any = {
                     id: report.id,
                     type: report.type
                 };
 
                 report.values.forEach(function(value) {
-                    _.keys(value).forEach(function(key) {
+                    _.keys(value).forEach(function(key: string | number) {
                         normalizedStatistics[key] = value[key];
                     });
                 });
@@ -318,13 +330,13 @@ define([
             return normalizedReport;
         case 'Chrome':
         default:
-            stats.result().forEach(function(report) {
-                var normalizedStatistics = {
+            stats.result().forEach(function(report : any) {
+                var normalizedStatistics :any = {
                     id: report.id,
                     type: report.type
                 };
 
-                report.names().forEach(function(name) {
+                report.names().forEach(function(name: string | number) {
                     normalizedStatistics[name] = report.stat(name);
                 });
 
@@ -337,11 +349,11 @@ define([
         }
     }
 
-    function isOutbound(statsReport) {
+    function isOutbound(statsReport: StatsReport_ConvertStats) {
         return _.includes(statsReport.id, 'send') || _.includes(statsReport.id, 'outbound') || statsReport.type === 'outboundrtp' || statsReport.type === 'outbound-rtp' || statsReport.type === 'kOutboundRtp';
     }
 
-    function isInbound(statsReport) {
+    function isInbound(statsReport: StatsReport_ConvertStats) {
         return _.includes(statsReport.id, 'recv') || statsReport.type === 'inboundrtp' || statsReport.type === 'inbound-rtp' || statsReport.type === 'kInboundRtp';
     }
 

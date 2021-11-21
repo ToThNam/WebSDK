@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -26,7 +26,7 @@ define([
 ], function(_, assert, event, rtc, ShakaRenderer, PhenixPlayerRenderer, FlashRenderer, streamEnums) {
     'use strict';
 
-    function PhenixLiveStream(type, streamId, uri, streamTelemetry, options, shaka, webPlayer, logger) {
+    function PhenixLiveStream(this: any, type: any, streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, webPlayer: any, logger: any) {
         this._type = type;
         this._streamId = streamId;
         this._uri = uri;
@@ -40,12 +40,12 @@ define([
         this._namedEvents = new event.NamedEvents();
     }
 
-    PhenixLiveStream.prototype.on = function(name, callback) {
+    PhenixLiveStream.prototype.on = function(name: string, callback: any) {
         this._namedEvents.listen(name, callback);
     };
 
     PhenixLiveStream.prototype.createRenderer = function() {
-        var renderer = null;
+        var renderer: any = null;
 
         switch (this._type) {
         case streamEnums.types.dash.name:
@@ -76,11 +76,11 @@ define([
 
         var that = this;
 
-        renderer.on(streamEnums.rendererEvents.error.name, function(type, error) {
+        renderer.on(streamEnums.rendererEvents.error.name, function(type: any, error: any) {
             that._namedEvents.fire(streamEnums.streamEvents.playerError.name, [type, error]);
         });
-        renderer.on(streamEnums.rendererEvents.ended.name, function(reason) {
-            that._renderers = _.filter(that._renderers, function(storedRenderer) {
+        renderer.on(streamEnums.rendererEvents.ended.name, function(reason: any) {
+            that._renderers = _.filter(that._renderers, function(storedRenderer: any) {
                 return storedRenderer !== renderer;
             });
 
@@ -95,25 +95,25 @@ define([
         return renderer;
     };
 
-    PhenixLiveStream.prototype.select = function select(trackSelectCallback) { // eslint-disable-line no-unused-vars
+    PhenixLiveStream.prototype.select = function select(trackSelectCallback: any) { // eslint-disable-line no-unused-vars
         this._logger.warn('[%s] selection of tracks not supported for [%s] live streams', this._streamId, this._type);
 
         return this;
     };
 
-    PhenixLiveStream.prototype.setStreamEndedCallback = function setStreamEndedCallback(callback) {
+    PhenixLiveStream.prototype.setStreamEndedCallback = function setStreamEndedCallback(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.streamEndedCallback = callback;
     };
 
-    PhenixLiveStream.prototype.setStreamErrorCallback = function setStreamErrorCallback(callback) {
+    PhenixLiveStream.prototype.setStreamErrorCallback = function setStreamErrorCallback(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.streamErrorCallback = callback;
     };
 
-    PhenixLiveStream.prototype.stop = function stop(reason) {
+    PhenixLiveStream.prototype.stop = function stop(reason: any) {
         if (!this.isActive()) {
             return;
         }
@@ -125,7 +125,7 @@ define([
         this._isStopped = true;
     };
 
-    PhenixLiveStream.prototype.monitor = function monitor(options, callback) {
+    PhenixLiveStream.prototype.monitor = function monitor(options: object, callback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
     };
@@ -134,7 +134,7 @@ define([
         return null;
     };
 
-    PhenixLiveStream.prototype.addBitRateThreshold = function addBitRateThreshold(threshold, callback) {
+    PhenixLiveStream.prototype.addBitRateThreshold = function addBitRateThreshold(threshold: any, callback: any) {
         assert.isFunction(callback, 'callback');
 
         return;
@@ -164,7 +164,7 @@ define([
         return _.get(this._renderers, [0], null);
     };
 
-    PhenixLiveStream.canPlaybackType = function canPlaybackType(type) {
+    PhenixLiveStream.canPlaybackType = function canPlaybackType(type: any) {
         var deviceSupportsDashPlayback = !!rtc.global.MediaSource;
         var deviceSupportsHlsPlayback = deviceSupportsDashPlayback || (typeof document === 'object' && document.createElement('video').canPlayType('application/vnd.apple.mpegURL') === 'maybe');
 

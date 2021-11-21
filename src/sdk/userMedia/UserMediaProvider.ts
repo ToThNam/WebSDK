@@ -23,7 +23,7 @@ define('',[
 
     var listenForMediaStreamTrackChangesTimeout = 2000;
 
-    function UserMediaProvider(this: any, logger: any, screenShareExtensionManager: any, onScreenShare: any) {
+    function UserMediaProvider(this: any, logger: object, screenShareExtensionManager: object, onScreenShare: any) {
         assert.isObject(logger, 'logger');
         assert.isObject(screenShareExtensionManager, 'screenShareExtensionManager');
 
@@ -36,7 +36,7 @@ define('',[
         this._onScreenShare = onScreenShare;
     }
 
-    UserMediaProvider.prototype.getUserMedia = function(options: any, callback: any) {
+    UserMediaProvider.prototype.getUserMedia = function(options: { screenAudio: boolean; screen: boolean; video: boolean; audio: boolean; }, callback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 

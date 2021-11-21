@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-logging',
@@ -32,7 +32,7 @@ define([
     var minTimeBeforeNextReload = 15000;
     var originStreamReadyDuration = 6000;
 
-    function PhenixPlayerRenderer(streamId, uri, streamTelemetry, options, webPlayer, logger) {
+    function PhenixPlayerRenderer(this: any, streamId: string, uri: string, streamTelemetry: any, options: any, webPlayer: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._manifestUri = encodeURI(uri).replace(/[#]/g, '%23');
@@ -62,11 +62,11 @@ define([
         return this._webPlayer && this._webPlayer.isSupported;
     };
 
-    PhenixPlayerRenderer.prototype.on = function(name, callback) {
+    PhenixPlayerRenderer.prototype.on = function(name: string, callback: any) {
         return this._namedEvents.listen(name, callback);
     };
 
-    PhenixPlayerRenderer.prototype.start = function(elementToAttachTo) {
+    PhenixPlayerRenderer.prototype.start = function(elementToAttachTo: { muted: boolean; }) {
         var that = this;
         var loggerAtInfoThreshold = createInfoThresholdLogger(this._logger);
 
@@ -97,7 +97,7 @@ define([
         return elementToAttachTo;
     };
 
-    PhenixPlayerRenderer.prototype.stop = function(reason, waitForLastChunk) {
+    PhenixPlayerRenderer.prototype.stop = function(reason: string, waitForLastChunk: boolean) {
         var that = this;
 
         if (that._waitingForFinalization) {
@@ -142,7 +142,7 @@ define([
                 that._logger.info('[%s] Phenix stream has been destroyed', that._streamId);
 
                 finalizeStreamEnded();
-            } catch (e) {
+            } catch (e: any) {
                 that._logger.error('[%s] Error while destroying Phenix stream player [%s]', that._streamId, e.code, e);
 
                 finalizeStreamEnded();
@@ -188,7 +188,7 @@ define([
         return stat;
     };
 
-    PhenixPlayerRenderer.prototype.setDataQualityChangedCallback = function(callback) {
+    PhenixPlayerRenderer.prototype.setDataQualityChangedCallback = function(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.dataQualityChangedCallback = callback;
@@ -198,11 +198,11 @@ define([
         return this._player;
     };
 
-    PhenixPlayerRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback, options) {
+    PhenixPlayerRenderer.prototype.addVideoDisplayDimensionsChangedCallback = function(callback: any, options: any) {
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function setupPlayer() {
+    function setupPlayer(this: any) {
         var that = this;
         var playerOptions = _.assign({bandwidthToStartAt: bandwidthAt720}, that._options);
 
@@ -232,7 +232,7 @@ define([
         _.addEventListener(that._player, 'error', _.bind(handleError, that));
     }
 
-    function handleError(e) {
+    function handleError(this: any, e: any) {
         if (canReload.call(this) && e && (e.code === 3 || e.severity === this._webPlayer.errors.severity.RECOVERABLE)) {
             this._logger.warn('Reloading unhealthy stream after error event [%s]', e);
 
@@ -242,7 +242,7 @@ define([
         this._namedEvents.fire(streamEnums.rendererEvents.error.name, ['phenix-player', e]);
     }
 
-    function reload() {
+    function reload(this: any) {
         this._player.dispose();
 
         this._player = null;
@@ -250,7 +250,7 @@ define([
         this.start(this._element);
     }
 
-    function reloadIfAble() {
+    function reloadIfAble(this: any) {
         if (!canReload.call(this)) {
             return;
         }
@@ -262,13 +262,13 @@ define([
         reload.call(this);
     }
 
-    function canReload() {
+    function canReload(this: any) {
         var hasElapsedMinTimeSinceLastReload = !this._lastReloadTime || _.now() - this._lastReloadTime > minTimeBeforeNextReload;
 
         return this._element && !this._waitForLastChunk && this._player && this._element.buffered.length !== 0 && hasElapsedMinTimeSinceLastReload;
     }
 
-    function onProgress() {
+    function onProgress(this: any) {
         this._lastProgress.time = _.now();
 
         if (this._element.buffered.length === 0) {
@@ -307,7 +307,7 @@ define([
         this._lastProgress.lastCurrentTime = this._element.currentTime;
     }
 
-    function stalled(event) {
+    function stalled(this: any, event: { type: any; }) {
         var that = this;
 
         that._logger.info('[%s] Loading Phenix Live stream player stalled caused by [%s] event.', that._streamId, event.type);
@@ -333,19 +333,19 @@ define([
         }, timeoutForStallWithoutProgressToRestart);
     }
 
-    function getTimeoutOrMinimum() {
+    function getTimeoutOrMinimum(this: any) {
         return this._lastProgress.averageLength * 1.5 < 2000 ? 2000 : this._lastProgress.averageLength * 1.5;
     }
 
-    function ended() {
+    function ended(this: any) {
         this._logger.info('[%s] Phenix stream player ended.', this._streamId);
     }
 
-    function createInfoThresholdLogger(logger) {
+    function createInfoThresholdLogger(logger: { getAppenders: () => void; getUserId: () => void; getEnvironment: () => void; getApplicationVersion: () => void; getObservableSessionId: () => void; }) {
         var appenders = logger.getAppenders();
         var throttledLogger = new logging.Logger();
 
-        _.forEach(appenders, function(appender) {
+        _.forEach(appenders, function(appender: { setThreshold: (arg0: any) => void; }) {
             if (appender instanceof logging.ConsoleAppender) {
                 appender = new logging.ConsoleAppender();
 

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { monitorCallback_MonitorPeerConnection, options_PeerConnectionMonitor, peerConnection_MonitorPeerConnection, stats_eachStats, track_PeerConnectionMonitor } from "../../../typescript/src/streaming/PeerConnectionMonitor";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -34,7 +36,7 @@ define([
     var minEdgeMonitoringInterval = 6000;
     var minEdgeConditionCountForNotification = 2;
 
-    function PeerConnectionMonitor(name, peerConnection, logger) {
+    function PeerConnectionMonitor(this: any, name: string, peerConnection: object, logger: object) {
         assert.isString(name, 'name');
         assert.isObject(peerConnection, 'peerConnection');
         assert.isObject(logger, 'logger');
@@ -45,7 +47,7 @@ define([
         this._lastStats = {};
     }
 
-    PeerConnectionMonitor.prototype.start = function(options, activeCallback, monitorCallback) {
+    PeerConnectionMonitor.prototype.start = function(options: options_PeerConnectionMonitor, activeCallback: any, monitorCallback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(activeCallback, 'activeCallback');
         assert.isFunction(monitorCallback, 'monitorCallback');
@@ -88,20 +90,20 @@ define([
         return monitorPeerConnection.call(this, this._name, this._peerConnection, options, activeCallback, monitorCallback);
     };
 
-    PeerConnectionMonitor.prototype.setMonitorTrackState = function(track, state) {
+    PeerConnectionMonitor.prototype.setMonitorTrackState = function(track: track_PeerConnectionMonitor , state: boolean) {
         assert.isObject(track, 'track');
         assert.isBoolean(state, 'state');
 
         try {
             var peerConnectionTracks = getAllTracks.call(this, this._peerConnection);
-            var foundTrack = !!_.find(peerConnectionTracks, function(pcTrack) {
+            var foundTrack = !!_.find(peerConnectionTracks, function(pcTrack: { id: string; }) {
                 return pcTrack.id === track.id;
             });
 
             if (!foundTrack) {
                 return this._logger.warn('[%s] Unable to find track [%s] [%s] in peer connection', this._name, track.kind, track.id);
             }
-        } catch (e) {
+        } catch (e: any) {
             if (phenixRTC.browser === 'Firefox' && e.message === 'InvalidStateError: Peer connection is closed') {
                 this._logger.debug('Failed to verify monitor track due to closed peer connection');
             } else {
@@ -117,7 +119,7 @@ define([
 
         var pausedTrackLength = this._pausedTracks.length;
 
-        this._pausedTracks = _.filter(this._pausedTracks, function(pausedTrack) {
+        this._pausedTracks = _.filter(this._pausedTracks, function(pausedTrack: { id: string; }) {
             return pausedTrack.id !== track.id;
         });
 
@@ -126,7 +128,7 @@ define([
         }
     };
 
-    PeerConnectionMonitor.prototype.on = function(eventName, listener) {
+    PeerConnectionMonitor.prototype.on = function(eventName: string, listener: any) {
         assert.isStringNotEmpty(eventName, 'eventName');
         assert.isFunction(listener, 'listener');
 
@@ -142,17 +144,19 @@ define([
         return 'PeerConnectionMonitor[' + this._name + ']';
     };
 
-    function monitorPeerConnection(name, peerConnection, options, activeCallback, monitorCallback) {
+    function monitorPeerConnection(this: any, name: string, peerConnection: peerConnection_MonitorPeerConnection, 
+        options: options_PeerConnectionMonitor, activeCallback: () => any, 
+        monitorCallback: (arg0: null, arg1: monitorCallback_MonitorPeerConnection) => any ) {
         var that = this;
         var conditionCount = 0;
-        var frameRate = undefined;
-        var videoBitRate = undefined;
-        var audioBitRate = undefined;
+        var frameRate: any = undefined;
+        var videoBitRate: any = undefined;
+        var audioBitRate: any = undefined;
 
         function nextCheck() {
             var selector = null;
 
-            getStats.call(that, peerConnection, options, selector, activeCallback, function successCallback(report) {
+            getStats.call(that, peerConnection, options, selector, activeCallback, function successCallback(this: any, report: any) {
                 var hasFrameRate = false;
                 var hasVideoBitRate = false;
                 var hasAudioBitRate = false;
@@ -161,7 +165,7 @@ define([
                     return that._logger.info('[%s] Finished monitoring of peer connection', name);
                 }
 
-                function eachStats(stats) {
+                function eachStats(stats: stats_eachStats) {
                     if (options.direction === 'outbound' && stats.direction === 'upload') {
                         switch (stats.mediaType) {
                         case 'video':
@@ -345,7 +349,7 @@ define([
                 } else {
                     setTimeout(nextCheck, conditionCount > 0 ? that._conditionMonitoringInterval : that._monitoringInterval);
                 }
-            }, function errorCallback(error) {
+            }, function errorCallback(error: null) {
                 monitorCallback(error, {
                     type: 'error',
                     message: 'Unable to get Connection statistics. Connection may have failed.'
@@ -356,38 +360,38 @@ define([
         setTimeout(nextCheck, that._monitoringInterval);
     }
 
-    function getStats(peerConnection, options, selector, activeCallback, successCallback, errorCallback) {
+    function getStats(this: any, peerConnection: any, options: { direction: string; }, selector: any, activeCallback: () => any, successCallback: (arg0: any) => void, errorCallback: (arg0: any) => void) {
         if (!activeCallback()) {
             return this._logger.info('[%s] Finished monitoring of peer connection', this._name);
         }
 
         var that = this;
 
-        phenixRTC.getStats(peerConnection, null, function(response) {
+        phenixRTC.getStats(peerConnection, null, function(response: any) {
             var report = PeerConnection.convertPeerConnectionStats(response, that._lastStats);
 
-            report = _.filter(report, function(stats) {
+            report = _.filter(report, function(stats: { direction: string; }) {
                 return options.direction === 'inbound' && stats.direction === 'download' || options.direction === 'outbound' && stats.direction === 'upload';
             });
 
             successCallback(report);
-        }, function(error) {
+        }, function(error: any) {
             errorCallback(error);
         });
     }
 
-    function getAllTracks(peerConnection) {
+    function getAllTracks(peerConnection: any) {
         var localTracks = getLocalTracks(peerConnection);
         var remoteTracks = getRemoteTracks(peerConnection);
 
         if (localTracks.length !== 0 && remoteTracks.length !== 0) {
-            var result = [];
+            var result: any = [];
 
-            _.forEach(localTracks, function(track) {
+            _.forEach(localTracks, function(track: any) {
                 result.push(track);
             });
 
-            _.forEach(remoteTracks, function(track) {
+            _.forEach(remoteTracks, function(track: any) {
                 result.push(track);
             });
 
@@ -401,19 +405,19 @@ define([
         return [];
     }
 
-    function getLocalTracks(peerConnection) {
-        var tracks = peerConnection.getSenders ? _.map(peerConnection.getSenders(), function(receiver) {
+    function getLocalTracks(peerConnection: any) {
+        var tracks = peerConnection.getSenders ? _.map(peerConnection.getSenders(), function(receiver: { track: any; }) {
             return receiver.track;
         }) : [];
 
-        tracks = _.filter(tracks, function(track) {
+        tracks = _.filter(tracks, function(track: any) {
             return !_.isNullOrUndefined(track);
         });
 
         if (tracks.length === 0) {
             var streams = peerConnection.getLocalStreams ? peerConnection.getLocalStreams() : [];
 
-            return _.reduce(streams, function(tracks, stream) {
+            return _.reduce(streams, function(tracks:  any, stream: { getTracks: () => any; }) {
                 return tracks.concat(stream.getTracks());
             }, []);
         }
@@ -421,19 +425,19 @@ define([
         return tracks;
     }
 
-    function getRemoteTracks(peerConnection) {
-        var tracks = peerConnection.getReceivers ? _.map(peerConnection.getReceivers(), function(sender) {
+    function getRemoteTracks(peerConnection: any) {
+        var tracks = peerConnection.getReceivers ? _.map(peerConnection.getReceivers(), function(sender: { track: any; }) {
             return sender.track;
         }) : [];
 
-        tracks = _.filter(tracks, function(track) {
+        tracks = _.filter(tracks, function(track: any) {
             return !_.isNullOrUndefined(track);
         });
 
         if (tracks.length === 0) {
             var streams = peerConnection.getRemoteStreams ? peerConnection.getRemoteStreams() : [];
 
-            return _.reduce(streams, function(tracks, stream) {
+            return _.reduce(streams, function(tracks: any, stream: { getTracks: () => any; }) {
                 return tracks.concat(stream.getTracks());
             }, []);
         }
@@ -441,20 +445,20 @@ define([
         return tracks;
     }
 
-    function areAllTracksOfTypePaused(kind, peerConnectionTracks) {
-        var pcTracksOfType = _.filter(peerConnectionTracks, function(track) {
+    function areAllTracksOfTypePaused(this: any, kind: string, peerConnectionTracks: any) {
+        var pcTracksOfType = _.filter(peerConnectionTracks, function(track: { kind: string; }) {
             return track.kind === kind;
         });
-        var pausedTracksOfType = _.filter(this._pausedTracks, function(track) {
+        var pausedTracksOfType = _.filter(this._pausedTracks, function(track: { kind: string; }) {
             return track.kind === kind;
         });
 
-        return _.reduce(pcTracksOfType, function(areAllPaused, track) {
+        return _.reduce(pcTracksOfType, function(areAllPaused: boolean, track: { id: string; enabled: any; }) {
             if (!areAllPaused) {
                 return areAllPaused;
             }
 
-            var isTrackPaused = !!_.find(pausedTracksOfType, function(pcTrack) {
+            var isTrackPaused = !!_.find(pausedTracksOfType, function(pcTrack: { id: string; }) {
                 return pcTrack.id === track.id;
             });
 

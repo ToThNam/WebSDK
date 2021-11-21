@@ -27,7 +27,7 @@ define('',[
     var defaultChromePCastScreenSharingExtensionId = 'icngjadgidcmifnehjcielbmiapkhjpn';
     var minimumSupportFirefoxVersionForUnWhiteListedScreenShare = 52;
 
-    function ScreenShareExtensionManager(this: any, options: Ioption, logger: any) {
+    function ScreenShareExtensionManager(this: any, options: Ioption, logger: object) {
         options = options || {};
 
         assert.isObject(options, 'options');
