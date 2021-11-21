@@ -24,6 +24,27 @@ function define(
       DimensionsChangedMonitor:any, 
       streamEnums:any, 
       FeatureDetector:any,
+      pcastLoggerFactory:any, 
+      environment:any, 
+      AudioContext:any, 
+      PCastProtocol:any, 
+      PCastEndPoint:any, 
+      ScreenShareExtensionManager:any, 
+      UserMediaProvider:any, 
+      PeerConnectionMonitor:any, 
+      DimensionsChangedMonitor:any, 
+      metricsTransmitterFactory:any, 
+      StreamTelemetry:any, 
+      SessionTelemetry:any, 
+      PeerConnection:any, 
+      StreamWrapper:any, 
+      PhenixLiveStream:any, 
+      PhenixRealTimeStream:any, 
+      FeatureDetector:any, 
+      streamEnums:any, 
+      BitRateMonitor:any, 
+      phenixRTC:any, 
+      sdpUtil:any
       ) => {  }) {
   throw new Error("Function not implemented.");
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Ioption } from "../../../typescript/src/userMedia/resolutionProvider";
+import { Ioption } from "../../../typescript/src/sdk/userMedia/resolutionProvider";
 
 define('',[
     'phenix-web-lodash-light',

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Options_FlashRenderer,stat } from "../../../typescript/src/streaming/FlashRenderer";
+import { Options_FlashRenderer,stat } from "../../../typescript/src/sdk/streaming/FlashRenderer";
 
 define('',[
     'phenix-web-lodash-light',

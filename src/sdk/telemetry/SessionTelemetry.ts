@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { NewStats_LogNetworkStatsChange, OldStats_LogNetworkStatsChange, Record_RecordMetricRecord } from "../../../typescript/src/telemetry/SessionTelemetry";
+import { NewStats_LogNetworkStatsChange, 
+    OldStats_LogNetworkStatsChange,
+     Record_RecordMetricRecord 
+    } from "../../../typescript/src/sdk/telemetry/SessionTelemetry";
 
 define('',[
     'phenix-web-lodash-light',

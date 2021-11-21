@@ -15,7 +15,7 @@
  */
 
 /* global chrome */
-import { Ioption, Iresponse } from "../../../typescript/src/userMedia/ScreenShareExtensionManager";
+import { Ioption, Iresponse } from "../../../typescript/src/sdk/userMedia/ScreenShareExtensionManager";
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',

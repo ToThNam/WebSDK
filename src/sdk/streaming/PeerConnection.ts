@@ -24,7 +24,7 @@ import {
     report_forOwn_Edge, 
     report_ReportToUpdate, 
     StatsReport_ConvertStats 
-} from "../../../typescript/src/streaming/PeerConnection";
+} from "../../../typescript/src/sdk/streaming/PeerConnection";
 
 define('',[
     'phenix-web-lodash-light',

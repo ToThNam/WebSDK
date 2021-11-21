@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { monitorCallback_MonitorPeerConnection, options_PeerConnectionMonitor, peerConnection_MonitorPeerConnection, stats_eachStats, track_PeerConnectionMonitor } from "../../../typescript/src/streaming/PeerConnectionMonitor";
+import { monitorCallback_MonitorPeerConnection, 
+    options_PeerConnectionMonitor, 
+    peerConnection_MonitorPeerConnection, 
+    stats_eachStats, 
+    track_PeerConnectionMonitor 
+} from "../../../typescript/src/sdk/streaming/PeerConnectionMonitor";
 
 define('',[
     'phenix-web-lodash-light',

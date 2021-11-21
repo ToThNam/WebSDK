@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert'
 ], function(_, assert) {
@@ -30,7 +30,7 @@ define([
 
     }
 
-    sdpUtil.prototype.getH264ProfileIds = function getH264ProfileIds(offerSdp) {
+    sdpUtil.prototype.getH264ProfileIds = function getH264ProfileIds(offerSdp: string) {
         assert.isStringNotEmpty(offerSdp, 'offerSdp');
 
         var h264ProfileIds = [];
@@ -49,7 +49,7 @@ define([
         return h264ProfileIds;
     };
 
-    sdpUtil.prototype.replaceH264ProfileId = function replaceH264ProfileId(offerSdp, profileIdToReplace, newProfileId) {
+    sdpUtil.prototype.replaceH264ProfileId = function replaceH264ProfileId(offerSdp: string, profileIdToReplace: string, newProfileId: string) {
         assert.isStringNotEmpty(offerSdp, 'offerSdp');
         assert.isStringNotEmpty(newProfileId, 'newProfileId');
 
@@ -62,12 +62,12 @@ define([
         return offerSdp.replace('profile-level-id=' + profileIdToReplace, 'profile-level-id=' + newProfileId);
     };
 
-    sdpUtil.prototype.getH264ProfileIdWithSameProfileAndEqualToOrHigherLevel = function(profileIds, replaceProfileId) {
+    sdpUtil.prototype.getH264ProfileIdWithSameProfileAndEqualToOrHigherLevel = function(profileIds: any, replaceProfileId: any) {
         if (_.includes(profileIds, replaceProfileId)) {
             return replaceProfileId;
         }
 
-        var nextProfileId = _.reduce(profileIds, function(selectedProfileId, profileId) {
+        var nextProfileId = _.reduce(profileIds, function(selectedProfileId: string, profileId: string) {
             var selectedProfile = parseInt(selectedProfileId.substring(0, 2), 16);
             var selectedLevel = parseInt(selectedProfileId.substring(4, 6), 16);
             var profile = parseInt(profileId.substring(0, 2), 16);
@@ -84,14 +84,14 @@ define([
         return nextProfileId === replaceProfileId ? null : nextProfileId;
     };
 
-    sdpUtil.prototype.getH264ProfileIdWithSameOrHigherProfileAndEqualToOrHigherLevel = function(profileIds, replaceProfileId) {
+    sdpUtil.prototype.getH264ProfileIdWithSameOrHigherProfileAndEqualToOrHigherLevel = function(profileIds: any, replaceProfileId: any) {
         var matchingProfile = this.getH264ProfileIdWithSameProfileAndEqualToOrHigherLevel(profileIds, replaceProfileId);
 
         if (matchingProfile) {
             return matchingProfile;
         }
 
-        var nextProfileId = _.reduce(profileIds, function(selectedProfileId, profileId) {
+        var nextProfileId = _.reduce(profileIds, function(selectedProfileId: string, profileId: string) {
             var selectedProfile = parseInt(selectedProfileId.substring(0, 2), 16);
             var selectedLevel = parseInt(selectedProfileId.substring(4, 6), 16);
             var profile = parseInt(profileId.substring(0, 2), 16);
@@ -110,7 +110,7 @@ define([
         return nextProfileId === replaceProfileId ? null : nextProfileId;
     };
 
-    sdpUtil.prototype.getSupportedCodecs = function getSupportedCodecs(offerSdp) {
+    sdpUtil.prototype.getSupportedCodecs = function getSupportedCodecs(offerSdp: string) {
         assert.isStringNotEmpty(offerSdp, 'offerSdp');
 
         var codecs = [];
@@ -134,16 +134,16 @@ define([
         return codecs;
     };
 
-    sdpUtil.prototype.hasMediaSectionsInLocalSdp = function hasMediaSectionsInLocalSdp(peerConnection) {
-        var indexOfSection = this.findInSdpSections(peerConnection, function(section) {
+    sdpUtil.prototype.hasMediaSectionsInLocalSdp = function hasMediaSectionsInLocalSdp(peerConnection: any) {
+        var indexOfSection = this.findInSdpSections(peerConnection, function(section: any) {
             return _.startsWith(section, 'video') || _.startsWith(section, 'audio');
         });
 
         return indexOfSection < 0;
     };
 
-    sdpUtil.prototype.hasActiveAudio = function hasActiveAudio(peerConnection) {
-        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section, index, remoteSections) {
+    sdpUtil.prototype.hasActiveAudio = function hasActiveAudio(peerConnection: any) {
+        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section: any, index: string | number, remoteSections: any) {
             if (_.startsWith(section, 'audio')) {
                 return !_.includes(section, 'a=inactive') && !_.includes(remoteSections[index], 'a=inactive');
             }
@@ -154,8 +154,8 @@ define([
         return indexOfActiveVideo < 0;
     };
 
-    sdpUtil.prototype.hasActiveVideo = function hasActiveVideo(peerConnection) {
-        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section, index, remoteSections) {
+    sdpUtil.prototype.hasActiveVideo = function hasActiveVideo(peerConnection: any) {
+        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section: any, index: string | number, remoteSections: { [x: string]: any; }) {
             if (_.startsWith(section, 'video')) {
                 return !_.includes(section, 'a=inactive') && !_.includes(remoteSections[index], 'a=inactive');
             }
@@ -166,7 +166,7 @@ define([
         return indexOfActiveVideo < 0;
     };
 
-    sdpUtil.prototype.findInSdpSections = function findInSdpSections(peerConnection, callback) {
+    sdpUtil.prototype.findInSdpSections = function findInSdpSections(peerConnection: any, callback:  any) {
         var localSections = this.getLocalSdp(peerConnection).split('m=');
         var remoteSections = this.getRemoteSdp(peerConnection).split('m=');
 
@@ -174,34 +174,34 @@ define([
             return false;
         }
 
-        return _.findIndex(localSections, function(section, index) {
+        return _.findIndex(localSections, function(section: any, index: any) {
             return callback(section, index, remoteSections);
         });
     };
 
-    sdpUtil.prototype.getNumberOfActiveSections = function getNumberOfActiveSections(peerConnection) {
+    sdpUtil.prototype.getNumberOfActiveSections = function getNumberOfActiveSections(peerConnection: any) {
         var sdp = this.getLocalSdp(peerConnection) || this.getRemoteSdp(peerConnection);
         var sections = sdp.split('m=');
 
-        return _.filter(sections, function(section) {
+        return _.filter(sections, function(section: any) {
             return !_.includes(section, 'a=inactive') && (_.startsWith(section, 'audio') || _.startsWith(section, 'video'));
         }).length;
     };
 
-    sdpUtil.prototype.getLocalSdp = function getLocalSdp(peerConnection) {
+    sdpUtil.prototype.getLocalSdp = function getLocalSdp(peerConnection: any) {
         return _.get(peerConnection, ['localDescription', 'sdp'], '');
     };
 
-    sdpUtil.prototype.getRemoteSdp = function getLocalSdp(peerConnection) {
+    sdpUtil.prototype.getRemoteSdp = function getLocalSdp(peerConnection: any) {
         return _.get(peerConnection, ['remoteDescription', 'sdp'], '');
     };
 
-    sdpUtil.prototype.setGroupLineOrderToMatchMediaSectionOrder = function setGroupLineOrderToMatchMediaSectionOrder(sdp) {
+    sdpUtil.prototype.setGroupLineOrderToMatchMediaSectionOrder = function setGroupLineOrderToMatchMediaSectionOrder(sdp: string) {
         var groupLineSegment = sdp.match(/(?=a=group:BUNDLE).*/);
         var mediaSegmentNamesString = _.get(_.get(groupLineSegment, [0], '').split('a=group:BUNDLE '), [1], '');
         var mediaSegmentNames = mediaSegmentNamesString.split(' ');
 
-        var sortedMediaSegmentNames = mediaSegmentNames.sort(function(nameA, nameB) {
+        var sortedMediaSegmentNames = mediaSegmentNames.sort(function(nameA: string, nameB: string) {
             return sdp.indexOf('m=' + nameA) - sdp.indexOf('m=' + nameB);
         });
 
@@ -212,5 +212,5 @@ define([
         return sdp;
     };
 
-    return new sdpUtil();
+    return new (sdpUtil as any) ();
 });

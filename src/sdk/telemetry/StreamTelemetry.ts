@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { Record_recordMetricRecord, video,trackedVideo, Dimensions_addVideoDisplayDimensionsChangedCallback } from "../../../typescript/src/telemetry/StreamTelemetry";
+import { Record_recordMetricRecord, 
+    video,trackedVideo,
+    Dimensions_addVideoDisplayDimensionsChangedCallback
+} from "../../../typescript/src/sdk/telemetry/StreamTelemetry";
 
 define('',[
     'phenix-web-lodash-light',

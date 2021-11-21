@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { elementToAttachTo_ShakaRenderer, updatedPlayerConfig_ShakaRenderer } from "../../../typescript/src/streaming/ShakaRenderer";
+import { elementToAttachTo_ShakaRenderer, updatedPlayerConfig_ShakaRenderer } from "../../../typescript/src/sdk/streaming/ShakaRenderer";
 
 define('',[
     'phenix-web-lodash-light',

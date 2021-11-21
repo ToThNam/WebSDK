@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Arg0_Callback, Metrics } from "../../../typescript/src/streaming/BiRateMonitor";
+import { Arg0_Callback, Metrics } from "../../../typescript/src/sdk/streaming/BiRateMonitor";
 
 define('',[
     'phenix-web-lodash-light',

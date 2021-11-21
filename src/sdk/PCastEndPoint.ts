@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { response_closestEndPointResolver, xhr_handleReadyStateChange } from "../../typescript/src/sdk/PCastEndPoint";
+
+define('',[
     'phenix-web-assert',
     'phenix-web-lodash-light',
     'phenix-web-disposable',
@@ -22,7 +24,7 @@ define([
 ], function(assert, _, disposable, ClosestEndPointResolver) {
     'use strict';
 
-    function PCastEndPoint(version, baseUri, logger, sessionTelemetry) {
+    function PCastEndPoint(this: any, version: string, baseUri: string, logger: object, sessionTelemetry: any) {
         assert.isStringNotEmpty(version, 'version');
         assert.isStringNotEmpty(baseUri, 'baseUri');
         assert.isObject(logger, 'logger');
@@ -40,7 +42,7 @@ define([
         return this._baseUri;
     };
 
-    PCastEndPoint.prototype.resolveUri = function(callback /* (error, {uri, roundTripTime}) */) {
+    PCastEndPoint.prototype.resolveUri = function(callback: any /* (error, {uri, roundTripTime}) */) {
         return resolveUri.call(this, this._baseUri, callback);
     };
 
@@ -52,7 +54,7 @@ define([
         return 'PCastEndPoint[' + this._baseUri + ']';
     };
 
-    function resolveUri(baseUri, callback /* (error, {uri, roundTripTime}) */) {
+    function resolveUri(this: any, baseUri: string , callback: any /* (error, {uri, roundTripTime}) */) {
         var isWss = baseUri.lastIndexOf('wss:', 0) === 0;
         var isWs = baseUri.lastIndexOf('ws:', 0) === 0;
         var isHttps = baseUri.lastIndexOf('https:', 0) === 0;
@@ -68,7 +70,7 @@ define([
             // HTTP - Resolve closest end point
             var that = this;
 
-            getEndpoints.call(that, baseUri, function(err, endPoints) {
+            getEndpoints.call(that, baseUri, function(err: any, endPoints: any) {
                 if (err) {
                     return callback(err);
                 }
@@ -76,7 +78,7 @@ define([
                 var closestEndPointResolver = new ClosestEndPointResolver({
                     logger: that._logger,
                     version: that._version
-                }, callback, function(err, response) {
+                }, callback, function(err: { code: number; }, response: response_closestEndPointResolver) {
                     if (err) {
                         if (err.code === 503) {
                             that._logger.debug('The end point [%s] is temporarily disabled', _.get(response, ['endPoint']));
@@ -105,12 +107,12 @@ define([
         }
     }
 
-    function getEndpoints(baseUri, callback) {
+    function getEndpoints(this: any, baseUri: string, callback: (arg0: any , arg1?: string[] ) => void) {
         var version = '%SDKVERSION%';
         var requestUrl = baseUri + '/pcast/endPoints?version=' + version + '&_=' + _.now();
-        var xhr = getAndOpenVendorSpecificXmlHttpMethod('GET', requestUrl);
+        var xhr: any = getAndOpenVendorSpecificXmlHttpMethod('GET', requestUrl);
 
-        xhr.addEventListener('readystatechange', _.bind(handleReadyStateChange, this, xhr, function(err, response) {
+        xhr.addEventListener('readystatechange', _.bind(handleReadyStateChange, this, xhr, function(err: any, response: { data: string; }) {
             if (err) {
                 return callback(new Error('Failed to resolve an end point', err));
             }
@@ -127,7 +129,7 @@ define([
         xhr.send(null);
     }
 
-    function getAndOpenVendorSpecificXmlHttpMethod(requestMethod, requestUrl) {
+    function getAndOpenVendorSpecificXmlHttpMethod(requestMethod: string, requestUrl: string) {
         var xhr = new XMLHttpRequest();
 
         if ('withCredentials' in xhr) {
@@ -145,7 +147,7 @@ define([
         return xhr;
     }
 
-    function handleReadyStateChange(xhr, callback) {
+    function handleReadyStateChange(xhr: xhr_handleReadyStateChange, callback: any) {
         if (xhr.readyState === 4 /* DONE */) {
             if (xhr.status === 200) {
                 var responseHeaders = getXhrResponseHeaders(xhr);
@@ -157,7 +159,7 @@ define([
 
                 callback(null, response);
             } else {
-                var err = new Error(xhr.status === 0 ? 'timeout' : 'Status=[' + xhr.status + ']');
+                var err: any = new Error(xhr.status === 0 ? 'timeout' : 'Status=[' + xhr.status + ']');
 
                 err.code = xhr.status;
 
@@ -166,10 +168,10 @@ define([
         }
     }
 
-    function getXhrResponseHeaders(xhr) {
+    function getXhrResponseHeaders(xhr: { getAllResponseHeaders: () => any; }) {
         var responseHeadersString = xhr.getAllResponseHeaders();
 
-        return _.reduce(responseHeadersString.trim().split(/[\r\n]+/), function(headers, header) {
+        return _.reduce(responseHeadersString.trim().split(/[\r\n]+/), function(headers: { [x: string]: any; }, header: string) {
             var parts = header.split(': ');
             var headerName = parts.shift();
             var headerValue = parts.join(': ');

@@ -14,6 +14,32 @@
  * limitations under the License.
  */
 
+import { 
+    arg0_callback_createPublisher, 
+    callback_StreamAddedListener, 
+    endPoint_ResolveUri, 
+    event_dataQuality, 
+    event_streamEnded, 
+    options_monitor, 
+    options_PCast, 
+    options_PCast_subscribe, 
+    peerConnection_areAllPeerConnectionsOffline, 
+    peerConnection_setupStateListener, 
+    publisher_forOwn, 
+    response_authenticate, 
+    response_Authenticate, 
+    response_SetupStream, 
+    statesetup_StreamAddedListener, 
+    streamTelemetry_StreamAddedListener, 
+    track_forEach,
+    mediaConstraints,
+    createOptions_createViewerPeerConnection,
+    response_setAnswerDescription,
+    options_createChunkedOrRtmpViewer,
+    response_addIceCandidates,
+    peerConnection_closePeerConnection
+} from "../../typescript/src/sdk/Pcast";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
@@ -50,7 +76,7 @@ define('',[
     var roomOrChannelIdRegex = /^(?:room|channel)Id[:](.*)$/;
     var roomOrChannelAliasRegex = /^(?:room|channel)Alias[:](.*)$/;
 
-    function PCast(options) {
+    function PCast(this: any, options: options_PCast) {
         options = options || {};
 
         assert.isObject(options, 'options');
@@ -132,7 +158,7 @@ define('',[
 
         var that = this;
         var supportedFeatures = _.filter(this._featureDetector.getFeatures(), FeatureDetector.isFeatureSupported);
-        var logGlobalError = function logGlobalError(event) {
+        var logGlobalError = function logGlobalError(event: { error: string; }) {
             var errorToLog = event ? event.error : 'Unknown Error';
             that._logger.error('Window Error Event Triggered with pcast in [%s] state [%s]', that._observableStatus.getValue(), /* Once for browsers that don't show stack traces */ errorToLog, errorToLog);
         };
@@ -188,7 +214,7 @@ define('',[
         return this._observableStatus;
     };
 
-    PCast.prototype.getRemoteDescriptionSdp = function(streamId) {
+    PCast.prototype.getRemoteDescriptionSdp = function(streamId: string) {
         assert.isStringNotEmpty(streamId, 'streamId');
 
         if (!this._peerConnections) {
@@ -202,7 +228,7 @@ define('',[
         return this._started;
     };
 
-    PCast.prototype.reAuthenticate = function(authToken) {
+    PCast.prototype.reAuthenticate = function(authToken: string) {
         assert.isStringNotEmpty(authToken, 'authToken');
 
         if (this._observableStatus.getValue() === 'online') {
@@ -216,7 +242,7 @@ define('',[
         reconnected.call(this);
     };
 
-    PCast.prototype.start = function(authToken, authenticationCallback, onlineCallback, offlineCallback) {
+    PCast.prototype.start = function(authToken: string, authenticationCallback: any, onlineCallback: any, offlineCallback: any) {
         assert.isStringNotEmpty(authToken, 'authToken');
         assert.isFunction(authenticationCallback, 'authenticationCallback');
         assert.isFunction(onlineCallback, 'onlineCallback');
@@ -261,7 +287,7 @@ define('',[
 
         var that = this;
 
-        that._endPoint.resolveUri(function(err, endPoint) {
+        that._endPoint.resolveUri(function(err: { code: any; }, endPoint: endPoint_ResolveUri) {
             if (err) {
                 that._logger.error('Failed to connect to [%s]', that._baseUri, err);
 
@@ -303,7 +329,7 @@ define('',[
         });
     };
 
-    PCast.prototype.stop = function(reason) {
+    PCast.prototype.stop = function(reason: string) {
         reason = reason || '';
 
         assert.isString(reason, 'reason');
@@ -322,23 +348,23 @@ define('',[
         try {
             var that = this;
 
-            _.forOwn(this._mediaStreams, function(mediaStream, streamId) {
+            _.forOwn(this._mediaStreams, function(mediaStream: any, streamId: string) {
                 endStream.call(that, streamId, reason);
             });
-            _.forOwn(this._publishers, function(publisher, publisherStreamId) {
+            _.forOwn(this._publishers, function(publisher: publisher_forOwn, publisherStreamId: string) {
                 endStream.call(that, publisherStreamId, reason);
 
                 if (!_.includes(publisher.getOptions(), 'detached')) {
                     publisher.stop(reason, true);
                 }
             });
-            _.forOwn(this._peerConnections, function(mediaStream, peerConnectionStreamId) {
+            _.forOwn(this._peerConnections, function(mediaStream: any, peerConnectionStreamId: string) {
                 endStream.call(that, peerConnectionStreamId, reason);
             });
-            _.forEach(this._gumStreams, function(gumStream) {
+            _.forEach(this._gumStreams, function(gumStream: { getTracks: () => any; }) {
                 var tracks = gumStream.getTracks();
 
-                _.forEach(tracks, function(track) {
+                _.forEach(tracks, function(track: { stop: () => void; }) {
                     track.stop();
                 });
             });
@@ -375,7 +401,7 @@ define('',[
         }
     };
 
-    PCast.prototype.getUserMedia = function(options, callback, onScreenShare) {
+    PCast.prototype.getUserMedia = function(options: any, callback: any, onScreenShare: any) {
         if (phenixRTC.browser === 'IE') {
             throw new Error('Publishing not supported on IE');
         }
@@ -392,7 +418,7 @@ define('',[
         return userMediaProvider.getUserMedia(options, callback);
     };
 
-    PCast.prototype.publish = function(streamToken, streamToPublish, callback, tags, options) {
+    PCast.prototype.publish = function(streamToken: string, streamToPublish: any, callback: any, tags: string | string[], options: { connectUri?: string; }) {
         if (phenixRTC.browser === 'IE') {
             throw new Error('Publishing not supported on IE');
         }
@@ -431,7 +457,7 @@ define('',[
         var streamTelemetry = new StreamTelemetry(this.getProtocol().getSessionId(), this._logger, this._metricsTransmitter);
 
         streamTelemetry.setProperty('resource', streamType);
-        this._protocol.setupStream(streamType, streamToken, setupStreamOptions, that._networkOneWayLatency * 2, function(error, response) {
+        this._protocol.setupStream(streamType, streamToken, setupStreamOptions, that._networkOneWayLatency * 2, function(error: any, response: response_SetupStream) {
             if (error) {
                 that._logger.error('Failed to create uploader [%s]', error);
 
@@ -478,7 +504,7 @@ define('',[
                         }
                     }
 
-                    return createPublisherPeerConnection.call(that, peerConnectionConfig, streamToPublish, streamId, offerSdp, streamTelemetry, function(phenixPublisher, error) {
+                    return createPublisherPeerConnection.call(that, peerConnectionConfig, streamToPublish, streamId, offerSdp, streamTelemetry, function(phenixPublisher: any, error: any) {
                         streamTelemetry.recordMetric('SetupCompleted', {string: error ? 'failed' : 'ok'});
 
                         if (error) {
@@ -489,7 +515,7 @@ define('',[
                     }, options, response.createStreamResponse.options);
                 }
 
-                return createPublisher.call(that, streamId, function(phenixPublisher, error) {
+                return createPublisher.call(that, streamId, function(phenixPublisher: any, error: any) {
                     streamTelemetry.recordMetric('SetupCompleted', {string: error ? 'failed' : 'ok'});
 
                     if (error) {
@@ -502,7 +528,7 @@ define('',[
         });
     };
 
-    PCast.prototype.subscribe = function(streamToken, callback, options) {
+    PCast.prototype.subscribe = function(streamToken: string, callback: any, options: options_PCast_subscribe) {
         if (!this._started) {
             throw new Error('PCast not started. Unable to subscribe. Please start pcast first.');
         }
@@ -537,7 +563,7 @@ define('',[
 
             streamTelemetry.setProperty('resource', streamType);
 
-            that._protocol.setupStream(streamType, streamToken, setupStreamOptions, that._networkOneWayLatency * 2, function(error, response) {
+            that._protocol.setupStream(streamType, streamToken, setupStreamOptions, that._networkOneWayLatency * 2, function(error: any, response: response_SetupStream) {
                 if (error) {
                     that._logger.error('Failed to create downloader [%s]', error);
 
@@ -584,7 +610,7 @@ define('',[
                     }
                 }
 
-                return create.call(that, streamId, offerSdp, streamTelemetry, function(phenixMediaStream, error) {
+                return create.call(that, streamId, offerSdp, streamTelemetry, function(phenixMediaStream: any, error: any) {
                     streamTelemetry.recordMetric('SetupCompleted', {string: error ? 'failed' : 'ok'});
 
                     if (error) {
@@ -616,25 +642,25 @@ define('',[
         return 'PCast[' + sessionId || 'unauthenticated' + ',' + (protocol ? protocol.toString() : 'uninitialized') + ']';
     };
 
-    PCast.prototype.parseCapabilitiesFromToken = function(streamToken) {
+    PCast.prototype.parseCapabilitiesFromToken = function(streamToken: string) {
         return _.get(parseToken.call(this, streamToken), ['capabilities'], []);
     };
 
-    PCast.prototype.parseRoomOrChannelIdFromToken = function(streamToken) {
+    PCast.prototype.parseRoomOrChannelIdFromToken = function(streamToken: string) {
         var requiredTag = _.get(parseToken.call(this, streamToken), ['requiredTag'], '');
         var idMatch = requiredTag.match(roomOrChannelIdRegex);
 
         return idMatch ? idMatch[1] : null;
     };
 
-    PCast.prototype.parseRoomOrChannelAliasFromToken = function(streamToken) {
+    PCast.prototype.parseRoomOrChannelAliasFromToken = function(streamToken: string) {
         var requiredTag = _.get(parseToken.call(this, streamToken), ['requiredTag'], '');
         var aliasMatch = requiredTag.match(roomOrChannelAliasRegex);
 
         return aliasMatch ? aliasMatch[1] : null;
     };
 
-    function parseToken(streamToken) {
+    function parseToken(this: any, streamToken: string) {
         if (!_.startsWith(streamToken, 'DIGEST:')) {
             this._logger.warn('Failed to parse the `streamToken` [%s]', streamToken);
 
@@ -648,7 +674,7 @@ define('',[
             var tokenOptions = JSON.parse(token);
 
             return tokenOptions;
-        } catch (e) {
+        } catch (e: any) {
             var sessionId = this.getProtocol().getSessionId();
             this._logger.warn('[%s] Failed to parse the `streamToken` [%s]', sessionId, streamToken);
 
@@ -656,7 +682,7 @@ define('',[
         }
     }
 
-    function instantiateProtocol(uri) {
+    function instantiateProtocol(this: any, uri: string) {
         this._protocol = new PCastProtocol(uri, this._deviceId, this._version, this._logger);
 
         this._protocol.onEvent('connected', _.bind(connected, this));
@@ -679,7 +705,7 @@ define('',[
             this._sessionIdSubscription.dispose();
         }
 
-        var handleSessionIdChange = function(sessionId) {
+        var handleSessionIdChange = function(this: any, sessionId: string) {
             this._observableSessionId.setValue(sessionId);
         };
 
@@ -688,7 +714,7 @@ define('',[
         this._sessionTelemetrySubscription = this._protocol.getObservableSessionId().subscribe(_.bind(this._sessionTelemetry.setSessionId, this._sessionTelemetry));
     }
 
-    function connected() {
+    function connected(this: any) {
         var that = this;
 
         if (that._stopped) {
@@ -708,7 +734,7 @@ define('',[
         var protocol = that._protocol;
         var authenticateCallId = ++that._authenticateCallId;
 
-        protocol.authenticate(that._authToken, function(error, response) {
+        protocol.authenticate(that._authToken, function(error: any, response: response_Authenticate) {
             if (protocol !== that._protocol) {
                 that._logger.info('Ignoring authentication response as reset took place');
 
@@ -739,11 +765,11 @@ define('',[
         });
     }
 
-    function reconnecting() {
+    function reconnecting(this: any) {
         transitionToStatus.call(this, 'reconnecting');
     }
 
-    function reconnected(optionalReason) {
+    function reconnected(this: any, optionalReason?: any) {
         if (optionalReason) {
             assert.isString('reason', optionalReason);
         }
@@ -755,7 +781,7 @@ define('',[
         reAuthenticate.call(this);
     }
 
-    function reAuthenticate() {
+    function reAuthenticate(this: any) {
         var that = this;
 
         if (that._stopped) {
@@ -767,7 +793,7 @@ define('',[
         var protocol = that._protocol;
         var reAuthenticateCallId = ++that._reAuthenticateCallId;
 
-        protocol.authenticate(that._authToken, function(error, response) {
+        protocol.authenticate(that._authToken, function(error: any, response: response_authenticate) {
             var suppressCallbackIfNeverDisconnected = that._connected === true;
 
             if (protocol !== that._protocol) {
@@ -804,7 +830,7 @@ define('',[
         });
     }
 
-    function disconnected() {
+    function disconnected(this: any) {
         if (areAllPeerConnectionsOffline.call(this) && this._observableStatus.getValue() === 'reconnecting') {
             this._logger.warn('[PCast] disconnected after attempting to reconnect. Going offline.');
 
@@ -817,8 +843,8 @@ define('',[
         transitionToStatus.call(this, 'offline');
     }
 
-    function areAllPeerConnectionsOffline() {
-        return _.reduce(this._peerConnections, function(isOffline, peerConnection) {
+    function areAllPeerConnectionsOffline(this: any) {
+        return _.reduce(this._peerConnections, function(isOffline: any, peerConnection: peerConnection_areAllPeerConnectionsOffline) {
             if (!isOffline) {
                 return isOffline;
             }
@@ -827,14 +853,14 @@ define('',[
         }, true);
     }
 
-    function streamEnded(event) {
+    function streamEnded(this: any, event: event_streamEnded) {
         var streamId = event.streamId;
         var reason = event.reason;
 
         return endStream.call(this, streamId, reason);
     }
 
-    function dataQuality(event) {
+    function dataQuality(this: any, event: event_dataQuality) {
         var streamId = event.streamId;
         var status = event.status;
         var reason = event.reason;
@@ -852,7 +878,7 @@ define('',[
         }
     }
 
-    function endStream(streamId, reason) {
+    function endStream(this: any, streamId: string , reason: string) {
         this._logger.info('[%s] Stream ended with reason [%s]', streamId, reason);
 
         var internalMediaStream = this._mediaStreams[streamId];
@@ -880,12 +906,12 @@ define('',[
         delete this._peerConnections[streamId];
     }
 
-    function setupStreamAddedListener(streamId, state, peerConnection, streamTelemetry, callback, options) {
+    function setupStreamAddedListener(this: any, streamId: string , state: statesetup_StreamAddedListener , peerConnection: any, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, options: any) {
         var that = this;
         var added = false;
-        var setupTimeoutId;
+        var setupTimeoutId: NodeJS.Timeout;
         var streamSetupInterval = 3000;
-        var onAddStream = function onAddStream(event) {
+        var onAddStream = function onAddStream(event: { stream: any; }) {
             if (state.failed || added) {
                 return;
             }
@@ -926,13 +952,13 @@ define('',[
             var realTimeStream = new PhenixRealTimeStream(streamId, masterStream, peerConnection, streamTelemetry, streamOptions, that._logger);
             var realTimeStreamDecorator = new StreamWrapper(kind, realTimeStream, that._logger);
 
-            var onError = function onError(source, event) {
+            var onError = function onError(source: any, event: any) {
                 that._logger.info('Phenix Real-Time stream error [%s] [%s]', source, event);
 
                 realTimeStreamDecorator.streamErrorCallback(kind, event);
             };
 
-            var onStop = function destroyMasterMediaStream(reason) {
+            var onStop = function destroyMasterMediaStream(reason: any) {
                 if (state.stopped || !that._protocol) {
                     return;
                 }
@@ -941,7 +967,7 @@ define('',[
 
                 closePeerConnection.call(that, streamId, peerConnection, 'stop');
 
-                that._protocol.destroyStream(streamId, reason || '', function(error, response) {
+                that._protocol.destroyStream(streamId, reason || '', function(error: any, response: { status: string; }) {
                     if (error) {
                         that._logger.error('[%s] failed to destroy stream [%s]', streamId, error);
 
@@ -970,9 +996,9 @@ define('',[
         _.addEventListener(peerConnection, 'track', onAddStream);
     }
 
-    function setupIceCandidateListener(streamId, peerConnection, callback) {
+    function setupIceCandidateListener(this: any, streamId: string, peerConnection: any, callback: (arg0: any) => void) {
         var that = this;
-        var onIceCandidate = function onIceCandidate(event) {
+        var onIceCandidate = function onIceCandidate(event: { candidate: any; }) {
             var candidate = event.candidate;
 
             if (candidate) {
@@ -989,25 +1015,25 @@ define('',[
         _.addEventListener(peerConnection, 'icecandidate', onIceCandidate);
     }
 
-    function setupStateListener(streamId, peerConnection) {
+    function setupStateListener(this: any, streamId: string, peerConnection: peerConnection_setupStateListener) {
         var that = this;
-        var onNegotiationNeeded = function onNegotiationNeeded(event) { // eslint-disable-line no-unused-vars
+        var onNegotiationNeeded = function onNegotiationNeeded(event: any) { // eslint-disable-line no-unused-vars
             that._logger.info('[%s] Negotiation needed', streamId);
         };
 
-        var onIceConnectionStateChanged = function onIceConnectionStateChanged(event) { // eslint-disable-line no-unused-vars
+        var onIceConnectionStateChanged = function onIceConnectionStateChanged(event: any) { // eslint-disable-line no-unused-vars
             that._logger.info('[%s] ICE connection state changed [%s]', streamId, peerConnection.iceConnectionState);
         };
 
-        var onIceGatheringStateChanged = function onIceGatheringStateChanged(event) { // eslint-disable-line no-unused-vars
+        var onIceGatheringStateChanged = function onIceGatheringStateChanged(event: any) { // eslint-disable-line no-unused-vars
             that._logger.info('[%s] ICE gathering state changed [%s]', streamId, peerConnection.iceGatheringState);
         };
 
-        var onSignalingStateChanged = function onSignalingStateChanged(event) { // eslint-disable-line no-unused-vars
+        var onSignalingStateChanged = function onSignalingStateChanged(event: any) { // eslint-disable-line no-unused-vars
             that._logger.info('[%s] Signaling state changed [%s]', streamId, peerConnection.signalingState);
         };
 
-        var onConnectionStateChanged = function onConnectionStateChanged(event) { // eslint-disable-line no-unused-vars
+        var onConnectionStateChanged = function onConnectionStateChanged(event: any) { // eslint-disable-line no-unused-vars
             that._logger.info('[%s] Connection state changed [%s]', streamId, peerConnection.connectionState);
         };
 
@@ -1018,7 +1044,7 @@ define('',[
         _.addEventListener(peerConnection, 'connectionstatechange', onConnectionStateChanged);
     }
 
-    function createPublisher(streamId, callback, streamOptions) {
+    function createPublisher(this: any, streamId: string | number, callback: any, streamOptions: any) {
         var that = this;
         var state = {stopped: false};
 
@@ -1047,14 +1073,14 @@ define('',[
                 return state.stopped;
             },
 
-            stop: function stop(reason) {
+            stop: function stop(reason: any) {
                 if (state.stopped) {
                     return;
                 }
 
                 that._logger.info('[%s] stopping publisher with reason [%s]', streamId, reason);
 
-                that._protocol.destroyStream(streamId, reason || '', function(error, response) {
+                that._protocol.destroyStream(streamId, reason || '', function(error: any, response: { status: string; }) {
                     if (error) {
                         that._logger.error('[%s] failed to destroy stream [%s]', streamId, error);
 
@@ -1071,13 +1097,13 @@ define('',[
                 state.stopped = true;
             },
 
-            setPublisherEndedCallback: function setPublisherEndedCallback(callback) {
+            setPublisherEndedCallback: function setPublisherEndedCallback(callback: any) {
                 assert.isFunction(callback, 'callback');
 
                 this.publisherEndedCallback = callback;
             },
 
-            setDataQualityChangedCallback: function setDataQualityChangedCallback(callback) {
+            setDataQualityChangedCallback: function setDataQualityChangedCallback(callback: any) {
                 assert.isFunction(callback, 'callback');
 
                 this.dataQualityChangedCallback = callback;
@@ -1087,7 +1113,7 @@ define('',[
                 return streamOptions;
             },
 
-            monitor: function monitor(options, callback) {
+            monitor: function monitor(options: any, callback: any) {
                 assert.isObject(options, 'options');
                 assert.isFunction(callback, 'callback');
             },
@@ -1102,7 +1128,7 @@ define('',[
         callback(publisher);
     }
 
-    function setEnvironmentCodecDefaults() {
+    function setEnvironmentCodecDefaults(this: any) {
         var that = this;
         var peerConnection = new phenixRTC.RTCPeerConnection();
 
@@ -1113,7 +1139,7 @@ define('',[
         }
 
         try {
-            var handleOffer = function handleOffer(offer) {
+            var handleOffer = function handleOffer(offer: { sdp: any; }) {
                 var h264ProfileIds = sdpUtil.getH264ProfileIds(offer.sdp);
 
                 that._supportedWebrtcCodecs = sdpUtil.getSupportedCodecs(offer.sdp);
@@ -1133,7 +1159,7 @@ define('',[
                 }
             };
 
-            var handleFailure = function(e) {
+            var handleFailure = function(e: any) {
                 that._logger.error('Unable to create offer to get local h264 profile level id', e);
 
                 if (peerConnection.close) {
@@ -1162,13 +1188,13 @@ define('',[
         }
     }
 
-    function setAudioState(done) {
+    function setAudioState(this: any, done?: () => void) {
         var that = this;
 
         switch (phenixRTC.browser) {
         case 'Edge':
-            return phenixRTC.getDestinations(function(destinations) {
-                var audioDestinations = _.filter(destinations, function(destination) {
+            return phenixRTC.getDestinations(function(destinations: any) {
+                var audioDestinations = _.filter(destinations, function(destination: { kind: string; }) {
                     return destination.kind === 'audio';
                 });
 
@@ -1195,7 +1221,7 @@ define('',[
         }
     }
 
-    function createPublisherPeerConnection(peerConnectionConfig, mediaStream, streamId, offerSdp, streamTelemetry, callback, createOptions, streamOptions) {
+    function createPublisherPeerConnection(this: any, peerConnectionConfig: any, mediaStream: { getTracks: () => any; }, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: any, streamOptions: any,value:any) {
         var that = this;
         var state = {
             failed: false,
@@ -1208,8 +1234,8 @@ define('',[
                 {DtlsSrtpKeyAgreement: !hasCrypto}, {RtpDataChannels: hasDataChannel}
             ]
         });
-        var remoteMediaStream = null;
-        var publisherMonitor = null;
+        var remoteMediaStream: any = null;
+        var publisherMonitor: any = null;
 
         shimPeerConnectionGetStreams(peerConnection);
 
@@ -1229,7 +1255,7 @@ define('',[
             offerSdp = offerSdp.replace(/(\na=ice-options:trickle)/g, '');
         }
 
-        var onFailure = function onFailure(status) {
+        var onFailure = function onFailure(status: any) {
             if (state.failed) {
                 return;
             }
@@ -1256,7 +1282,7 @@ define('',[
             var bandwidthAttribute = /(b=AS:([0-9]*)[\n\r]*)/gi;
             var video = /(mid:video)([\n\r]*)/gi;
             var limit = 0;
-            var bandwithAttribute = bandwidthAttribute.exec(offerSdp);
+            var bandwithAttribute: any = bandwidthAttribute.exec(offerSdp);
 
             if (bandwithAttribute && bandwithAttribute.length >= 3) {
                 limit = bandwithAttribute[2] * 1000;
@@ -1291,7 +1317,7 @@ define('',[
                     }
                 },
 
-                stop: function stop(reason) {
+                stop: function stop(reason: string) {
                     if (state.stopped || !that._protocol) {
                         return;
                     }
@@ -1300,7 +1326,7 @@ define('',[
 
                     closePeerConnection.call(that, streamId, peerConnection, 'closed');
 
-                    that._protocol.destroyStream(streamId, reason || '', function(error, response) {
+                    that._protocol.destroyStream(streamId, reason || '', function(error: any, response: { status: string; }) {
                         if (error) {
                             that._logger.error('[%s] failed to destroy stream [%s]', streamId, error);
 
@@ -1317,19 +1343,19 @@ define('',[
                     state.stopped = true;
                 },
 
-                setPublisherEndedCallback: function setPublisherEndedCallback(callback) {
+                setPublisherEndedCallback: function setPublisherEndedCallback(callback: any) {
                     assert.isFunction(callback, 'callback');
 
                     this.publisherEndedCallback = callback;
                 },
 
-                setDataQualityChangedCallback: function setDataQualityChangedCallback(callback) {
+                setDataQualityChangedCallback: function setDataQualityChangedCallback(callback: any) {
                     assert.isFunction(callback, 'callback');
 
                     this.dataQualityChangedCallback = callback;
                 },
 
-                limitBandwidth: function limitBandwidth(bandwidthLimit) {
+                limitBandwidth: function limitBandwidth(bandwidthLimit: number) {
                     if (phenixRTC.browser === 'Edge') {
                         return that._logger.warn('Limit bandwidth not support on [%s]', phenixRTC.browser);
                     }
@@ -1344,7 +1370,7 @@ define('',[
                     var updatedSdp = remoteDescription.sdp.replace(bandwidthAttribute, '');
 
                     // Add new limit in kbps
-                    updatedSdp = updatedSdp.replace(video, function(match, videoLine, lineEnding, offset, sdp) { // eslint-disable-line no-unused-vars
+                    updatedSdp = updatedSdp.replace(video, function(match: any, videoLine: any, lineEnding: any, offset: any, sdp: any) { // eslint-disable-line no-unused-vars
                         return [videoLine, lineEnding, 'b=AS:', Math.ceil(newLimit / 1000), lineEnding].join('');
                     });
 
@@ -1366,7 +1392,7 @@ define('',[
                     return publisherMonitor;
                 },
 
-                monitor: function monitor(options, callback) {
+                monitor: function monitor(options: options_monitor, callback:  any) {
                     assert.isObject(options, 'options');
                     assert.isFunction(callback, 'callback');
 
@@ -1378,7 +1404,7 @@ define('',[
                     };
                     monitor.start(options, function activeCallback() {
                         return that._publishers[streamId] === publisher && !state.stopped;
-                    }, function monitorCallback(error, monitorEvent) {
+                    }, function monitorCallback(error: any, monitorEvent: { reasons: any; }) {
                         if (error) {
                             that._logger.warn('[%s] Publisher monitor triggered unrecoverable error [%s]', error);
                         }
@@ -1388,7 +1414,7 @@ define('',[
                         return callback(publisher, 'client-side-failure', monitorEvent);
                     });
 
-                    _.forEach(mediaStream.getTracks(), function(track) {
+                    _.forEach(mediaStream.getTracks(), function(track: track_forEach) {
                         _.addEventListener(track, 'readystatechange', function() {
                             if (track.readyState === 'ended') {
                                 that._logger.warn('[%s] Publisher track has failed [%s]', streamId, track);
@@ -1406,7 +1432,7 @@ define('',[
                     return monitor;
                 },
 
-                addBitRateThreshold: function addBitRateThreshold(threshold, callback) {
+                addBitRateThreshold: function addBitRateThreshold(threshold: any, callback: any) {
                     var bitRateMonitor = new BitRateMonitor('Publisher', publisherMonitor, function getLimit() {
                         return limit;
                     });
@@ -1414,7 +1440,7 @@ define('',[
                     return bitRateMonitor.addThreshold(threshold, callback);
                 },
 
-                setRemoteMediaStreamCallback: function setRemoteMediaStreamCallback(callback) {
+                setRemoteMediaStreamCallback: function setRemoteMediaStreamCallback(callback: any) {
                     assert.isFunction(callback, 'callback');
 
                     this.remoteMediaStreamCallback = callback;
@@ -1428,7 +1454,7 @@ define('',[
                     return streamOptions;
                 },
 
-                getStats: function getStats(callback) {
+                getStats: function getStats(callback: any) {
                     assert.isFunction(callback, 'callback');
 
                     if (!this._lastStats) {
@@ -1437,7 +1463,7 @@ define('',[
 
                     var that = this;
 
-                    return phenixRTC.getStats(peerConnection, null, function(stats) {
+                    return phenixRTC.getStats(peerConnection, null, function(stats: any) {
                         callback(PeerConnection.convertPeerConnectionStats(stats, that._lastStats));
                     });
                 },
@@ -1450,7 +1476,7 @@ define('',[
             callback.call(that, publisher);
         };
 
-        setupStreamAddedListener.call(that, streamId, state, peerConnection, streamTelemetry, function(mediaStream) {
+        setupStreamAddedListener.call(that, streamId, state, peerConnection, streamTelemetry, function(mediaStream: any) {
             var publisher = that._publishers[streamId];
 
             remoteMediaStream = mediaStream;
@@ -1470,7 +1496,7 @@ define('',[
             type: 'offer',
             sdp: offerSdp
         });
-        var mediaConstraints = {mandatory: {}};
+        var mediaConstraints :mediaConstraints = {mandatory: {}};
 
         if (phenixRTC.browser === 'Chrome' || phenixRTC.browser === 'ReactNative') {
             mediaConstraints.mandatory.OfferToReceiveVideo = createOptions.receiveVideo === true;
@@ -1487,12 +1513,12 @@ define('',[
                     return peerConnection.createAnswer(mediaConstraints);
                 })
                 .then(_.bind(onCreateAnswerSuccess, that))
-                .then(function(answerSdp) {
-                    return new phenixRTC.global.Promise(function(resolve, reject) {
+                .then(function(answerSdp: any) {
+                    return new phenixRTC.global.Promise(function(resolve: any, reject: any) {
                         setRemoteAnswer.call(that, streamId, answerSdp, resolve, reject);
                     });
                 })
-                .then(function(sessionDescription) {
+                .then(function(sessionDescription: any) {
                     return peerConnection.setLocalDescription(sessionDescription);
                 })
                 .then(_.bind(onSetLocalDescriptionSuccess, that, peerConnection))
@@ -1508,10 +1534,10 @@ define('',[
         peerConnection.setRemoteDescription(offerSessionDescription, function() {
             onSetRemoteDescriptionSuccess.call(that, peerConnection);
 
-            peerConnection.createAnswer(function(answerSdp) {
+            peerConnection.createAnswer(function(answerSdp: any) {
                 onCreateAnswerSuccess.call(that, answerSdp);
 
-                setRemoteAnswer.call(that, streamId, answerSdp, function(sessionDescription) {
+                setRemoteAnswer.call(that, streamId, answerSdp, function(sessionDescription: any) {
                     peerConnection.setLocalDescription(sessionDescription, function() {
                         onSetLocalDescriptionSuccess.call(that, peerConnection);
 
@@ -1524,7 +1550,7 @@ define('',[
         }, onFailure);
     }
 
-    function createViewerPeerConnection(peerConnectionConfig, streamId, offerSdp, streamTelemetry, callback, createOptions) {
+    function createViewerPeerConnection(this: any, peerConnectionConfig: any, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, createOptions: createOptions_createViewerPeerConnection) {
         if (phenixRTC.browser === 'IE') {
             throw new Error('Subscribing in real-time not supported on IE');
         }
@@ -1562,7 +1588,7 @@ define('',[
             offerSdp = sdpUtil.setGroupLineOrderToMatchMediaSectionOrder(offerSdp);
         }
 
-        var onFailure = function onFailure(status) {
+        var onFailure = function onFailure(status: any) {
             if (state.failed) {
                 return;
             }
@@ -1597,7 +1623,7 @@ define('',[
             type: 'offer',
             sdp: offerSdp
         });
-        var mediaConstraints = {mandatory: {}};
+        var mediaConstraints: mediaConstraints = {mandatory: {}};
 
         if (phenixRTC.browser === 'Chrome' || phenixRTC.browser === 'ReactNative') {
             mediaConstraints.mandatory.OfferToReceiveVideo = createOptions.receiveVideo !== false;
@@ -1614,12 +1640,12 @@ define('',[
                     return peerConnection.createAnswer(mediaConstraints);
                 })
                 .then(_.bind(onCreateAnswerSuccess, that))
-                .then(function(answerSdp) {
-                    return new phenixRTC.global.Promise(function(resolve, reject) {
+                .then(function(answerSdp: any) {
+                    return new phenixRTC.global.Promise(function(resolve: any, reject: any) {
                         setRemoteAnswer.call(that, streamId, answerSdp, resolve, reject);
                     });
                 })
-                .then(function(sessionDescription) {
+                .then(function(sessionDescription: any) {
                     return peerConnection.setLocalDescription(sessionDescription);
                 })
                 .then(_.bind(onSetLocalDescriptionSuccess, that, peerConnection))
@@ -1634,10 +1660,10 @@ define('',[
         peerConnection.setRemoteDescription(offerSessionDescription, function() {
             onSetRemoteDescriptionSuccess.call(that, peerConnection);
 
-            peerConnection.createAnswer(function(answerSdp) {
+            peerConnection.createAnswer(function(answerSdp: any) {
                 onCreateAnswerSuccess.call(that, answerSdp);
 
-                setRemoteAnswer.call(that, streamId, answerSdp, function(sessionDescription) {
+                setRemoteAnswer.call(that, streamId, answerSdp, function(sessionDescription: any) {
                     peerConnection.setLocalDescription(sessionDescription, function() {
                         onSetLocalDescriptionSuccess.call(that, peerConnection);
 
@@ -1648,24 +1674,24 @@ define('',[
         }, onFailure);
     }
 
-    function onSetLocalDescriptionSuccess(peerConnection) {
+    function onSetLocalDescriptionSuccess(this: any, peerConnection: any) {
         this._logger.debug('Set local description [%s] [%s]', _.get(peerConnection, ['localDescription', 'type']), _.get(peerConnection, ['localDescription', 'sdp']));
     }
 
-    function onSetRemoteDescriptionSuccess(peerConnection) {
+    function onSetRemoteDescriptionSuccess(this: any, peerConnection: any) {
         this._logger.debug('Set remote description [%s] [%s]', _.get(peerConnection, ['localDescription', 'type']), _.get(peerConnection, ['remoteDescription', 'sdp']));
     }
 
-    function onCreateAnswerSuccess(answerSdp) {
+    function onCreateAnswerSuccess(this: any, answerSdp: { sdp: any; }) {
         this._logger.info('Created answer [%s]', answerSdp.sdp);
 
         return answerSdp;
     }
 
-    function setRemoteAnswer(streamId, answerSdp, setRemoteAnswerCallback, onFailure) {
+    function setRemoteAnswer(this: any, streamId: string , answerSdp: { sdp: any; }, setRemoteAnswerCallback: any, onFailure:  any) {
         var that = this;
 
-        that._protocol.setAnswerDescription(streamId, answerSdp.sdp, function(error, response) {
+        that._protocol.setAnswerDescription(streamId, answerSdp.sdp, function(error: any, response: response_setAnswerDescription ) {
             if (error) {
                 that._logger.error('Failed to set answer description [%s]', error);
 
@@ -1701,7 +1727,7 @@ define('',[
         });
     }
 
-    function onIceCandidate(streamId, candidate) {
+    function onIceCandidate(this: any, streamId: string , candidate: any) {
         var that = this;
         var iceCandidates = this._pendingIceCandidates[streamId];
 
@@ -1745,7 +1771,7 @@ define('',[
         }));
     }
 
-    function submitIceCandidates(streamId, options) {
+    function submitIceCandidates(this: any, streamId: string , options: string | any[]) {
         var iceCandidates = this._pendingIceCandidates[streamId] || [];
 
         if (iceCandidates.length === 0 && options.length === 0) {
@@ -1758,7 +1784,7 @@ define('',[
 
         this._logger.info('[%s] Adding [%s] ICE Candidates with Options [%s]', streamId, iceCandidates.length, options);
 
-        this._protocol.addIceCandidates(streamId, iceCandidates, options, function(error, response) {
+        this._protocol.addIceCandidates(streamId, iceCandidates, options, function(error: any, response: response_addIceCandidates) {
             if (error) {
                 return that._logger.error('Failed to add ICE candidate [%s]', error);
             } else if (response.status !== 'ok') {
@@ -1771,7 +1797,7 @@ define('',[
         });
     }
 
-    function createChunkedOrRtmpViewer(streamId, offerSdp, streamTelemetry, callback, options) {
+    function createChunkedOrRtmpViewer(this: any, streamId: string, offerSdp: any, streamTelemetry: any, callback: any, options: options_createChunkedOrRtmpViewer) {
         var that = this;
 
         var rtmpQuery = /a=x-rtmp:(rtmp:\/\/[^\n]*)/m;
@@ -1802,7 +1828,7 @@ define('',[
 
         switch (preferredFeature) {
         case streamEnums.types.rtmp.name:
-            var rtmpUris = [];
+            var rtmpUris: any = [];
             var env = environment.parseEnvFromPcastBaseUri(this._baseUri);
 
             this._logger.info('Selecting flash playback for rtmp.');
@@ -1859,16 +1885,16 @@ define('',[
         return callback.call(that, undefined, 'failed');
     }
 
-    function createLiveViewerOfKind(streamId, uri, kind, streamTelemetry, callback, options) {
+    function createLiveViewerOfKind(this: any, streamId: string , uri: string, kind: any, streamTelemetry: any, callback: any, options: any) {
         var that = this;
         var pending = 0;
-        var shaka = null;
-        var webPlayer = null;
+        var shaka: any = null;
+        var webPlayer: any = null;
 
         if (!this._shakaLoader && !this._webPlayerLoader) {
             that._logger.warn('[%s] No player available for [%s] and uri [%s]. Please provide a loader via options.', streamId, kind, uri);
 
-            that._protocol.destroyStream(streamId, 'unsupported-features', function(error, response) {
+            that._protocol.destroyStream(streamId, 'unsupported-features', function(error: any, response: { status: string; }) {
                 if (error) {
                     that._logger.error('[%s] failed to destroy stream with unsupported features, [%s]', streamId, error);
 
@@ -1901,18 +1927,18 @@ define('',[
             var liveStream = new PhenixLiveStream(kind, streamId, uri, streamTelemetry, options, shaka, webPlayer, that._logger);
             var liveStreamDecorator = new StreamWrapper(kind, liveStream, that._logger);
 
-            var onPlayerError = function onPlayerError(source, event) {
+            var onPlayerError = function onPlayerError(source: any, event: any) {
                 that._logger.warn('Phenix Live Stream Player Error [%s] [%s]', source, event);
 
                 liveStreamDecorator.streamErrorCallback(source, event);
             };
 
-            var onStop = function onStop(reason) {
+            var onStop = function onStop(reason: any) {
                 if (!that._protocol) {
                     return that._logger.warn('Unable to destroy stream [%s]', streamId);
                 }
 
-                that._protocol.destroyStream(streamId, reason || '', function(error, response) {
+                that._protocol.destroyStream(streamId, reason || '', function(error: any, response: { status: string; }) {
                     if (error) {
                         that._logger.error('[%s] failed to destroy stream, [%s]', streamId, error);
 
@@ -1936,7 +1962,7 @@ define('',[
         };
 
         if (this._shakaLoader) {
-            this._shakaLoader(function(s) {
+            this._shakaLoader(function(s: any) {
                 shaka = s;
                 pending--;
 
@@ -1947,7 +1973,7 @@ define('',[
         }
 
         if (this._webPlayerLoader) {
-            this._webPlayerLoader(function(w) {
+            this._webPlayerLoader(function(w: any) {
                 webPlayer = w;
                 pending--;
 
@@ -1962,7 +1988,7 @@ define('',[
         }
     }
 
-    function transitionToStatus(newStatus, reason, suppressCallback) {
+    function transitionToStatus(this: any, newStatus?: string, reason?: string | null, suppressCallback?: any) {
         var oldStatus = this.getStatus();
 
         if (oldStatus !== newStatus && !(isOfflineStatus(oldStatus) && newStatus === 'offline')) {
@@ -1994,11 +2020,11 @@ define('',[
         }
     }
 
-    function isOfflineStatus(status) {
+    function isOfflineStatus(status: string) {
         return status === 'critical-network-issue' || status === 'offline';
     }
 
-    function closePeerConnection(streamId, peerConnection, reason) {
+    function closePeerConnection(this: any, streamId: string, peerConnection: peerConnection_closePeerConnection, reason: any) {
         if (peerConnection.signalingState === 'closed' || peerConnection.__closing) {
             this._logger.debug('[%s] Peer connection is already closed [%s]', streamId, reason);
 
@@ -2011,19 +2037,19 @@ define('',[
         peerConnection.__closing = true;
     }
 
-    function handleForeground() {
+    function handleForeground(this: any) {
         if (this._treatBackgroundAsOffline || this._reAuthenticateOnForeground) {
             reconnected.call(this, 'entered-foreground');
         }
     }
 
-    function handleBackground() {
+    function handleBackground(this: any) {
         if (this._treatBackgroundAsOffline) {
             transitionToStatus.call(this, 'offline', 'entered-background');
         }
     }
 
-    function parseProtobufMessage(message) {
+    function parseProtobufMessage(message: any) {
         if (!message) {
             return message;
         }
@@ -2040,7 +2066,7 @@ define('',[
         return parsedMessage;
     }
 
-    function removeNullValuesAndParseEnums(parsedMessage, value, key) {
+    function removeNullValuesAndParseEnums(parsedMessage: any, value: string | null, key: string) {
         if (value === null) {
             return;
         }
@@ -2059,7 +2085,7 @@ define('',[
         parsedMessage[key] = valueParsedWithoutKey;
     }
 
-    function applyVendorSpecificLogic(config) {
+    function applyVendorSpecificLogic(config: any) {
         switch (phenixRTC.browser) {
         case 'Firefox':
             // Firefox doesn't support TURN with TCP/TLS https://bugzilla.mozilla.org/show_bug.cgi?id=1056934
@@ -2078,13 +2104,13 @@ define('',[
         return config;
     }
 
-    function removeTurnsServers(config) {
+    function removeTurnsServers(config: { iceServers: any; }) {
         if (!config) {
             return config;
         }
 
-        _.forEach(config.iceServers, function(server) {
-            server.urls = _.filter(server.urls, function(url) {
+        _.forEach(config.iceServers, function(server: { urls: string[]; }) {
+            server.urls = _.filter(server.urls, function(url: string) {
                 return !_.startsWith(url, 'turns');
             });
         });
@@ -2092,13 +2118,13 @@ define('',[
         return config;
     }
 
-    function forceTurnUdp(config) {
+    function forceTurnUdp(config: { iceServers: any; }) {
         if (!config) {
             return config;
         }
 
-        _.forEach(config.iceServers, function(server) {
-            server.urls = _.map(server.urls, function(url) {
+        _.forEach(config.iceServers, function(server: { urls: string[]; }) {
+            server.urls = _.map(server.urls, function(url: string) {
                 return url.replace('transport=tcp', 'transport=udp');
             });
         });
@@ -2107,16 +2133,16 @@ define('',[
     }
 
     // Shim required. Webrtc adapter successfully shims but breaks Edge.
-    var shimPeerConnectionGetStreams = function(peerConnection) {
+    var shimPeerConnectionGetStreams = function(peerConnection:any) {
         if (!_.isUndefined(peerConnection.onaddstream)) {
             return;
         }
 
-        var remoteStreams = [];
-        var localStreams = [];
+        var remoteStreams: any[] = [];
+        var localStreams: any[] = [];
 
-        _.addEventListener(peerConnection, 'track', function(event) {
-            _.forEach(event.streams, function(stream) {
+        _.addEventListener(peerConnection, 'track', function(event: { streams: any; }) {
+            _.forEach(event.streams, function(stream: any) {
                 if (!_.includes(remoteStreams, stream)) {
                     remoteStreams.push(stream);
                 }
@@ -2131,12 +2157,12 @@ define('',[
             return localStreams;
         };
 
-        peerConnection.addStream = function addStream(stream) {
+        peerConnection.addStream = function addStream(stream: { getTracks: () => any; }) {
             if (!_.includes(localStreams, stream)) {
                 localStreams.push(stream);
             }
 
-            _.forEach(stream.getTracks(), function(track) {
+            _.forEach(stream.getTracks(), function(track: any) {
                 peerConnection.addTrack(track, stream);
             });
         };
@@ -2144,3 +2170,4 @@ define('',[
 
     return PCast;
 });
+

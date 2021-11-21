@@ -24,7 +24,7 @@ import {
     Resolution_SetUserMediaOptionsForEdge, 
     Resolution_SetUserMediaOptionsForNewerBrowse,
     Resolution_SetUserMediaOptionsForOtherBrowsers
-} from "../../../typescript/src/userMedia/UserMediaResolver";
+} from "../../../typescript/src/sdk/userMedia/UserMediaResolver";
 
 define('',[
     'phenix-web-lodash-light',
