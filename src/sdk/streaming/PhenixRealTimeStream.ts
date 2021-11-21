@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -32,7 +32,7 @@ define([
 
     var defaultIceConnectionTimeout = 12000;
 
-    function PhenixRealTimeStream(streamId, streamSrc, peerConnection, streamTelemetry, options, logger) {
+    function PhenixRealTimeStream(this: any, streamId: string, streamSrc: any, peerConnection: { remoteDescription: string; }, streamTelemetry: any, options: any, logger: any) {
         this._streamId = streamId;
         this._streamSrc = streamSrc;
         this._peerConnection = peerConnection;
@@ -52,7 +52,7 @@ define([
         this._disposables.add(applicationActivityDetector.onForeground(_.bind(emitPendingBackgroundEvent, this)));
 
         var bandwidthAttribute = /(b=AS:([0-9]*)[\n\r]*)/gi;
-        var bandwithAttribute = bandwidthAttribute.exec(peerConnection.remoteDescription);
+        var bandwithAttribute:any = bandwidthAttribute.exec(peerConnection.remoteDescription);
 
         if (bandwithAttribute && bandwithAttribute.length >= 3) {
             this._limit = bandwithAttribute[2] * 1000;
@@ -61,7 +61,7 @@ define([
         _.addEventListener(peerConnection, 'iceconnectionstatechange', _.bind(onIceConnectionChange, this));
     }
 
-    PhenixRealTimeStream.prototype.on = function(name, callback) {
+    PhenixRealTimeStream.prototype.on = function(name: string, callback: any) {
         this._namedEvents.listen(name, callback);
     };
 
@@ -81,7 +81,7 @@ define([
 
             var sdpTracks = sdp.split('m=');
 
-            sdpTracks.forEach(function(track) {
+            sdpTracks.forEach(function(track: string) {
                 if (track.startsWith('audio') && track.includes('a=inactive')) {
                     options.capabilities.push('video-only');
                 }
@@ -94,11 +94,11 @@ define([
 
         var renderer = new PhenixRealTimeRenderer(this._streamId, this._streamSrc, this._streamTelemetry, options, this._logger);
 
-        renderer.on(streamEnums.rendererEvents.error.name, function(type, error) {
+        renderer.on(streamEnums.rendererEvents.error.name, function(type: any, error: any) {
             that._namedEvents.fire(streamEnums.streamEvents.playerError.name, [type, error]);
         });
-        renderer.on(streamEnums.rendererEvents.ended.name, function(reason) {
-            that._renderers = _.filter(that._renderers, function(storedRenderer) {
+        renderer.on(streamEnums.rendererEvents.ended.name, function(reason: any) {
+            that._renderers = _.filter(that._renderers, function(storedRenderer: any) {
                 return storedRenderer !== renderer;
             });
 
@@ -113,7 +113,7 @@ define([
         return renderer;
     };
 
-    PhenixRealTimeStream.prototype.select = function select(trackSelectCallback) {
+    PhenixRealTimeStream.prototype.select = function select(trackSelectCallback: (arg0: any, arg1: number) => any) {
         assert.isFunction(trackSelectCallback, 'trackSelectCallback');
         assert.isFunction(rtc.global.MediaStream, 'rtc.global.MediaStream');
 
@@ -131,9 +131,9 @@ define([
         }
 
         var that = this;
-        var newMediaStream = new PhenixRealTimeStream(this._streamId, streamToAttach, this._peerConnection, this._streamTelemetry, this._options, this._logger);
+        var newMediaStream = new (PhenixRealTimeStream(this._streamId, streamToAttach, this._peerConnection, this._streamTelemetry, this._options, this._logger)as any);
 
-        newMediaStream.on(streamEnums.streamEvents.stopped.name, function(reason) {
+        newMediaStream.on(streamEnums.streamEvents.stopped.name, function(reason: any) {
             if (isStreamStopped(that._streamSrc)) {
                 that._namedEvents.fire(streamEnums.streamEvents.stopped.name, [reason]);
             }
@@ -144,20 +144,20 @@ define([
         return newMediaStream;
     };
 
-    PhenixRealTimeStream.prototype.setStreamEndedCallback = function setStreamEndedCallback(callback) {
+    PhenixRealTimeStream.prototype.setStreamEndedCallback = function setStreamEndedCallback(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this._streamEndedCallback = callback;
     };
 
-    PhenixRealTimeStream.prototype.setStreamErrorCallback = function setStreamErrorCallback(callback) {
+    PhenixRealTimeStream.prototype.setStreamErrorCallback = function setStreamErrorCallback(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this._streamErrorCallback = callback;
     };
 
-    PhenixRealTimeStream.prototype.streamEndedCallback = function streamEndedCallback(stream, status, reason) {
-        _.forEach(this._childrenStreams, function(childStream) {
+    PhenixRealTimeStream.prototype.streamEndedCallback = function streamEndedCallback(stream: any, status: string, reason: string) {
+        _.forEach(this._childrenStreams, function(childStream: { streamEndedCallback: (arg0: any, arg1: any) => void; }) {
             childStream.streamEndedCallback(status, reason);
         });
 
@@ -166,8 +166,8 @@ define([
         }
     };
 
-    PhenixRealTimeStream.prototype.streamErrorCallback = function streamErrorCallback(stream, errorSource, error) {
-        _.forEach(this._childrenStreams, function(childStream) {
+    PhenixRealTimeStream.prototype.streamErrorCallback = function streamErrorCallback(stream: any, errorSource: string, error: string) {
+        _.forEach(this._childrenStreams, function(childStream: { streamErrorCallback: (arg0: any, arg1: any) => void; }) {
             childStream.streamErrorCallback(errorSource, error);
         });
 
@@ -176,7 +176,7 @@ define([
         }
     };
 
-    PhenixRealTimeStream.prototype.stop = function stop(reason) {
+    PhenixRealTimeStream.prototype.stop = function stop(reason: string) {
         if (!this.isActive()) {
             return;
         }
@@ -192,7 +192,7 @@ define([
         this._isStopped = true;
     };
 
-    PhenixRealTimeStream.prototype.monitor = function monitor(options, callback) {
+    PhenixRealTimeStream.prototype.monitor = function monitor(options: { direction: string; }, callback: (arg0: any, arg1: string, arg2: any) => any,monitorCallback:()=>void) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 
@@ -203,7 +203,7 @@ define([
 
         monitor.start(options, function activeCallback() {
             return that.isActive();
-        }, function monitorCallback(error, monitorEvent) {
+        }, function monitorCallback(error: string, monitorEvent: { type: string; reasons: string; }) :any{
             if (error) {
                 that._logger.warn('[%s] Media stream monitor triggered unrecoverable error [%s]', that._streamId, error);
             }
@@ -228,7 +228,7 @@ define([
         return this._monitor;
     };
 
-    PhenixRealTimeStream.prototype.addBitRateThreshold = function addBitRateThreshold(threshold, callback) {
+    PhenixRealTimeStream.prototype.addBitRateThreshold = function addBitRateThreshold(threshold: any, callback: any) {
         var that = this;
         var bitRateMonitor = new BitRateMonitor('Media Stream', this._monitor, function getLimit() {
             return that._limit;
@@ -249,7 +249,7 @@ define([
         return this._streamId;
     };
 
-    PhenixRealTimeStream.prototype.getStats = function getStats(callback) {
+    PhenixRealTimeStream.prototype.getStats = function getStats(callback: (arg0: any) => void) {
         assert.isFunction(callback, 'callback');
 
         if (!this._lastStats) {
@@ -258,7 +258,7 @@ define([
 
         var that = this;
 
-        return rtc.getStats(this._peerConnection, null, function(stats) {
+        return rtc.getStats(this._peerConnection, null, function(stats: any) {
             callback(PeerConnection.convertPeerConnectionStats(stats, that._lastStats));
         });
     };
@@ -271,7 +271,7 @@ define([
         return 'PhenixRealTimeStream[' + this._streamId + ']';
     };
 
-    function emitPendingBackgroundEvent() {
+    function emitPendingBackgroundEvent(this: any) {
         if (!this._backgroundMonitorEventCallback) {
             return;
         }
@@ -283,29 +283,29 @@ define([
         eventCallback();
     }
 
-    function isStreamStopped(stream) {
-        return _.reduce(stream.getTracks(), function(isStopped, track) {
+    function isStreamStopped(stream: { getTracks: () => any; }) {
+        return _.reduce(stream.getTracks(), function(isStopped: any, track: any) {
             return isStopped && isTrackStopped(track);
         }, true);
     }
 
-    function isTrackStopped(track) {
+    function isTrackStopped(track: { readyState: string; }) {
         assert.isObject(track, 'track');
 
         return track.readyState === 'ended';
     }
 
-    function stopWebRTCStream(stream) {
+    function stopWebRTCStream(stream: { stop: () => void; getTracks: () => any; }) {
         if (stream && _.isFunction(stream.stop, 'stream.stop')) {
             stream.stop();
         }
 
-        _.forEach(stream && stream.getTracks ? stream.getTracks() : [], function(track) {
+        _.forEach(stream && stream.getTracks ? stream.getTracks() : [], function(track: { stop: () => void; }) {
             track.stop();
         });
     }
 
-    function onIceConnectionChange() {
+    function onIceConnectionChange(this: any) {
         var that = this;
         var connectionState = this._peerConnection.iceConnectionState;
 

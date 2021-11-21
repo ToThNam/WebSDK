@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { member_getMemberKey, member_getMostRecentMember, member_getNextMember, member_getNextMember_forEach, member_getSimilarMembers, member_isAlternate, member_isPrimary, mostRecentMember_getMostRecentMember } from "../../../typescript/src/express/MemberSelector";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert'
@@ -25,7 +27,7 @@ define('',[
     var defaultBannedFailureCount = 100;
     var defaultBanMemberOnCapacityFailureCount = 5;
 
-    function MemberSelector(this: any, selectionStrategy: string, logger: any, options: any) {
+    function MemberSelector(this: any, selectionStrategy: string, logger: object, options: any) {
         if (selectionStrategy) {
             assert.isStringNotEmpty(selectionStrategy, 'selectionStrategy');
         }
@@ -130,7 +132,7 @@ define('',[
     };
 
     MemberSelector.getSimilarMembers = function(screenName: string, optionalSessionId: string, members: any) {
-        var otherMembers = _.filter(members, function(member: { getObservableScreenName: () => { (): string; new(): string; getValue: { (): string; new(): string; }; }; getSessionId: () => string; }) {
+        var otherMembers = _.filter(members, function(member:member_getSimilarMembers ) {
             return member.getObservableScreenName().getValue() !== screenName && (!optionalSessionId || member.getSessionId() !== optionalSessionId);
         });
         var primaryMembers = _.filter(otherMembers, isPrimary);
@@ -147,7 +149,7 @@ define('',[
         return otherMembers || primaryMembers || alternateMembers;
     };
 
-    function getMemberKey(member: { getSessionId: () => any; getObservableScreenName: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }) {
+    function getMemberKey(member: member_getMemberKey) {
         if (!member) {
             return '';
         }
@@ -160,7 +162,7 @@ define('',[
 
         switch (this._selectionStrategy) {
         case mostRecentStrategy:
-            var activeMembers = _.reduce(members, function(activeMembers: any[], member: { getSessionId: () => any; getObservableScreenName: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }) {
+            var activeMembers = _.reduce(members, function(activeMembers: any[], member:member_getNextMember ) {
                 var memberKey = getMemberKey(member);
                 var isDead = _.get(that._deadMembers, [memberKey], false);
 
@@ -180,7 +182,7 @@ define('',[
             var selectedMember: any = undefined;
             var minFailureCount = Number.MAX_VALUE;
 
-            _.forEach(members, function(member: { getSessionId: () => any; getObservableScreenName: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }) {
+            _.forEach(members, function(member: member_getNextMember_forEach) {
                 var memberKey = getMemberKey(member);
                 var isDead = _.get(that._deadMembers, [memberKey], false);
 
@@ -215,7 +217,7 @@ define('',[
     }
 
     function getMostRecentMember(members: any) {
-        return _.reduce(members, function(mostRecentMember: { getLastUpdate: () => number; }, member: { getLastUpdate: () => number; }) {
+        return _.reduce(members, function(mostRecentMember: mostRecentMember_getMostRecentMember, member:member_getMostRecentMember) {
             if (!mostRecentMember) {
                 return member;
             }
@@ -224,13 +226,13 @@ define('',[
         });
     }
 
-    function isPrimary(member: { getSessionId?: () => string; getObservableScreenName: any; }) {
+    function isPrimary(member:member_isPrimary ) {
         var screenName = member.getObservableScreenName().getValue();
 
         return isPrimaryName(screenName);
     }
 
-    function isAlternate(member: { getSessionId?: () => string; getObservableScreenName: any; }) {
+    function isAlternate(member:member_isAlternate) {
         var screenName = member.getObservableScreenName().getValue();
 
         return isAlternateName(screenName);

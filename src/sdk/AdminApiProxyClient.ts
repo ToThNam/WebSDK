@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-define([
+import { endpointPaths_setEndpointPaths } from "../../typescript/AdminApiProxyClient";
+
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-http',
@@ -24,7 +26,7 @@ define([
 
     var networkUnavailableCode = 0;
     var requestMaxTimeout = 20000;
-    var defaultRequestOptions = {
+    var defaultRequestOptions:any = {
         timeout: requestMaxTimeout,
         retryOptions: {
             backoff: 1.5,
@@ -58,7 +60,7 @@ define([
         }
     };
 
-    function AdminApiProxyClient() {
+    function AdminApiProxyClient(this: any) {
         this._requestHandler = null;
         this._backendUri = '';
         this._endpointPaths = defaultEndpointPaths;
@@ -84,7 +86,7 @@ define([
         return this._backendUri;
     };
 
-    AdminApiProxyClient.prototype.setBackendUri = function(backendUri) {
+    AdminApiProxyClient.prototype.setBackendUri = function(backendUri: string) {
         assert.isString(backendUri, 'backendUri');
 
         this._backendUri = backendUri;
@@ -94,7 +96,7 @@ define([
         return _.assign({}, this._endpointPaths);
     };
 
-    AdminApiProxyClient.prototype.setEndpointPaths = function(endpointPaths) {
+    AdminApiProxyClient.prototype.setEndpointPaths = function(endpointPaths: endpointPaths_setEndpointPaths) {
         assert.isObject(endpointPaths, 'endpointPaths');
 
         if (endpointPaths.createStreamTokenPath) {
@@ -112,7 +114,7 @@ define([
         return _.assign({}, this._authenticationData);
     };
 
-    AdminApiProxyClient.prototype.setAuthenticationData = function(authenticationData) {
+    AdminApiProxyClient.prototype.setAuthenticationData = function(authenticationData: object) {
         assert.isObject(authenticationData, 'authenticationData');
 
         this._authenticationData = authenticationData;
@@ -122,7 +124,7 @@ define([
         return this._authenticationDataLocationInPayload;
     };
 
-    AdminApiProxyClient.prototype.setAuthenticationDataLocationInPayload = function(authenticationDataLocationInPayload) {
+    AdminApiProxyClient.prototype.setAuthenticationDataLocationInPayload = function(authenticationDataLocationInPayload: any) {
         assert.isValidType(authenticationDataLocationInPayload, authenticationDataLocations, 'authenticationDataLocationInPayload');
 
         this._authenticationDataLocationInPayload = authenticationDataLocationInPayload;
@@ -132,7 +134,7 @@ define([
         return this._requestHandler;
     };
 
-    AdminApiProxyClient.prototype.setRequestHandler = function(callback) {
+    AdminApiProxyClient.prototype.setRequestHandler = function(callback: any) {
         assert.isFunction(callback, 'callback');
 
         if (this._backendUri) {
@@ -154,7 +156,7 @@ define([
         this._requestHandler = callback;
     };
 
-    AdminApiProxyClient.prototype.createAuthenticationToken = function createAuthenticationToken(callback) {
+    AdminApiProxyClient.prototype.createAuthenticationToken = function createAuthenticationToken(callback: (arg0?: any, arg1?: { status: string; }) => void) {
         if (this._requestHandler) {
             return this._requestHandler(requestTypes.auth.name, {}, _.bind(handleOverrideRequestResponse, this, requestTypes.auth.name, callback));
         }
@@ -170,7 +172,7 @@ define([
         return requestWithTimeout.call(this, requestWithoutCallback, callback);
     };
 
-    AdminApiProxyClient.prototype.createStreamTokenForPublishing = function createStreamTokenForPublishing(sessionId, capabilities, callback) {
+    AdminApiProxyClient.prototype.createStreamTokenForPublishing = function createStreamTokenForPublishing(sessionId: string, capabilities: any[], callback: (arg0?: any, arg1?: { status: string; }) => void) {
         assert.isStringNotEmpty(sessionId, 'sessionId');
         assert.isObject(capabilities, 'capabilities');
 
@@ -194,23 +196,23 @@ define([
         return requestWithTimeout.call(this, requestWithoutCallback, callback);
     };
 
-    AdminApiProxyClient.prototype.createStreamTokenForPublishingToExternal = function createStreamTokenForPublishingToExternal(sessionId, capabilities, streamId, callback) {
+    AdminApiProxyClient.prototype.createStreamTokenForPublishingToExternal = function createStreamTokenForPublishingToExternal(sessionId: string, capabilities: any[], streamId: string, callback: any) {
         this.createStreamTokenForSubscribing(sessionId, capabilities, streamId, null, callback);
     };
 
-    AdminApiProxyClient.prototype.createStreamTokenForSubscribing = function createStreamTokenForSubscribing(sessionId, capabilities, streamId, alternateStreamIds, callback) {
+    AdminApiProxyClient.prototype.createStreamTokenForSubscribing = function createStreamTokenForSubscribing(sessionId: string, capabilities: any[], streamId: string, alternateStreamIds: string , callback: (arg0?: any, arg1?: { status: string; }) => void) {
         assert.isStringNotEmpty(sessionId, 'sessionId');
         assert.isObject(capabilities, 'capabilities');
 
         if (!_.isNullOrUndefined(alternateStreamIds)) {
             assert.isArray(alternateStreamIds, 'additionalStreamIds');
 
-            _.forEach(alternateStreamIds, function(alternateOriginStreamId) {
+            _.forEach(alternateStreamIds, function(alternateOriginStreamId: string) {
                 assert.isStringNotEmpty(alternateOriginStreamId, 'alternateOriginStreamId');
             });
         }
 
-        var data = {
+        var data:any = {
             sessionId: sessionId,
             capabilities: capabilities,
             originStreamId: streamId
@@ -235,9 +237,9 @@ define([
         return requestWithTimeout.call(this, requestWithoutCallback, callback);
     };
 
-    function requestWithTimeout(requestWithoutCallback, callback) {
-        var requestTimeoutId = null;
-        var requestDisposable = requestWithoutCallback(_.bind(handleResponse, this, function(error, response) {
+    function requestWithTimeout(this: any, requestWithoutCallback: (arg0: any) => any, callback: (arg0?: Error | any, arg1?: { status: string; } ) => void) {
+        var requestTimeoutId: NodeJS.Timeout | any = null;
+        var requestDisposable = requestWithoutCallback(_.bind(handleResponse, this, function(error?: Error | any, response?: { status: string; } ) {
             clearTimeout(requestTimeoutId);
 
             switch (_.get(error, ['code'])) {
@@ -265,7 +267,7 @@ define([
         return requestDisposable;
     }
 
-    function bindAuthDataAndPrepareRequest(method, scope, uri, data, options) {
+    function bindAuthDataAndPrepareRequest(this: any, method: any, scope: any, uri: string, data: any, options: { headers: any; }) {
         switch (this._authenticationDataLocationInPayload) {
         case authenticationDataLocations.body.name:
             data = appendAuthDataTo.call(this, data);
@@ -282,11 +284,11 @@ define([
         return _.bind(method, scope, uri, JSON.stringify(data), options);
     }
 
-    function appendAuthDataTo(data) {
+    function appendAuthDataTo(this: any, data: any) {
         return _.assign({}, data, this._authenticationData);
     }
 
-    function appendAuthHeaders(options) {
+    function appendAuthHeaders(this: any, options: { headers: any; }) {
         if (options.headers) {
             options.headers = _.assign({}, this._authenticationData, options.headers);
 
@@ -296,7 +298,7 @@ define([
         return _.assign({}, {headers: this._authenticationData}, options);
     }
 
-    function handleResponse(callback, error, response) {
+    function handleResponse(callback: (arg0: any, arg1: { status?: string; }) => any, error: string, response: { data: string; }) {
         if (error) {
             return callback(error, {});
         }
@@ -310,12 +312,12 @@ define([
         return callback(null, res);
     }
 
-    function handleOverrideRequestResponse(type, callback, error, token) {
+    function handleOverrideRequestResponse(type: string, callback: (arg0: any, arg1: { status: string; }) => any, error: string, token: string) {
         if (!token || error) {
             return callback(error, {status: 'failed'});
         }
 
-        var response = {status: 'ok'};
+        var response:any = {status: 'ok'};
 
         switch(type) {
         case requestTypes.auth.name:

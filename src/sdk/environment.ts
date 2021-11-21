@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light'
 ], function(_) {
     'use strict';
 
-    var environment = {};
+    var environment:any = {};
 
-    environment.getEnvironmentFromUrl = function(uri) {
+    environment.getEnvironmentFromUrl = function(uri: string | URL) {
         try {
             var baseURL = new URL(uri);
 
@@ -31,7 +31,7 @@ define([
         }
     };
 
-    environment.parseEnvFromPcastBaseUri = function(uri) {
+    environment.parseEnvFromPcastBaseUri = function(uri: string) {
         uri = uri.toLowerCase();
 
         if (_.includes(uri, 'local')) {
@@ -43,7 +43,7 @@ define([
         return 'production';
     };
 
-    environment.getTelemetryServerUri = function(baseUri) {
+    environment.getTelemetryServerUri = function(baseUri: string | URL) {
         if (!baseUri) {
             return '';
         }

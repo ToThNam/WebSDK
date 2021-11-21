@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-observable',
@@ -34,7 +34,7 @@ define([
     var defaultStreamWildcardTokenRefreshInterval = 300000;
     var streamingTypeCapabilities = ['streaming', 'rtmp'];
 
-    function RoomExpress(options) {
+    function RoomExpress(this: any, options: { pcastExpress: object; features: any; }) {
         assert.isObject(options, 'options');
 
         if (options.pcastExpress) {
@@ -57,7 +57,7 @@ define([
 
         var that = this;
 
-        this._pcastExpress.getPCastObservable().subscribe(function(pcast) {
+        this._pcastExpress.getPCastObservable().subscribe(function(pcast: any) {
             if (!pcast) {
                 return;
             }
@@ -71,7 +71,7 @@ define([
                     return;
                 }
 
-                _.forOwn(that._roomServices, function(roomService) {
+                _.forOwn(that._roomServices, function(roomService: { setPCast: (arg0: any) => void; }) {
                     roomService.setPCast(pcast);
                 });
             });
@@ -97,7 +97,7 @@ define([
     };
 
     // Responsible for creating room. Returns immutable room
-    RoomExpress.prototype.createRoom = function createRoom(options, callback) {
+    RoomExpress.prototype.createRoom = function createRoom(options: { room: { name: string; type: string; description: string; }; }, callback: (arg0?: null, arg1?: any) => any) {
         assert.isFunction(callback, 'callback');
         assert.isObject(options.room, 'options.room');
         assert.isStringNotEmpty(options.room.name, 'options.room.name');
@@ -109,7 +109,7 @@ define([
 
         var roomDescription = options.room.description || getDefaultRoomDescription(options.room.type);
 
-        createRoomService.call(this, null, null, function(error, roomServiceResponse) {
+        createRoomService.call(this, null, null, function(error: any, roomServiceResponse: { status: string; roomService: any; }) {
             if (error) {
                 return callback(error);
             }
@@ -125,7 +125,7 @@ define([
                 roomToCreate.description = roomDescription;
             }
 
-            roomService.createRoom(roomToCreate, function(error, roomResponse) {
+            roomService.createRoom(roomToCreate, function(error: any, roomResponse: any) {
                 if (error) {
                     return callback(error);
                 }
@@ -138,7 +138,7 @@ define([
         });
     };
 
-    RoomExpress.prototype.joinRoom = function joinRoom(options, joinRoomCallback, membersChangedCallback) {
+    RoomExpress.prototype.joinRoom = function joinRoom(options: { role: string; screenName: string; roomId: string; alias: string; streams: any[]; },arg:any, joinRoomCallback: (arg0: any, arg1: any) => void, membersChangedCallback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(joinRoomCallback, 'joinRoomCallback');
         assert.isStringNotEmpty(options.role, 'options.role');
@@ -164,18 +164,18 @@ define([
         }
 
         var that = this;
-        var joinRoomWithPCast = function(pcast) {
+        var joinRoomWithPCast = function(pcast: { getObservableStatus: () => string; }) {
             if (!pcast) {
                 return;
             }
 
-            joinRoomWithOptions.call(that, options, function(error, response) {
+            joinRoomWithOptions.call(that, options, arg,function(error: any, response: any) {
                 var joinRoomResponse = response;
 
                 if (joinRoomResponse && joinRoomResponse.roomService) {
                     var leaveRoom = joinRoomResponse.roomService.leaveRoom;
 
-                    joinRoomResponse.roomService.leaveRoom = function(callback, isForceLeaveRoom) {
+                    joinRoomResponse.roomService.leaveRoom = function(callback: any, isForceLeaveRoom: boolean) {
                         if (subscription && pcast.getObservableStatus() !== 'offline') {
                             subscription.dispose();
                         }
@@ -195,7 +195,7 @@ define([
         var subscription = this._pcastExpress.getPCastObservable().subscribe(joinRoomWithPCast);
     };
 
-    RoomExpress.prototype.publishToRoom = function publishToRoom(options, callback) {
+    RoomExpress.prototype.publishToRoom = function publishToRoom(options: { room: { roomId: string; alias: string; }; streamUri: string; mediaConstraints:object; userMediaStream: object; videoElement: object; screenName: string; tags: string; streamInfo: string; streamToken: string; publishToken: string; capabilities: any[]; viewerStreamSelectionStrategy: string; enableWildcardCapability: boolean; streamType: string; memberRole: string; },arg:any, callback: (arg0: null, arg1?: any) => void) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
         assert.isObject(options.room, 'options.room');
@@ -277,7 +277,7 @@ define([
 
         var activeRoomService = findActiveRoom.call(that, roomId, alias);
 
-        var joinAndPublish = function joinAndPublish(room, createRoomResponse) {
+        var joinAndPublish = function joinAndPublish(room: { getObservableType: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; getRoomId: () => string; getObservableAlias: () => { (): any; new(): any; getValue: { (): string; new(): any; }; }; }, createRoomResponse: any) {
             var publishOptions = _.assign({
                 monitor: {
                     callback: _.bind(monitorSubsciberOrPublisher, that, callback),
@@ -294,7 +294,7 @@ define([
 
             if (options.streamUri) {
                 var remoteOptions = _.assign({connectOptions: []}, publishOptions);
-                var hasRoomConnectOptions = _.find(remoteOptions.connectOptions, function(option) {
+                var hasRoomConnectOptions = _.find(remoteOptions.connectOptions, function(option: any) {
                     return _.startsWith(option, 'room-id');
                 });
 
@@ -314,7 +314,7 @@ define([
                     ]);
                 }
 
-                var callbackWithRoomService = function(error, response) {
+                var callbackWithRoomService = function(error: null, response: any) {
                     callback(error, response ? _.assign({roomService: null}, response) : response);
                 };
 
@@ -326,9 +326,10 @@ define([
                 roomId: room.getRoomId()
             });
 
-            joinRoomWithOptions.call(that, joinRoomAsAudienceOptions, function(error, joinRoomResponse) {
+            joinRoomWithOptions.call(that, joinRoomAsAudienceOptions, arg,function(error: null, joinRoomResponse: { status: string; roomService: { getObservableActiveRoom: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }; }) {
                 if (error) {
-                    return callback(error);
+//@ts-ignore                    
+                    retu7+rn ;callback(error);
                 }
 
                 if (joinRoomResponse.status !== 'ok' && joinRoomResponse.status !== 'already-in-room') {
@@ -336,16 +337,14 @@ define([
                 }
 
                 var activeRoom = joinRoomResponse.roomService.getObservableActiveRoom().getValue();
-                var callbackWithRoomService = function(error, response) {
+                var callbackWithRoomService = function(error: null, response: any) {
                     callback(error, response ? _.assign({roomService: joinRoomResponse.roomService}, response) : response);
                 };
 
                 publishAndUpdateSelf.call(that, publishOptions, activeRoom, callbackWithRoomService);
             });
-
             return;
         };
-
         if (activeRoomService) {
             var activeRoom = activeRoomService.getObservableActiveRoom().getValue();
 
@@ -354,7 +353,7 @@ define([
             return;
         }
 
-        this.createRoom(options, function(error, createRoomResponse) {
+        this.createRoom(options, function(error: null, createRoomResponse: { status?: string; room?: any; } ) {
             if (error) {
                 return callback(error);
             }
@@ -369,13 +368,13 @@ define([
         });
     };
 
-    RoomExpress.prototype.publishScreenToRoom = function publishScreenToRoom(options, callback) {
+    RoomExpress.prototype.publishScreenToRoom = function publishScreenToRoom(options: any, callback: any) {
         var publishScreenOptions = _.assign({mediaConstraints: {screen: true}}, options);
 
         this.publishToRoom(publishScreenOptions, callback);
     };
 
-    RoomExpress.prototype.subscribeToMemberStream = function(memberStream, options, callback, defaultFeatureIndex) {
+    RoomExpress.prototype.subscribeToMemberStream = function(memberStream: { getUri: () => any; getPCastStreamId: () => any; getInfo: () => any; getObservableAudioState: () => { (): any; new(): any; subscribe: { (arg0: (state: any) => void, arg1: { initial: string; }): any; new(): any; }; }; getObservableVideoState: () => { (): any; new(): any; subscribe: { (arg0: (state: any) => void, arg1: { initial: string; }): any; new(): any; }; }; }, options: { capabilities: any[]; streamToken: string; }, callback: (arg0: Error | null, arg1: { status: string; }) => void, defaultFeatureIndex: number) {
         var capabilitiesFromStreamToken;
         var that = this;
 
@@ -458,7 +457,7 @@ define([
         }, options);
         var disposables = new disposable.DisposableList();
 
-        subscribeToMemberStream.call(this, subscribeOptions, isScreen, function(error, response) {
+        subscribeToMemberStream.call(this, subscribeOptions, isScreen, function(error: any, response: { status: string; mediaStream: { getStream: () => { (): any; new(): any; getAudioTracks: { (): any; new(): any; }; getVideoTracks: { (): any; new(): any; }; }; getMonitor: () => any; }; }) {
             disposables.dispose();
 
             if (response && response.status === 'ok' && response.mediaStream && response.mediaStream.getStream()) {
@@ -497,7 +496,7 @@ define([
         });
     };
 
-    function getCapabilitiesFromTokenIfAble(streamToken) {
+    function getCapabilitiesFromTokenIfAble(this: any, streamToken: string) {
         var that = this;
 
         try {
@@ -509,13 +508,13 @@ define([
         }
     }
 
-    function disposeOfRoomServices() {
-        _.forOwn(this._roomServicePublishers, function(publishers) {
-            _.forEach(publishers, function(publisher) {
+    function disposeOfRoomServices(this: any) {
+        _.forOwn(this._roomServicePublishers, function(publishers: any) {
+            _.forEach(publishers, function(publisher: { stop: (arg0: string) => void; }) {
                 publisher.stop('dispose');
             });
         });
-        _.forOwn(this._roomServices, function(roomService) {
+        _.forOwn(this._roomServices, function(roomService: { stop: (arg0: string) => void; }) {
             roomService.stop('dispose');
         });
 
@@ -525,11 +524,11 @@ define([
         this._activeRoomServices = [];
     }
 
-    function createRoomService(roomId, alias, callback) {
+    function createRoomService(this: any, roomId: string, alias: string, callback: (arg0?: any, arg1?: { status: string; roomService: any; } ) => void) {
         var that = this;
         var uniqueId = _.uniqueId();
 
-        this._pcastExpress.waitForOnline(function(error) {
+        this._pcastExpress.waitForOnline(function(error: null) {
             if (error) {
                 return callback(error);
             }
@@ -558,17 +557,17 @@ define([
         });
     }
 
-    function findActiveRoom(roomId, alias) {
-        return _.find(this._activeRoomServices, function(roomService) {
+    function findActiveRoom(this: any, roomId: string, alias: string) {
+        return _.find(this._activeRoomServices, function(roomService: { getObservableActiveRoom: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }) {
             var activeRoom = roomService.getObservableActiveRoom().getValue();
 
             return activeRoom && (activeRoom.getRoomId() === roomId || activeRoom.getObservableAlias().getValue() === alias);
         });
     }
 
-    function createExpressRoomService(roomService, uniqueId) {
+    function createExpressRoomService(this: any, roomService: { stop: { (arg0: string): void; (): void; }; leaveRoom: (callback: any, isForceLeaveRoom: any) => void; getObservableActiveRoom: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }, uniqueId: string) {
         var that = this;
-        var roomServiceStop = roomService.stop;
+        var roomServiceStop:any = roomService.stop;
         var roomServiceLeaveRoom = roomService.leaveRoom;
 
         roomService.stop = function() {
@@ -580,7 +579,7 @@ define([
         roomService.leaveRoom = function leaveRoom(callback, isForceLeaveRoom) {
             var room = roomService.getObservableActiveRoom().getValue();
 
-            roomServiceLeaveRoom.call(roomService, function(error, response) {
+            roomServiceLeaveRoom.call(roomService, function(error: any, response: { status: string; }) {
                 if (error) {
                     roomService.stop('leave-room-failure');
 
@@ -602,12 +601,12 @@ define([
         return roomService;
     }
 
-    function joinRoomWithOptions(options, joinRoomCallback, membersChangedCallback) {
+    function joinRoomWithOptions(this: any, options: { role?: string; screenName?: string; roomId: string; alias: string; streams?: any[]; streamsWildcardTokenCapabilities: any; },arg:any, joinRoomCallback: (arg0: any, arg1?: { status: string; roomService: any; } | any) => void, membersChangedCallback: (arg0?: any[]) => void){
         var that = this;
         var role = options.role;
         var screenName = options.screenName || _.uniqueId();
 
-        createRoomService.call(that, options.roomId, options.alias, function(error, roomServiceResponse) {
+        createRoomService.call(that, options.roomId, options.alias, function(error, roomServiceResponse:any) {
             if (error) {
                 return joinRoomCallback(error);
             }
@@ -616,10 +615,10 @@ define([
                 return joinRoomCallback(null, roomServiceResponse);
             }
 
-            var roomService = roomServiceResponse.roomService;
+            var roomService= roomServiceResponse.roomService;
             var activeRoomObservable = roomService.getObservableActiveRoom();
             var activeRoom = activeRoomObservable.getValue();
-            var membersSubscription = null;
+            var membersSubscription: { dispose: () => void; } | null = null;
             var setupMembersSubscription = function setupMembersSubscription() {
                 var room = activeRoomObservable.getValue();
 
@@ -633,7 +632,7 @@ define([
 
                 membersSubscription = room.getObservableMembers().subscribe(membersChangedCallback, {initial: 'notify'});
 
-                that._disposables.add(activeRoomObservable.subscribe(function(newRoom) {
+                that._disposables.add(activeRoomObservable.subscribe(function(newRoom: { getObservableMembers: () => { (): any; new(): any; subscribe: { (arg0: (arg0: never[]) => void, arg1: { initial: string; }): { dispose: () => void; } | null; new(): any; }; }; }) {
                     if (membersSubscription) {
                         membersChangedCallback([]);
                         membersSubscription.dispose();
@@ -661,7 +660,7 @@ define([
                 }
 
                 if (options.streamsWildcardTokenCapabilities && activeRoom && !_.includes(stream.uri, 'streamToken')) {
-                    return createViewerStreamTokensAndUpdateSelf.call(that, options, stream, activeRoom, function(error, response) {
+                    return createViewerStreamTokensAndUpdateSelf.call(that, options, stream, activeRoom, function(error: null, response: any) {
                         joinRoomCallback(error, _.assign({roomService: roomService}, response));
 
                         if (membersChangedCallback) {
@@ -672,7 +671,7 @@ define([
 
                 var roleToJoin = options.streamsWildcardTokenCapabilities && !activeRoom && !_.includes(stream.uri, 'streamToken') ? memberEnums.roles.audience.name : options.role;
 
-                updateSelfStreamsAndRole.call(that, options.streams, roleToJoin, roomService, function(error) {
+                updateSelfStreamsAndRole.call(that, options.streams, roleToJoin, roomService, function(error: null) {
                     if (error) {
                         return joinRoomCallback(error);
                     }
@@ -692,7 +691,7 @@ define([
                 return;
             }
 
-            roomService.enterRoom(options.roomId, options.alias, function(error, roomResponse) {
+            roomService.enterRoom(options.roomId, options.alias, function(error: null, roomResponse: { status: string; roomService: any;room:any }, ) {
                 if (error) {
                     roomService.stop('enter-room-failure');
 
@@ -717,10 +716,10 @@ define([
                 that._activeRoomServices.push(roomService);
 
                 if (options.streamsWildcardTokenCapabilities && stream && !_.includes(stream.uri, 'streamToken')) {
-                    return createViewerStreamTokensAndUpdateSelf.call(that, options, stream, room, function(error, response) {
+                    return createViewerStreamTokensAndUpdateSelf.call(that, options, stream, room, function(error: any, response: any) {
                         joinRoomCallback(error, _.assign({roomService: roomService}, response));
 
-                        if (membersChangedCallback) {
+                        if (membersChangedCallback()) {
                             return setupMembersSubscription();
                         }
                     });
@@ -738,11 +737,11 @@ define([
         });
     }
 
-    function subscribeToMemberStream(subscribeOptions, isScreen, callback) {
+    function subscribeToMemberStream(this: any, subscribeOptions: any, isScreen: any, callback: (arg0?: any, arg1?: { status: string; retry?: () => void; } ) => void) {
         var that = this;
 
         var count = 0;
-        var handleSubscribe = function(error, response) {
+        var handleSubscribe = function(error: any, response: { status: string; retry: () => void; }) {
             if (error) {
                 return callback(error);
             }
@@ -787,15 +786,15 @@ define([
         return that._pcastExpress.subscribe(subscribeOptions, handleSubscribe);
     }
 
-    function publishAndUpdateSelf(options, room, callback) {
+    function publishAndUpdateSelf(this: any, options: { memberRole: string; enableWildcardCapability: boolean; }, room: { getRoomId: () => string; getObservableAlias: () => { (): any; new(): any; getValue: { (): string; new(): any; }; }; }, callback: (arg0?: any, arg1?: any) => void) {
         var that = this;
-        var publisher;
-        var refreshTokenIntervalId;
-        var callbackWithPublisher = function(error, response) {
+        var publisher: { getStreamId: () => string | number; stop: () => void; };
+        var refreshTokenIntervalId: NodeJS.Timeout;
+        var callbackWithPublisher = function(error: any, response?: any) {
             callback(error, response ? _.assign({publisher: publisher}, response) : response);
         };
 
-        var handlePublish = function(error, response) {
+        var handlePublish = function(error: any, response: { status: string;arg:any; publisher: { getStreamId: () => string | number; stop: () => void; }; }) {
             if (refreshTokenIntervalId && publisher) {
                 clearInterval(refreshTokenIntervalId);
             }
@@ -838,7 +837,7 @@ define([
                     return;
                 }
 
-                updateSelfStreamsAndRoleAndEnterRoomIfNecessary.call(that, streamsAfterStop, streamsAfterStop.length === 0 ? memberEnums.roles.audience.name : options.memberRole, roomService, room, options, function(error) {
+                updateSelfStreamsAndRoleAndEnterRoomIfNecessary.call(that, streamsAfterStop, streamsAfterStop.length === 0 ? memberEnums.roles.audience.name : options.memberRole, roomService, room, options, function(error: any) {
                     if (error) {
                         return callbackWithPublisher(error);
                     }
@@ -879,7 +878,7 @@ define([
         this._pcastExpress.publish(options, handlePublish);
     }
 
-    function addPublisher(publisher, room) {
+    function addPublisher(this: any, publisher: any, room: { getRoomId: () => string | number; }) {
         if (!this._roomServicePublishers[room.getRoomId()]) {
             this._roomServicePublishers[room.getRoomId()] = [];
         }
@@ -887,21 +886,21 @@ define([
         this._roomServicePublishers[room.getRoomId()].push(publisher);
     }
 
-    function removePublisher(publisher, room) {
+    function removePublisher(this: any, publisher: { getStreamId: () => any; }, room: { getRoomId: () => string | number; }) {
         if (!this._roomServicePublishers[room.getRoomId()] || !publisher) {
             return;
         }
 
-        this._roomServicePublishers[room.getRoomId()] = _.filter(this._roomServicePublishers[room.getRoomId()], function(roomPublisher) {
+        this._roomServicePublishers[room.getRoomId()] = _.filter(this._roomServicePublishers[room.getRoomId()], function(roomPublisher: { getStreamId: () => any; }) {
             return roomPublisher.getStreamId() !== publisher.getStreamId();
         });
     }
 
-    function createOptionalViewerStreamTokensAndUpdateSelf(options, publisher, room, callback) {
+    function createOptionalViewerStreamTokensAndUpdateSelf(this: any, options: { streamType: string; streamInfo: string; streamToken: string; capabilities: any[]; enableWildcardCapability: boolean; viewerStreamSelectionStrategy: string; screenName: string; }, publisher: any, room: { getRoomId: () => string; getObservableAlias: () => { (): any; new(): any; getValue: { (): string; new(): any; }; }; }, callback: { (arg0: Error, arg1: { status: string; }): any; (arg0: any, arg1: { status: string; roomService: any; }): void; (arg0?: any, arg1?: any): void; (arg0?: any, arg1?: { status: string; }): void; }) {
         var that = this;
         var streamType = options.streamType;
         var streamInfo = options.streamInfo;
-        var capabilities = [];
+        var capabilities:any = [];
 
         if (options.streamToken) {
             var capabilitiesFromStreamToken = getCapabilitiesFromTokenIfAble.call(that, options.streamToken);
@@ -927,16 +926,16 @@ define([
         return createViewerStreamTokensAndUpdateSelf.call(this, options, publisherStream, room, callback);
     }
 
-    function createViewerStreamTokensAndUpdateSelf(options, publisherStream, room, callback) {
+    function createViewerStreamTokensAndUpdateSelf(this: any, options: { viewerStreamSelectionStrategy: string; streamToken: string; capabilities: any[]; screenName: string; }, publisherStream: { uri: string; type?: string ; audioState?: string; videoState?: string; }, room: { getObservableType?: any; getObservableMembers?: any; getRoomId: any; getObservableAlias: any; }, callback: (arg0?: Error | any, arg1?: { status: string; }) => void) {
         var that = this;
         var composeWithAdditionalStreams = options.viewerStreamSelectionStrategy === 'high-availability' && room.getObservableType().getValue() === roomEnums.types.channel.name;
-        var additionalStreamIds = [];
-        var handleJoinRoomCallback = callback;
+        var additionalStreamIds: string | any[] = [];
+        var handleJoinRoomCallback:any = callback;
         var publisherStreamId = Stream.parsePCastStreamIdFromStreamUri(_.get(publisherStream, 'uri', ''));
         var protocol = that.getPCastExpress().getPCast().getProtocol();
         var sessionId = protocol ? protocol.getSessionId() : '';
         var disposables = that._publisherDisposables[publisherStreamId];
-        var disposable;
+        var disposable: { dispose: () => void; } ;
 
         if (!_.includes(publisherStream, 'capabilities')) {
             if (options.streamToken) {
@@ -957,7 +956,7 @@ define([
 
             additionalStreamIds = getValidStreamIds(membersWithSameContent);
 
-            handleJoinRoomCallback = function(error, response) {
+            handleJoinRoomCallback = function(error: any, response: { status: string; }) {
                 callback(error, response);
 
                 var roomService = _.get(response, 'roomService', findActiveRoom.call(that, room.getRoomId(), room.getObservableAlias().getValue()));
@@ -968,16 +967,16 @@ define([
 
                 var activeRoom = roomService.getObservableActiveRoom().getValue();
 
-                disposable = activeRoom.getObservableMembers().subscribe(function(members) {
+                disposable = activeRoom.getObservableMembers().subscribe(function(members: any) {
                     var self = roomService.getSelf();
                     var selfSessionId = self ? self.getSessionId() : '';
                     var newMembersWithSameContent = MemberSelector.getSimilarMembers(options.screenName, selfSessionId, members);
                     var newAdditionalStreamIds = getValidStreamIds(newMembersWithSameContent);
-                    var areTheSame = newAdditionalStreamIds.length === additionalStreamIds.length && _.reduce(newAdditionalStreamIds, function(areAllPreviousTheSame, streamId) {
+                    var areTheSame = newAdditionalStreamIds.length === additionalStreamIds.length && _.reduce(newAdditionalStreamIds, function(areAllPreviousTheSame: any, streamId: any) {
                         return areAllPreviousTheSame ? _.includes(additionalStreamIds, streamId) : areAllPreviousTheSame;
                     }, true);
                     var selfStreams = self ? self.getObservableStreams().getValue() : [];
-                    var publishedSelfStream = _.find(selfStreams, function(stream) {
+                    var publishedSelfStream = _.find(selfStreams, function(stream: { getPCastStreamId: () => any; }) {
                         return stream.getPCastStreamId() === publisherStreamId;
                     });
 
@@ -1026,17 +1025,17 @@ define([
         });
     }
 
-    function generateAllStreamTokensAndCreateStream(publisherCapabilities, streamId, additionalStreamIds, stream, callback) {
-        var generateStreamTokenRequests = [];
+    function generateAllStreamTokensAndCreateStream(this: any, publisherCapabilities: any, streamId: any, additionalStreamIds: string | any[], stream: { uri: any; type: string , audioState: string; videoState: string; }, callback: (arg0: null, arg1: { status: string; }) => void) {
+        var generateStreamTokenRequests: any[] = [];
         var numberOfCompletedRequests = 0;
         var requestCancelled = false;
         var disposeOfRequests = function() {
-            _.forEach(generateStreamTokenRequests, function(disposable) {
+            _.forEach(generateStreamTokenRequests, function(disposable: { dispose: () => void; }) {
                 disposable.dispose();
             });
         };
 
-        var completedRequestsCallback = function(error, response) {
+        var completedRequestsCallback = function(error: null, response: { status: any; }) {
             if (requestCancelled) {
                 return;
             }
@@ -1079,7 +1078,7 @@ define([
         return disposeOfRequests;
     }
 
-    function generateWildcardStreamTokenAndAppendToStream(capabilities, streamId, additionalStreamIds, stream, tokenName, callback) {
+    function generateWildcardStreamTokenAndAppendToStream(this: any, capabilities: any, streamId: any, additionalStreamIds: any, stream: { uri: string; type: string; audioState: string; videoState: string; }, tokenName: string, callback: (arg0?: any, arg1?: any) => void) {
         var that = this;
         var adminApi = that._pcastExpress.getAdminAPI();
 
@@ -1087,7 +1086,7 @@ define([
             throw new Error('Set "options.enableWildcardCapability" to "false", or set adminApiProxyClient on initiating room express');
         }
 
-        return that._pcastExpress.getAdminAPI().createStreamTokenForSubscribing('*', capabilities, streamId, additionalStreamIds, function(error, response) {
+        return that._pcastExpress.getAdminAPI().createStreamTokenForSubscribing('*', capabilities, streamId, additionalStreamIds, function(error:any, response: { status: string; streamToken: string; } ) {
             if (error) {
                 return callback(error);
             }
@@ -1102,7 +1101,7 @@ define([
         });
     }
 
-    function addStreamInfo(stream, name, value) {
+    function addStreamInfo(stream: { uri: any; type?: string; audioState?: string; videoState?: string; }, name: string, value: string) {
         var indexOfQueryParam = stream.uri.indexOf('?');
         var prefix = indexOfQueryParam > -1 ? '&' : '?';
         var indexOfHashAfterQueryParam = stream.uri.indexOf('#', indexOfQueryParam === -1 ? stream.uri.length : indexOfQueryParam);
@@ -1114,8 +1113,8 @@ define([
         return stream;
     }
 
-    function getValidStreamIds(members) {
-        return _.reduce(members, function(streamIds, member) {
+    function getValidStreamIds(members: any) {
+        return _.reduce(members, function(streamIds: any[], member: { getObservableStreams: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }) {
             var stream = _.get(member.getObservableStreams().getValue(), '0');
             var streamId = stream ? stream.getPCastStreamId() : '';
 
@@ -1127,7 +1126,7 @@ define([
         }, []);
     }
 
-    function mapNewPublisherStreamToMemberStreams(publisherStream, room) {
+    function mapNewPublisherStreamToMemberStreams(this: any, publisherStream: { uri: string; type: string; }, room: { getRoomId: () => string; getObservableAlias: () => { (): any; new(): any; getValue: { (): string; new(): any; }; }; }) {
         var that = this;
         var activeRoomService = findActiveRoom.call(this, room.getRoomId(), room.getObservableAlias().getValue());
         var defaultStreams = publisherStream ? [publisherStream] : [];
@@ -1142,11 +1141,11 @@ define([
             return defaultStreams;
         }
 
-        var selfStreams = _.map(self.getObservableStreams().getValue(), function(selfStream) {
+        var selfStreams = _.map(self.getObservableStreams().getValue(), function(selfStream: { toJson: () => any; }) {
             return selfStream.toJson();
         });
         var publishers = this._roomServicePublishers[room.getRoomId()] || [];
-        var publisherIds = _.map(publishers, function(publisher) {
+        var publisherIds = _.map(publishers, function(publisher: { getStreamId: () => any; }) {
             return publisher.getStreamId();
         });
 
@@ -1155,7 +1154,7 @@ define([
         }
 
         if (publisherStream) {
-            selfStreams = _.filter(selfStreams, function(stream) {
+            selfStreams = _.filter(selfStreams, function(stream: { uri: string; type: string; }) {
                 var hasSameUri = stream.uri === publisherStream.uri;
                 var pcastStreamId = Stream.parsePCastStreamIdFromStreamUri(stream.uri);
                 var isPCastStream = !!pcastStreamId;
@@ -1169,14 +1168,14 @@ define([
             selfStreams.push(publisherStream);
         }
 
-        return _.filter(selfStreams, function(stream) {
+        return _.filter(selfStreams, function(stream: { uri: string; }) {
             return !Stream.parsePCastStreamIdFromStreamUri(stream.uri)
                 || _.includes(publisherIds, Stream.parsePCastStreamIdFromStreamUri(stream.uri) || stream.uri)
                 || _.includes(that._externalPublishers, stream.uri.split('?')[0]);
         });
     }
 
-    function updateSelfStreamsAndRole(streams, role, roomService, callback) {
+    function updateSelfStreamsAndRole(this: any, streams: any[], role: any, roomService: { getObservableActiveRoom: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; getSelf: () => { (): any; new(): any; setStreams?: any; getObservableRole?: any; commitChanges?: (arg0: { (error: any, response: any): any; (error: any, response: any): any; }) => void; getRoomService: () => any; getObservableLastUpdate?: () => { (): any; new(): any; getValue: { (): any; new(): any; }; setValue: { (arg0: any): void; new(): any; }; }; }; }, callback: (arg0?: any, arg1?: any) => void) {
         var activeRoom = roomService ? roomService.getObservableActiveRoom().getValue() : null;
 
         if (streams && roomService) {
@@ -1192,7 +1191,7 @@ define([
         }
     }
 
-    function updateSelfStreamsAndRoleAndEnterRoomIfNecessary(streams, role, roomService, room, options, callback) {
+    function updateSelfStreamsAndRoleAndEnterRoomIfNecessary(this: any, streams: any[], role: string, roomService: { getObservableActiveRoom: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; }, room: { getRoomId: () => string; getObservableAlias: () => { (): any; new(): any; getValue: { (): string; new(): any; }; }; }, options: any, callback: { (arg0: null, arg1: { status?: string ; roomService: any; } ): void; (arg0?: any, arg1?: any): void; }) {
         var activeRoomService = findActiveRoom.call(this, room.getRoomId(), room.getObservableAlias().getValue());
         var activeRoom = roomService ? roomService.getObservableActiveRoom().getValue() : null;
         var shouldJoinRoom = !activeRoom && !activeRoomService;
@@ -1241,7 +1240,7 @@ define([
         }
     }
 
-    function updateSelfWithRetry(self, callback) {
+    function updateSelfWithRetry(this: any, self: { commitChanges: (arg0: { (error: any, response: any): any; (error: any, response: any): any; }) => void; getRoomService: () => any; getObservableLastUpdate: () => { (): any; new(): any; getValue: { (): any; new(): any; }; setValue: { (arg0: any): void; new(): any; }; }; }, callback: (arg0?: any, arg1?: any) => void) {
         var updateSelfErrors = 0;
         var that = this;
         var maxUpdateSelfRetries = 5;
@@ -1292,7 +1291,7 @@ define([
         }
     }
 
-    function monitorSubsciberOrPublisher(callback, error, response) {
+    function monitorSubsciberOrPublisher(callback: (arg0?: any, arg1?: any) => void, error: any, response: { retry: () => any; }) {
         if (error) {
             return callback(error);
         }
@@ -1304,7 +1303,7 @@ define([
         callback(error, response);
     }
 
-    function getDefaultRoomDescription(type) {
+    function getDefaultRoomDescription(type: string) {
         switch(type) {
         case roomEnums.types.channel.name:
             return 'Room Channel';
@@ -1322,7 +1321,7 @@ define([
     }
 
     // TODO(dy) Remove backward compatibility when all publisher clients adapt to providing capabilities.
-    function buildCapabilitiesFromPublisherWildcardTokens(uri) {
+    function buildCapabilitiesFromPublisherWildcardTokens(uri: string) {
         var streamInfo = Stream.getInfoFromStreamUri(uri);
         var capabilities = [];
 
@@ -1333,7 +1332,7 @@ define([
         return capabilities;
     }
 
-    function getStreamTokenForFeature(uri, feature) {
+    function getStreamTokenForFeature(uri: string, feature: any) {
         var streamInfo = Stream.getInfoFromStreamUri(uri);
 
         switch(feature) {
@@ -1349,7 +1348,7 @@ define([
     }
 
     // TODO(dy) Remove backward compatibility when all publisher clients adapt to providing capabilities.
-    function parseStreamTokenFromStreamUri(uri, capabilities) {
+    function parseStreamTokenFromStreamUri(uri: string, capabilities: any[]) {
         var streamInfo = Stream.getInfoFromStreamUri(uri);
         var isStreaming = streamInfo.streamTokenForLiveStream && _.includes(capabilities, 'streaming');
         var isRtmp = streamInfo.streamTokenForLiveStream && _.includes(capabilities, 'rtmp');
@@ -1380,7 +1379,7 @@ define([
         }
     }
 
-    function mapStreamToMemberStream(publisher, type, streamInfo, capabilities, viewerStreamToken, viewerStreamTokenForBroadcastStream, viewerStreamTokenForLiveStream, drmStreamTokens) {
+    function mapStreamToMemberStream(publisher: { getStream: () => any; getStreamId: () => any; }, type: string , streamInfo: string , capabilities: string[], viewerStreamToken: any, viewerStreamTokenForBroadcastStream: any, viewerStreamTokenForLiveStream: any, drmStreamTokens: any[] ) {
         var mediaStream = publisher.getStream();
         var audioTracks = mediaStream ? mediaStream.getAudioTracks() : null;
         var videoTracks = mediaStream ? mediaStream.getVideoTracks() : null;
@@ -1395,7 +1394,7 @@ define([
             audioTrackEnabled = false;
         }
 
-        var publishedStream = {
+        var publishedStream:any = {
             uri: Stream.getPCastPrefix() + publisher.getStreamId(),
             type: type,
             audioState: audioTrackEnabled ? trackEnums.states.trackEnabled.name : trackEnums.states.trackDisabled.name,
@@ -1427,7 +1426,7 @@ define([
             infoToAppend.streamTokenForLiveStreamWithDrmHollywood = drmStreamTokens[1];
         }
 
-        var queryParamString = _.reduce(infoToAppend, function(queryParamString, currentValue, currentKey) {
+        var queryParamString = _.reduce(infoToAppend, function(queryParamString: string, currentValue: string, currentKey: string) {
             var currentPrefix = queryParamString ? '&' : '?';
 
             return queryParamString + currentPrefix + currentKey + '=' + currentValue;
@@ -1442,7 +1441,7 @@ define([
         return publishedStream;
     }
 
-    function listenForTrackStateChange(publisher, room, callbackWithPublisher) {
+    function listenForTrackStateChange(this: any, publisher: { getStream: () => any; getStreamId: () => any; }, room: { getRoomId: () => string; }, callbackWithPublisher: any) {
         var that = this;
         var stream = publisher.getStream();
 
@@ -1452,7 +1451,7 @@ define([
 
         var tracks = stream.getTracks();
 
-        _.forEach(tracks, function(track) {
+        _.forEach(tracks, function(track: { enabled: any; id: string; kind: string; updateState: (enabled: any) => void; }) {
             var handleStateChange = function handleStateChange() {
                 that._isHandlingTrackChange = true;
 
@@ -1464,7 +1463,7 @@ define([
                 }
 
                 var selfStreams = activeRoomService.getSelf().getObservableStreams().getValue();
-                var memberStream = _.find(selfStreams, function(selfStream) {
+                var memberStream = _.find(selfStreams, function(selfStream: { getPCastStreamId: () => any; }) {
                     return selfStream.getPCastStreamId() === publisher.getStreamId();
                 });
                 var self = getSelfAssociatedWithStream.call(that, memberStream);
@@ -1503,19 +1502,19 @@ define([
                 });
             };
 
-            track.updateState = function(enabled) {
+            track.updateState = function(enabled: any) {
                 this.enabled = enabled;
                 handleStateChangeIfPossible();
             };
         });
     }
 
-    function getSelfAssociatedWithStream(memberStream) {
-        var roomService = _.find(this._activeRoomServices, function(roomService) {
+    function getSelfAssociatedWithStream(this: any, memberStream: any) {
+        var roomService = _.find(this._activeRoomServices, function(roomService: { getSelf: () => any; }) {
             var self = roomService.getSelf();
             var selfStreams = self ? self.getObservableStreams().getValue() : [];
 
-            return _.find(selfStreams, function(selfStream) {
+            return _.find(selfStreams, function(selfStream: any) {
                 return memberStream === selfStream;
             });
         });
@@ -1525,3 +1524,4 @@ define([
 
     return RoomExpress;
 });
+

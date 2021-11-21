@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { callback_wrapResponseWithChannelPrefixes, member_evaluateMembers, options_joinChannel, options_publishScreenToChannel, options_publishToChannel, response_joinRoomCallback, response_mediaStreamCallback, response_monitorChannelSubscriber, response_wrapResponseWithChannelPrefixes } from "../../../typescript/src/express/ChannelExpress";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
@@ -39,7 +41,7 @@ define('',[
     var backoffIntervalOnCapacity = 5000;
     var backoffIntervalOnRetry = 100;
 
-    function ChannelExpress(options) {
+    function ChannelExpress(this: any, options: { roomExpress: object; }) {
         assert.isObject(options, 'options');
 
         if (options.roomExpress) {
@@ -74,7 +76,7 @@ define('',[
         return this._roomExpress.getPCastExpress();
     };
 
-    ChannelExpress.prototype.createChannel = function createChannel(options, callback) {
+    ChannelExpress.prototype.createChannel = function createChannel(options: { channel: object; }, callback: any) {
         assert.isObject(options, 'options');
         assert.isObject(options.channel, 'options.channel');
 
@@ -87,7 +89,7 @@ define('',[
         this._roomExpress.createRoom(createRoomOptions, _.bind(wrapResponseWithChannelPrefixesAndContinue, null, callback));
     };
 
-    ChannelExpress.prototype.joinChannel = function joinChannel(options, joinChannelCallback, subscriberCallback) {
+    ChannelExpress.prototype.joinChannel = function joinChannel(options: options_joinChannel, joinChannelCallback:()=>void, subscriberCallback: (arg0: null, arg1: { status: string; }) => void) {
         assert.isObject(options, 'options');
         assert.isFunction(joinChannelCallback, 'joinChannelCallback');
         assert.isFunction(subscriberCallback, 'subscriberCallback');
@@ -110,13 +112,13 @@ define('',[
             failureCountForBanningAMember: failureCountForBanningAMember,
             banMemberOnCapacityFailureCount: banMemberOnCapacityFailureCount
         });
-        var lastMediaStream;
-        var lastStreamId;
-        var memberSubscriptions = [];
-        var channelRoomService;
+        var lastMediaStream: { stop: (arg0: string) => void; isActive: () => any; } | null;
+        var lastStreamId: null;
+        var memberSubscriptions: any[] = [];
+        var channelRoomService: { getObservableActiveRoom: () => { (): any; new(): any; getValue: { (): any; new(): any; }; }; };
         var channelId = '';
         var that = this;
-        var memberSelectionBackoffTimeoutId = null;
+        var memberSelectionBackoffTimeoutId: NodeJS.Timeout | null = null;
 
         if (channelOptions.channelId) {
             channelOptions.roomId = channelOptions.channelId;
@@ -139,7 +141,7 @@ define('',[
             memberSubscriptions = [];
         };
 
-        var joinRoomCallback = function(error, response) {
+        var joinRoomCallback = function(error: any, response: response_joinRoomCallback) {
             var channelResponse = !response || _.assign({}, response);
 
             if (that._pcastStatusSubscription) {
@@ -156,7 +158,7 @@ define('',[
 
                 that._logger.info('Joined channel [%s] with [%s] selection strategy', channelId, memberSelector.getStrategy());
 
-                channelResponse.roomService.leaveRoom = function(callback) {
+                channelResponse.roomService.leaveRoom = function(callback: any) {
                     if (lastMediaStream) {
                         lastMediaStream.stop('leave-channel');
                     }
@@ -170,13 +172,13 @@ define('',[
             wrapResponseWithChannelPrefixesAndContinue(joinChannelCallback, error, channelResponse);
         };
 
-        that._roomExpress.joinRoom(channelOptions, joinRoomCallback, function membersChangedCallback(members, streamErrorStatus) {
+        that._roomExpress.joinRoom(channelOptions, joinRoomCallback, function membersChangedCallback(members: any[], streamErrorStatus: any) {
             resetListeners();
 
             that._logger.info('[%s] Members changed with status [%s]. Channel has [%s] active members.', channelId, streamErrorStatus, members.length);
 
-            var evaluateMembers = function() {
-                var presenters = _.filter(members, function(member) {
+            var evaluateMembers = function(this: any) {
+                var presenters = _.filter(members, function(member: member_evaluateMembers) {
                     return member.getObservableRole().getValue() === memberEnums.roles.presenter.name && member.getObservableStreams().getValue().length > 0;
                 });
                 var selectedPresenter = memberSelector.getNext(presenters);
@@ -229,7 +231,7 @@ define('',[
                     }
                 }
 
-                var tryNextMember = function(streamStatus) {
+                var tryNextMember = function(streamStatus: string) {
                     if (memberSelectionBackoffTimeoutId !== null) {
                         that._logger.warn('[%s] Clearing backoff interval after triggering of another unexpected failure [%s]', channelId, streamStatus);
 
@@ -252,7 +254,7 @@ define('',[
                     }, streamStatus === 'capacity' ? backoffIntervalOnCapacity : backoffIntervalOnRetry);
                 };
 
-                function monitorChannelSubscriber(mediaStreamId, error, response) {
+                function monitorChannelSubscriber(mediaStreamId: string, error: null, response:response_monitorChannelSubscriber) {
                     if (lastStreamId !== mediaStreamId) {
                         that._logger.info('[%s] Ignore old channel subscriber monitor stream [%s]. Active stream is [%s]', channelId, mediaStreamId, lastStreamId);
 
@@ -312,7 +314,7 @@ define('',[
 
                 lastStreamId = streamId;
 
-                var mediaStreamCallback = function mediaStreamCallback(mediaStreamId, error, response) {
+                var mediaStreamCallback = function mediaStreamCallback(mediaStreamId: string, error: null, response:response_mediaStreamCallback ) {
                     if (lastStreamId !== mediaStreamId) {
                         that._logger.info('[%s] Ignore old media stream callback for stream [%s]. Active stream is [%s]', channelId, mediaStreamId, lastStreamId);
 
@@ -371,7 +373,7 @@ define('',[
         });
     };
 
-    ChannelExpress.prototype.publishToChannel = function publishToChannel(options, callback) {
+    ChannelExpress.prototype.publishToChannel = function publishToChannel(options:options_publishToChannel , callback: (arg0: Error, arg1: { status: string; }) => void) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 
@@ -404,7 +406,7 @@ define('',[
         this._roomExpress.publishToRoom(channelOptions, _.bind(wrapResponseWithChannelPrefixesAndContinue, null, callback));
     };
 
-    ChannelExpress.prototype.publishScreenToChannel = function publishScreenToChannel(options, callback) {
+    ChannelExpress.prototype.publishScreenToChannel = function publishScreenToChannel(options:options_publishScreenToChannel, callback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 
@@ -421,7 +423,7 @@ define('',[
         this._roomExpress.publishScreenToRoom(channelOptions, _.bind(wrapResponseWithChannelPrefixesAndContinue, null, callback));
     };
 
-    function wrapResponseWithChannelPrefixesAndContinue(callback, error, response) {
+    function wrapResponseWithChannelPrefixesAndContinue(callback:callback_wrapResponseWithChannelPrefixes , error: string, response: response_wrapResponseWithChannelPrefixes) {
         if (response && _.hasIndexOrKey(response, 'roomService')) {
             response.channelService = response.roomService ? new ChannelService(response.roomService) : null;
 

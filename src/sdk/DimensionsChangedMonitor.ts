@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define([
+define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event'
@@ -24,7 +24,7 @@ define([
     var defaultPollFrequency = 500;
     var minimumPollFrequency = 15;
 
-    function DimensionsChangedMonitor(logger, options) {
+    function DimensionsChangedMonitor(this: any, logger: object, options: { pollFrequency: number; }) {
         assert.isObject(logger, 'logger');
 
         this._logger = logger;
@@ -45,7 +45,7 @@ define([
         this._renderer = null;
     }
 
-    DimensionsChangedMonitor.prototype.start = function start(renderer, element) {
+    DimensionsChangedMonitor.prototype.start = function start(renderer: any, element: any) {
         startMonitor.call(this, renderer, element);
     };
 
@@ -53,7 +53,7 @@ define([
         stopMonitor.call(this);
     };
 
-    DimensionsChangedMonitor.prototype.addVideoDisplayDimensionsChangedCallback = function addVideoDisplayDimensionsChangedCallback(callback) {
+    DimensionsChangedMonitor.prototype.addVideoDisplayDimensionsChangedCallback = function addVideoDisplayDimensionsChangedCallback(callback: any) {
         assert.isFunction(callback, 'addVideoDisplayDimensionsChangedCallback');
         startInterval.call(this);
 
@@ -67,7 +67,7 @@ define([
             ', state=' + (this._dimensionsChangedIntervalId ? 'running' : 'stopped') + ']';
     };
 
-    function startMonitor(renderer, element) {
+    function startMonitor(this: any, renderer: any, element: { videoWidth: any; }) {
         if (!element || _.isUndefined(element.videoWidth)) {
             this._logger.warn("Attempting to start dimensions changed monitor without providing proper 'video' element.");
         }
@@ -78,7 +78,7 @@ define([
         startInterval.call(this);
     }
 
-    function stopMonitor() {
+    function stopMonitor(this: any) {
         this._toBeStarted = false;
 
         if (this._dimensionsChangedIntervalId) {
@@ -89,7 +89,7 @@ define([
         this._dimensionsChangedEvent.dispose();
     }
 
-    function startInterval() {
+    function startInterval(this: any) {
         // Return if either:
         // - start hasn't been called yet
         // - the interval is already running

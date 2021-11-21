@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { options_createExpressPublisher, options_getStreamingTokenAndPublish, options_getUserMedia, options_PCastExpress, options_publish, options_publishRemote, options_publishStreamToExternal, options_publishUserMediaOrUri, options_resolveUserMedia, options_subscribe, options_subscribeToStream, pcast_subscribeToStatusChange, publisher_setStreamAudioTracksState, publisher_setStreamVideoTracksState, screenOptions_resolveUserMedia, subscriber_createExpressSubscriber } from "../../../typescript/src/express/PCastExpress";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
@@ -36,7 +38,7 @@ define('',[
         maxReconnectFrequency: 60 * 1000
     };
 
-    function PCastExpress(this: any, options: { authToken: string; adminApiProxyClient: { createAuthenticationToken: any; }; onError: any; onlineTimeout: number; reconnectOptions: { maxOfflineTime: number; maxReconnectFrequency: number; }; backendUri: string; authenticationData: object; }) {
+    function PCastExpress(this: any, options:options_PCastExpress ) {
         assert.isObject(options, 'options');
 
         if (options.authToken) {
@@ -160,7 +162,7 @@ define('',[
         return this._adminApiProxyClient;
     };
 
-    PCastExpress.prototype.getUserMedia = function(options: {resolutionSelectionStrategy:any; mediaConstraints: object; resolution: number; frameRate: number; aspectRatio: string; onResolveMedia: any; onScreenShare: any; }, callback: any) {
+    PCastExpress.prototype.getUserMedia = function(options:options_getUserMedia , callback: any) {
         var that = this;
 
         assert.isObject(options.mediaConstraints, 'options.mediaConstraints');
@@ -201,7 +203,7 @@ define('',[
         });
     };
 
-    PCastExpress.prototype.publish = function publish(options: { streamId:string,capabilities: any[]; connectOptions: string[]; mediaConstraints: object; userMediaStream: object; videoElement: object; monitor: { callback: any; options: any; }; publishToken: string; streamToken: string; isContinuation: any; }, callback: (arg0?: any,arg1?:any) => any) {
+    PCastExpress.prototype.publish = function publish(options:options_publish, callback: (arg0?: any,arg1?:any) => any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 
@@ -271,7 +273,7 @@ define('',[
 
     var connectOptionCapabilities = ['streaming', 'low-latency', 'on-demand', 'uld', 'vvld', 'vld', 'ld', 'sd', 'hd', 'fhd', 'uhd'];
 
-    PCastExpress.prototype.publishRemote = function publishRemote(options: { streamUri: string; capabilities: any[]; connectOptions: string[]; mediaConstraints: object; videoElement: any; prerollSkipDuration: number; monitor: { callback: any; options: object; }; frameRate: { exact: number; max: number; }; publishToken: string; streamToken: string; }, callback: (arg0: any) => any) {
+    PCastExpress.prototype.publishRemote = function publishRemote(options:options_publishRemote, callback: (arg0: any) => any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
         assert.isStringNotEmpty(options.streamUri, 'options.streamUri');
@@ -365,7 +367,7 @@ define('',[
         });
     };
 
-    PCastExpress.prototype.publishStreamToExternal = function publishStreamToExternal(options: { streamId: string; externalUri: string; capabilities: any[]; connectOptions: string[]; mediaConstraints: object; videoElement: any; monitor: { callback: any; options: object; }; streamToken: string; }, callback: (arg0: any) => any) {
+    PCastExpress.prototype.publishStreamToExternal = function publishStreamToExternal(options:options_publishStreamToExternal, callback: (arg0: any) => any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
         assert.isStringNotEmpty(options.streamId, 'options.streamId');
@@ -436,7 +438,7 @@ define('',[
         return this.publish(publishScreenOptions, callback);
     };
 
-    PCastExpress.prototype.subscribe = function subscribe(options: { streamId: string; videoElement: object; monitor: { callback: any; options: object; }; streamToken: string; capabilities: object; subscriberOptions: object; isContinuation: any; }, callback: (arg0?: null,arg1?:any) => any) {
+    PCastExpress.prototype.subscribe = function subscribe(options:options_subscribe, callback: (arg0?: null,arg1?:any) => any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
         assert.isStringNotEmpty(options.streamId, 'options.streamId');
@@ -546,7 +548,7 @@ define('',[
 
         this._logger.info('[%s] Waiting for online status before continuing. Timeout set to [%s]', this, disposeOfWaitTimeout);
 
-        var subscribeToStatusChange = (pcast: { getObservableStatus: () => { (): any; new(): any; subscribe: { (arg0: (status: string) => void, arg1: { initial: string; }): { dispose: () => void; } | null; new(): any; }; }; }) => {
+        var subscribeToStatusChange = (pcast:pcast_subscribeToStatusChange ) => {
             if (statusSubscription) {
                 statusSubscription.dispose();
             }
@@ -784,13 +786,13 @@ define('',[
         this._onError(e);
     }
 
-    function resolveUserMedia(pcast: any, options: { aspectRatio: string; resolution: number; frameRate: number; resolutionSelectionStrategy: any; onScreenShare: (arg0: any) => any; mediaConstraints: any; onResolveMedia: (arg0: any) => void; }, callback: (arg0: null, arg1?: undefined) => void) {
+    function resolveUserMedia(pcast: any, options:options_resolveUserMedia , callback: (arg0: null, arg1?: undefined) => void) {
         var userMediaResolver = new UserMediaResolver(pcast, {
             aspectRatio: options.aspectRatio,
             resolution: options.resolution,
             frameRate: options.frameRate,
             resolutionSelectionStrategy: options.resolutionSelectionStrategy,
-            onScreenShare: function(screenOptions: { resolution: number; frameRate: number; aspectRatio: string; }) {
+            onScreenShare: function(screenOptions:screenOptions_resolveUserMedia) {
                 screenOptions = options.onScreenShare ? options.onScreenShare(screenOptions) : screenOptions;
 
                 if (screenOptions.resolution) {
@@ -822,7 +824,7 @@ define('',[
         });
     }
 
-    function getStreamingTokenAndPublish(this: any, userMediaOrUri: any, options: { publishToken: any; capabilities?: any; streamToken: any; streamId?: any; isContinuation: any; tags?: any[]; connectOptions?: any[]; authFailure?: any; monitor?: { callback: any; options: object; }; videoElement?: object; }, cleanUpUserMediaOnStop: any, callback: (arg0?: Error | null, arg1?: { status: string; } | any,) => any) {
+    function getStreamingTokenAndPublish(this: any, userMediaOrUri: any, options: options_getStreamingTokenAndPublish, cleanUpUserMediaOnStop: any, callback: (arg0?: Error | null, arg1?: { status: string; } | any,) => any) {
         var that = this;
 
         if (options.publishToken) {
@@ -888,7 +890,7 @@ define('',[
         }, options.isContinuation);
     }
 
-    function publishUserMediaOrUri(this: any, streamToken: string, userMediaOrUri: any, options: { tags?: any[]; connectOptions?: any[]; streamToken?: string; publishToken?: string; authFailure?: any; monitor?: { callback?: any; options?: object; }; videoElement?: any; isContinuation?: any; }, cleanUpUserMediaOnStop: any, callback: { (arg0: null, arg1: { status: any; publisher?: any; } | undefined): void; (arg0?: Error | null | undefined, arg1?: any): any; (arg0?: Error | null | undefined, arg1?: any): any; }) {
+    function publishUserMediaOrUri(this: any, streamToken: string, userMediaOrUri: any, options:options_publishUserMediaOrUri , cleanUpUserMediaOnStop: any, callback: { (arg0: null, arg1: { status: any; publisher?: any; } | undefined): void; (arg0?: Error | null | undefined, arg1?: any): any; (arg0?: Error | null | undefined, arg1?: any): any; }) {
         var that = this;
         var hasAlreadyAttachedMedia = false;
         var cachedPublisher: { getStreamId: () => string | number; } | null = null;
@@ -995,7 +997,7 @@ define('',[
         }, options.isContinuation);
     }
 
-    function subscribeToStream(this: any, streamToken: any, options: { streamId?: any; skipRetryOnUnauthorized?: any; streamToken?: any; authFailure?: any; videoElement?: any; monitor?: { callback?: any; options?: any; }; subscriberOptions?: any; isContinuation?: any; }, callback: (arg0?: null, arg1?: { status: any; retry?: any; mediaStream?: any; } | undefined) => void) {
+    function subscribeToStream(this: any, streamToken: any, options: options_subscribeToStream, callback: (arg0?: null, arg1?: { status: any; retry?: any; mediaStream?: any; } | undefined) => void) {
         var that = this;
         var cachedSubsciber: { getStreamId: () => string | number; } | null = null;
 
@@ -1127,7 +1129,7 @@ define('',[
         }, options.isContinuation);
     }
 
-    function createExpressPublisher(this: any, publisher: { stop?: any; getStreamId: any; getStream: any; enableAudio?: any; disableAudio?: any; enableVideo?: any; disableVideo?: any; setPublisherEndedCallback?: any; }, videoElement: { src: string; srcObject: null; }, cleanUpUserMediaOnStop: any) {
+    function createExpressPublisher(this: any, publisher:options_createExpressPublisher , videoElement: { src: string; srcObject: null; }, cleanUpUserMediaOnStop: any) {
         var that = this;
         var publisherStop = _.bind(publisher.stop, publisher);
 
@@ -1174,10 +1176,7 @@ define('',[
         return publisher;
     }
 
-    function createExpressSubscriber(this: any, subscriber: {
-            stop: (reason: any) => void; enableAudio: () => boolean | undefined; getStream: () => { getStreamId: (() => any) | (() => any); getStream: (() => any) | (() => any); }; disableAudio: () => boolean | undefined; enableVideo: () => boolean | undefined; disableVideo: () => boolean //www.apache.org/licenses/LICENSE-2.0
-                | undefined; setStreamEndedCallback: () => void;
-        }, renderer: { stop: (arg0: any) => void; }) {
+    function createExpressSubscriber(this: any, subscriber:subscriber_createExpressSubscriber , renderer: { stop: (arg0: any) => void; }) {
         var that = this;
         var subscriberStop = _.bind(subscriber.stop, subscriber);
 
@@ -1213,7 +1212,7 @@ define('',[
         return subscriber;
     }
 
-    function setStreamAudioTracksState(this: any, publisher: { getStreamId: () => any; getStream: () => any; }, newState: boolean) {
+    function setStreamAudioTracksState(this: any, publisher:publisher_setStreamAudioTracksState , newState: boolean) {
         var pcast = this.getPCast();
 
         if (!pcast) {
@@ -1258,7 +1257,7 @@ define('',[
         return newState;
     }
 
-    function setStreamVideoTracksState(this: any, publisher: { getStreamId: () => any; getStream: () => any; }, newState: boolean) {
+    function setStreamVideoTracksState(this: any, publisher: publisher_setStreamVideoTracksState, newState: boolean) {
         var pcast = this.getPCast();
 
         if (!pcast) {
@@ -1311,7 +1310,7 @@ define('',[
         });
     }
 
-    function onMonitorCallback(callback: (arg0: null, arg1: any) => void, retry: any, stream: any, reason: any, monitorEvent: any) { // eslint-disable-line no-unused-vars
+    function onMonitorCallback(callback: (arg0: null, arg1: any) => void, retry: any, stream: any, reason: string, monitorEvent: any) { // eslint-disable-line no-unused-vars
         switch (reason) {
         case 'camera-track-failure':
         case 'client-side-failure':
