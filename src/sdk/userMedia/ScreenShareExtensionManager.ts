@@ -15,7 +15,7 @@
  */
 
 /* global chrome */
-import { Ioption, Iresponse } from "../../../typescript/src/sdk/userMedia/ScreenShareExtensionManager";
+import { Ioption, Iresponse, options_mapChromeConstraints } from "../../../typescript/src/sdk/userMedia/ScreenShareExtensionManager";
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
@@ -134,7 +134,7 @@ define('',[
         });
     }
 
-    function getScreenSharingConstraints(this: any, options: any, callback: (arg0: Error |string | null, arg1: { status: string; constraints?: any | { video: {}; }; }) => void) {
+    function getScreenSharingConstraints(this: any, options: any, callback: any) {
         switch (phenixRTC.browser) {
         case 'Chrome':
             return requestMediaSourceIdWithRuntime.call(this, function(error : Error |string | null, response: any) {
@@ -207,7 +207,7 @@ define('',[
         }
     }
 
-    function mapChromeConstraints(options: { screen: boolean; screenAudio: boolean; }, id: string, captureOptions: { canRequestAudioTrack: any; }) {
+    function mapChromeConstraints(options:options_mapChromeConstraints, id: string, captureOptions: { canRequestAudioTrack: any; }) {
         var constraints :any = {};
 
         if (_.isObject(options) && _.isObject(options.screen)) {

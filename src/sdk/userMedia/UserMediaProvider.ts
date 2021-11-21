@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { e_getUserMediaErrorStatus, Option_getUserMedia, Option_sGetUserMediaConstraints, Option_UserMediaProvider, response_getUserMediaConstraints, stream_onUserMediaSuccess } from "../../../typescript/src/sdk/userMedia/UserMediaProvider";
+
 define('',[
     'phenix-web-lodash-light',
     'phenix-web-assert',
@@ -36,14 +38,14 @@ define('',[
         this._onScreenShare = onScreenShare;
     }
 
-    UserMediaProvider.prototype.getUserMedia = function(options: { screenAudio: boolean; screen: boolean; video: boolean; audio: boolean; }, callback: any) {
+    UserMediaProvider.prototype.getUserMedia = function(options: Option_UserMediaProvider, callback: any) {
         assert.isObject(options, 'options');
         assert.isFunction(callback, 'callback');
 
         getUserMedia.call(this, options, callback);
     };
 
-    function getUserMedia(this: any, options: { screenAudio: boolean; screen: boolean; video: boolean; audio: boolean; }, callback: any) {
+    function getUserMedia(this: any, options: Option_getUserMedia, callback: any) {
         var that = this;
 
         var onUserMediaSuccess = function onUserMediaSuccess(status: string, stream: any) {
@@ -96,13 +98,13 @@ define('',[
             failureCallback(getUserMediaErrorStatus(e), undefined, e);
         };
 
-        var onUserMediaSuccess = function onUserMediaSuccess(stream: { getTracks: any; id?: any; }) {
+        var onUserMediaSuccess = function onUserMediaSuccess(stream: stream_onUserMediaSuccess) {
             wrapNativeMediaStream.call(that, stream);
 
             successCallback('ok', stream);
         };
 
-        return getUserMediaConstraints.call(this, options, function(error: any, response: { status: string; constraints: any; }) {
+        return getUserMediaConstraints.call(this, options, function(error: any, response: response_getUserMediaConstraints) {
             if (_.get(response, ['status']) !== 'ok') {
                 return onUserMediaFailure(error);
             }
@@ -129,7 +131,7 @@ define('',[
         });
     }
 
-    function getUserMediaConstraints(this: any, options: { screen: boolean; audio: boolean; video: boolean; }, callback: any) {
+    function getUserMediaConstraints(this: any, options: Option_sGetUserMediaConstraints, callback: any) {
         var that = this;
 
         if (options.screen) {
@@ -153,7 +155,7 @@ define('',[
         });
     }
 
-    var getUserMediaErrorStatus = function getUserMediaErrorStatus(e: { code: string; message: string; name: string; }) {
+    var getUserMediaErrorStatus = function getUserMediaErrorStatus(e: e_getUserMediaErrorStatus) {
         var status;
 
         if (e.code === 'unavailable') {
@@ -175,7 +177,7 @@ define('',[
         return status;
     };
 
-    function wrapNativeMediaStream(this: any, stream: { getTracks: any; id?: string; }) {
+    function wrapNativeMediaStream(this: any, stream: stream_onUserMediaSuccess) {
         var lastTrackEnabledStates: any = {};
         var lastTrackReadyStates: any = {};
         var that = this;
