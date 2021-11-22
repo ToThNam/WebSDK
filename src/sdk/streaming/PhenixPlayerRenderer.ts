@@ -58,7 +58,7 @@ define('',[
         this._onEnded = _.bind(ended, this);
     }
 
-    PhenixPlayerRenderer.isSupported = function() {
+    PhenixPlayerRenderer.prototype.isSupported = function() {
         return this._webPlayer && this._webPlayer.isSupported;
     };
 

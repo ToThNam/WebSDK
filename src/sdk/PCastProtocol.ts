@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { authenticate_PCastProtocol, candidate_PCastProtocol, fetchRoomConversation_PCastProtocol, options_PCastProtocol, room_PCastProtocol, setupStream_PCastProtocol } from "../../typescript/src/sdk/PCastProtocol";
+import { arg1_callback_PCastProtocol, authenticate_PCastProtocol, candidate_PCastProtocol, fetchRoomConversation_PCastProtocol, options_PCastProtocol, room_PCastProtocol, setupStream_PCastProtocol } from "../../typescript/src/sdk/PCastProtocol";
 
 define('',[
     'phenix-web-lodash-light',
@@ -29,7 +29,7 @@ define('',[
 
     var apiVersion = 5;
 
-    function PCastProtocol(this: any, uri: string, deviceId: string, version: any, logger: any) {
+    function PCastProtocol(this: any, uri: string, deviceId: string, version: string, logger: any) {
         assert.isStringNotEmpty(uri, 'uri');
         assert.isString(deviceId, 'deviceId');
         assert.isStringNotEmpty(version, 'version');
@@ -52,7 +52,7 @@ define('',[
         return this._mqWebSocket.disconnect();
     };
 
-    PCastProtocol.prototype.authenticate = function(authToken: any, callback: any) {
+    PCastProtocol.prototype.authenticate = function(authToken: string, callback: (arg0: any, arg1: arg1_callback_PCastProtocol) => void) {
         assert.isStringNotEmpty(authToken, 'authToken');
         assert.isFunction(callback, 'callback');
 
@@ -94,7 +94,7 @@ define('',[
         return this._observableSessionId;
     };
 
-    PCastProtocol.prototype.bye = function(reason: any, callback: any) {
+    PCastProtocol.prototype.bye = function(reason: string, callback: any) {
         assert.isStringNotEmpty(reason, 'reason');
         assert.isFunction(callback, 'callback');
 
@@ -106,7 +106,7 @@ define('',[
         return this._mqWebSocket.sendRequest('pcast.Bye', bye, callback);
     };
 
-    PCastProtocol.prototype.setupStream = function(streamType: any, streamToken: string, options:options_PCastProtocol, rtt: string, callback: any) {
+    PCastProtocol.prototype.setupStream = function(streamType: string, streamToken: string, options:options_PCastProtocol, rtt: string, callback: any) {
         assert.isStringNotEmpty(streamType, 'streamType');
         assert.isStringNotEmpty(streamToken, 'streamToken');
         assert.isObject(options, 'options');

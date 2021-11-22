@@ -37,7 +37,7 @@
  ], function(rtc, logging, PCast, RoomService, AudioSpeakerDetector, BandwidthMonitor, UserMediaResolver, PCastExpress, RoomExpress, ChannelExpress, AdminApiProxyClient) {
      rtc.global.atob = function(parameter: any) {
          // eslint-disable-next-line no-undef
-         return new Buffer.from(parameter, 'base64').toString('binary');
+         return new (Buffer.from(parameter, 'base64').toString('binary') as any);
      };
  
      return {

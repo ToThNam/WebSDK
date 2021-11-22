@@ -131,7 +131,7 @@ define('',[
         }
 
         var that = this;
-        var newMediaStream  = new PhenixRealTimeStream(this._streamId, streamToAttach, this._peerConnection, this._streamTelemetry, this._options, this._logger);
+        var newMediaStream  = new (PhenixRealTimeStream(this._streamId, streamToAttach, this._peerConnection, this._streamTelemetry, this._options, this._logger)as any) ;
 
         newMediaStream.on(streamEnums.streamEvents.stopped.name, function(reason: any) {
             if (isStreamStopped(that._streamSrc)) {

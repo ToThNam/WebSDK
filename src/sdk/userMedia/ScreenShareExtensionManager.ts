@@ -167,7 +167,7 @@ define('',[
         }
     }
 
-    function requestMediaSourceIdWithRuntime(this: any, callback:  any) {
+    function requestMediaSourceIdWithRuntime(this: any, callback: (arg0: any, arg1?: { status: string; }) => void) {
         var that = this;
         var runtimeEnvironment = getRuntime.call(this);
 
