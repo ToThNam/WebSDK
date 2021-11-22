@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { endpointPaths_setEndpointPaths } from "../../typescript/AdminApiProxyClient";
+import { endpointPaths_setEndpointPaths } from "../../typescript/src/sdk/AdminApiProxyClient";
 
 define('',[
     'phenix-web-lodash-light',
