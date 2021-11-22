@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Meter_StopAudioVolumeMeters, Stream_GetAudioVolumeMeter } from "../../../typescript/src/audio/AudioVolumeMeterFactory";
+import { Meter_StopAudioVolumeMeters, Stream_GetAudioVolumeMeter } from "../../../typescript/src/sdk/audio/AudioVolumeMeterFactory";
 
 
 define('',[

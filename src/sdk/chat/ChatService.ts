@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ChatMessage_ConvertTimeFromLongInChatMessage, Event_OnRoomConversationEvent, Pcast_ChatService, Response_GetMessages, Response_SubscribeToRoomConversation, SetPCast_ChatService } from "../../../typescript/src/chat/ChatService";
+import { ChatMessage_ConvertTimeFromLongInChatMessage, Event_OnRoomConversationEvent, Pcast_ChatService, Response_GetMessages, Response_SubscribeToRoomConversation, SetPCast_ChatService } from "../../../typescript/src/sdk/chat/ChatService";
 
 define('',[
     'phenix-web-lodash-light',

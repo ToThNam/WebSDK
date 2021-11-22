@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Meter_GetAudioVolumeMeters, Options_AudioSpeakerDetector, Options_SetupAudioVolumeMeter, Options_SetupSpeakingDetection } from "../../../typescript/src/audio/AudioSpeakerDetector";
+import { Meter_GetAudioVolumeMeters, Options_AudioSpeakerDetector, Options_SetupAudioVolumeMeter, Options_SetupSpeakingDetection } from "../../../typescript/src/sdk/audio/AudioSpeakerDetector";
 
 
 

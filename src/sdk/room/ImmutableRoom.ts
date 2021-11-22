@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Value_WrapObservable } from "../../../typescript/src/room/ImmutableRoom";
+import { Value_WrapObservable } from "../../../typescript/src/sdk/room/ImmutableRoom";
 
 define('',[
     'phenix-web-lodash-light',

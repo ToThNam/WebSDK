@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { member_getMemberKey, member_getMostRecentMember, member_getNextMember, member_getNextMember_forEach, member_getSimilarMembers, member_isAlternate, member_isPrimary, mostRecentMember_getMostRecentMember } from "../../../typescript/src/express/MemberSelector";
+import { member_getMemberKey, member_getMostRecentMember, member_getNextMember, member_getNextMember_forEach, member_getSimilarMembers, member_isAlternate, member_isPrimary, mostRecentMember_getMostRecentMember } from "../../../typescript/src/sdk/express/MemberSelector";
 
 define('',[
     'phenix-web-lodash-light',

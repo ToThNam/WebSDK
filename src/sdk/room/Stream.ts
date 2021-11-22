@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Stream_Update } from "../../../typescript/src/room/Steam";
+import { Stream_Update } from "../../../typescript/src/sdk/room/Steam";
 
 define('',[
     'phenix-web-lodash-light',

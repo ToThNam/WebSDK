@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2020 Phenix Real Time Solutions, Inc. All Rights Reserved.
  *
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Channel_CreateChannel, Response_WrapResponse } from "../../../typescript/src/room/ChannelService";
+import { Channel_CreateChannel, Response_WrapResponse } from "../../../typescript/src/sdk/room/ChannelService";
 
 define('',[
     'phenix-web-lodash-light',

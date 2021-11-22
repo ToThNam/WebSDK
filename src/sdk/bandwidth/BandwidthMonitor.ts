@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Adjuster_ClosePublisherAdjusters, Options_BandwidthMonitor } from "../../../typescript/src/bandwidth/BandwidthMonitor";
+import { Adjuster_ClosePublisherAdjusters, Options_BandwidthMonitor } from "../../../typescript/src/sdk/bandwidth/BandwidthMonitor";
 
 define('',[
     'phenix-web-lodash-light',

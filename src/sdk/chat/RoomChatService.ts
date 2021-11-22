@@ -15,7 +15,7 @@
  */
 
 
-import { Message_AddMessage, Pcast_SetPCast, Response_OnReceiveMessages, RoomService_RoomChatService, Room_OnRoomChange } from "../../../typescript/src/chat/RoomChatService";
+import { Message_AddMessage, Pcast_SetPCast, Response_OnReceiveMessages, RoomService_RoomChatService, Room_OnRoomChange } from "../../../typescript/src/sdk/chat/RoomChatService";
 
 define('',[
     'phenix-web-lodash-light',

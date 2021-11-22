@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RoomService_Connect, Options_Connect } from "../../../typescript/src/bandwidth/PublisherBandwidthAdjuster";
+import { RoomService_Connect, Options_Connect } from "../../../typescript/src/sdk/bandwidth/PublisherBandwidthAdjuster";
 
 define('',[
     'phenix-web-lodash-light',

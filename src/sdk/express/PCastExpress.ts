@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { options_createExpressPublisher, options_getStreamingTokenAndPublish, options_getUserMedia, options_PCastExpress, options_publish, options_publishRemote, options_publishStreamToExternal, options_publishUserMediaOrUri, options_resolveUserMedia, options_subscribe, options_subscribeToStream, pcast_subscribeToStatusChange, publisher_setStreamAudioTracksState, publisher_setStreamVideoTracksState, screenOptions_resolveUserMedia, subscriber_createExpressSubscriber } from "../../../typescript/src/express/PCastExpress";
+import { options_createExpressPublisher, options_getStreamingTokenAndPublish, options_getUserMedia, options_PCastExpress, options_publish, options_publishRemote, options_publishStreamToExternal, options_publishUserMediaOrUri, options_resolveUserMedia, options_subscribe, options_subscribeToStream, pcast_subscribeToStatusChange, publisher_setStreamAudioTracksState, publisher_setStreamVideoTracksState, screenOptions_resolveUserMedia, subscriber_createExpressSubscriber } from "../../../typescript/src/sdk/express/PCastExpress";
 
 define('',[
     'phenix-web-lodash-light',
@@ -227,7 +227,8 @@ define('',[
 
         if (options.monitor) {
             assert.isObject(options.monitor, 'options.monitor');
-            assert.isFunction(options.monitor.callback, 'options.monitor.callback');
+            assert.isFunction(options.monitor.
+            , 'options.monitor.callback');
 
             if (options.monitor.options) {
                 assert.isObject(options.monitor.options, 'options.monitor.options');

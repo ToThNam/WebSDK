@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { callback_wrapResponseWithChannelPrefixes, member_evaluateMembers, options_joinChannel, options_publishScreenToChannel, options_publishToChannel, response_joinRoomCallback, response_mediaStreamCallback, response_monitorChannelSubscriber, response_wrapResponseWithChannelPrefixes } from "../../../typescript/src/express/ChannelExpress";
+import { callback_wrapResponseWithChannelPrefixes, member_evaluateMembers, options_joinChannel, options_publishScreenToChannel, options_publishToChannel, response_joinRoomCallback, response_mediaStreamCallback, response_monitorChannelSubscriber, response_wrapResponseWithChannelPrefixes } from "../../../typescript/src/sdk/express/ChannelExpress";
 
 define('',[
     'phenix-web-lodash-light',

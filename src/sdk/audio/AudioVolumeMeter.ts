@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context_Init, Event_OnAudioProcess, Stream_ConnectToStream } from "../../../typescript/src/audio/AudioVolumeMeter";
+import { Context_Init, Event_OnAudioProcess, Stream_ConnectToStream } from "../../../typescript/src/sdk/audio/AudioVolumeMeter";
 
 
 

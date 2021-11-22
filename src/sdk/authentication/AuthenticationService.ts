@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Pcast_SetPCast } from "../../../typescript/src/authentication/AuthenticationService";
+import { Pcast_SetPCast } from "../../../typescript/src/sdk/authentication/AuthenticationService";
 
 define('',[
     'phenix-web-lodash-light',

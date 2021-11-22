@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AudioVolumeMeter, Options_StartAudioDetection } from "../../../typescript/src/audio/AudioSpeakerDetectionAlgorithm";
+import { AudioVolumeMeter, Options_StartAudioDetection } from "../../../typescript/src/sdk/audio/AudioSpeakerDetectionAlgorithm";
 
 
 

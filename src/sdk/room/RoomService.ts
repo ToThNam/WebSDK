@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Event_OnRoomEvent, Member_GetDifferencesBetweenCachedRoom, Room_CreateRoom, Room_GetValidRoomObject, Room_ReplaceSelfInstanceInRoom } from "../../../typescript/src/room/RoomService";
+import { Event_OnRoomEvent, Member_GetDifferencesBetweenCachedRoom, Room_CreateRoom, Room_GetValidRoomObject, Room_ReplaceSelfInstanceInRoom } from "../../../typescript/src/sdk/room/RoomService";
 
 define('',[
     'phenix-web-lodash-light',

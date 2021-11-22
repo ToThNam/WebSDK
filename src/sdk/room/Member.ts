@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Member_Update, Stream_CreateNewObservableStream, Stream_forEach } from "../../../typescript/src/room/Member";
+import { Member_Update, Stream_CreateNewObservableStream, Stream_forEach } from "../../../typescript/src/sdk/room/Member";
 
 define('',[
     'phenix-web-lodash-light',

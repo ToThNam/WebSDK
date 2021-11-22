@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Member_MapMembers, Member_RemoveMembers, Member_UpdateMembers, ObservableMember_RemoveMembers, ObservableMember_UpdateMembers, Room_Update } from "../../../typescript/src/room/Room";
+import { Member_MapMembers, Member_RemoveMembers, Member_UpdateMembers, ObservableMember_RemoveMembers, ObservableMember_UpdateMembers, Room_Update } from "../../../typescript/src/sdk/room/Room";
 
 define('',[
     'phenix-web-lodash-light',
