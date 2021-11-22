@@ -57,3 +57,7 @@ export interface fetchRoomConversation_PCastProtocol{
   beforeMessageId?:string;
   afterMessageId?: string;
 };
+
+export interface arg1_callback_PCastProtocol{
+  sessionId: string;
+};

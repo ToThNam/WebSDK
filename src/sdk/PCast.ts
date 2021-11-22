@@ -37,7 +37,13 @@ import {
     response_setAnswerDescription,
     options_createChunkedOrRtmpViewer,
     response_addIceCandidates,
-    peerConnection_closePeerConnection
+    peerConnection_closePeerConnection,
+    callback_PCast,
+    createOptions_createPublisherPeerConnection,
+    callback_createPublisherPeerConnection,
+    callback_subscribe_PCast,
+    arg2_callback_monitor,
+    callback_createChunkedOrRtmpViewer
 } from "../../typescript/src/sdk/Pcast";
 
 define('',[
@@ -418,7 +424,7 @@ define('',[
         return userMediaProvider.getUserMedia(options, callback);
     };
 
-    PCast.prototype.publish = function(streamToken: string, streamToPublish: any, callback: any, tags: string | string[], options: { connectUri?: string; }) {
+    PCast.prototype.publish = function(streamToken: string, streamToPublish: any, callback: callback_PCast, tags: string | string[], options: options_PCast) {
         if (phenixRTC.browser === 'IE') {
             throw new Error('Publishing not supported on IE');
         }
@@ -528,7 +534,7 @@ define('',[
         });
     };
 
-    PCast.prototype.subscribe = function(streamToken: string, callback: any, options: options_PCast_subscribe) {
+    PCast.prototype.subscribe = function(streamToken: string, callback: callback_subscribe_PCast, options: options_PCast_subscribe) {
         if (!this._started) {
             throw new Error('PCast not started. Unable to subscribe. Please start pcast first.');
         }
@@ -769,7 +775,7 @@ define('',[
         transitionToStatus.call(this, 'reconnecting');
     }
 
-    function reconnected(this: any, optionalReason?: any) {
+    function reconnected(this: any, optionalReason?: string) {
         if (optionalReason) {
             assert.isString('reason', optionalReason);
         }
@@ -906,7 +912,7 @@ define('',[
         delete this._peerConnections[streamId];
     }
 
-    function setupStreamAddedListener(this: any, streamId: string , state: statesetup_StreamAddedListener , peerConnection: any, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, options: any) {
+    function setupStreamAddedListener(this: any, streamId: string , state: statesetup_StreamAddedListener , peerConnection: any, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, options: any,) {
         var that = this;
         var added = false;
         var setupTimeoutId: NodeJS.Timeout;
@@ -958,7 +964,7 @@ define('',[
                 realTimeStreamDecorator.streamErrorCallback(kind, event);
             };
 
-            var onStop = function destroyMasterMediaStream(reason: any) {
+            var onStop = function destroyMasterMediaStream(reason: string) {
                 if (state.stopped || !that._protocol) {
                     return;
                 }
@@ -1044,11 +1050,11 @@ define('',[
         _.addEventListener(peerConnection, 'connectionstatechange', onConnectionStateChanged);
     }
 
-    function createPublisher(this: any, streamId: string | number, callback: any, streamOptions: any) {
+    function createPublisher(this: any, streamId: string , callback: any, streamOptions: any) {
         var that = this;
         var state = {stopped: false};
 
-        var publisher = {
+        var publisher: any = {
             getStreamId: function getStreamId() {
                 return streamId;
             },
@@ -1120,7 +1126,10 @@ define('',[
 
             getMonitor: function getMonitor() {
                 return null;
-            }
+            },
+            
+            
+
         };
 
         that._publishers[streamId] = publisher;
@@ -1221,7 +1230,7 @@ define('',[
         }
     }
 
-    function createPublisherPeerConnection(this: any, peerConnectionConfig: any, mediaStream: { getTracks: () => any; }, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: any, streamOptions: any,value:any) {
+    function createPublisherPeerConnection(this: any, peerConnectionConfig: any, mediaStream: { getTracks: () => any; }, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_createPublisherPeerConnection, streamOptions: any,createOptions: createOptions_createPublisherPeerConnection) {
         var that = this;
         var state = {
             failed: false,
@@ -1288,7 +1297,7 @@ define('',[
                 limit = bandwithAttribute[2] * 1000;
             }
 
-            var publisher = {
+            var publisher: any = {
                 getStreamId: function getStreamId() {
                     return streamId;
                 },
@@ -1392,7 +1401,7 @@ define('',[
                     return publisherMonitor;
                 },
 
-                monitor: function monitor(options: options_monitor, callback:  any) {
+                monitor: function monitor(options: options_monitor, callback: (arg0: any, arg1: string, arg2: arg2_callback_monitor) => any) {
                     assert.isObject(options, 'options');
                     assert.isFunction(callback, 'callback');
 
@@ -1404,7 +1413,7 @@ define('',[
                     };
                     monitor.start(options, function activeCallback() {
                         return that._publishers[streamId] === publisher && !state.stopped;
-                    }, function monitorCallback(error: any, monitorEvent: { reasons: any; }) {
+                    }, function monitorCallback(error: any, monitorEvent: { reasons: string; }) {
                         if (error) {
                             that._logger.warn('[%s] Publisher monitor triggered unrecoverable error [%s]', error);
                         }
@@ -1797,7 +1806,7 @@ define('',[
         });
     }
 
-    function createChunkedOrRtmpViewer(this: any, streamId: string, offerSdp: any, streamTelemetry: any, callback: any, options: options_createChunkedOrRtmpViewer) {
+    function createChunkedOrRtmpViewer(this: any, streamId: string, offerSdp: any, streamTelemetry: any, callback: callback_createChunkedOrRtmpViewer, options: options_createChunkedOrRtmpViewer) {
         var that = this;
 
         var rtmpQuery = /a=x-rtmp:(rtmp:\/\/[^\n]*)/m;
@@ -2170,4 +2179,6 @@ define('',[
 
     return PCast;
 });
+
+
 

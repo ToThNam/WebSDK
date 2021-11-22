@@ -143,7 +143,7 @@ define('',[
     };
 
     sdpUtil.prototype.hasActiveAudio = function hasActiveAudio(peerConnection: any) {
-        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section: any, index: string | number, remoteSections: any) {
+        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section: any, index: number, remoteSections: any) {
             if (_.startsWith(section, 'audio')) {
                 return !_.includes(section, 'a=inactive') && !_.includes(remoteSections[index], 'a=inactive');
             }
@@ -155,7 +155,7 @@ define('',[
     };
 
     sdpUtil.prototype.hasActiveVideo = function hasActiveVideo(peerConnection: any) {
-        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section: any, index: string | number, remoteSections: { [x: string]: any; }) {
+        var indexOfActiveVideo = this.findInSdpSections(peerConnection, function(section: any, index: number, remoteSections: { [x: string]: any; }) {
             if (_.startsWith(section, 'video')) {
                 return !_.includes(section, 'a=inactive') && !_.includes(remoteSections[index], 'a=inactive');
             }

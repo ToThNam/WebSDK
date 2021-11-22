@@ -10,3 +10,9 @@ export interface xhr_handleReadyStateChange {
   responseText: any; 
   getAllResponseHeaders: () => any;
 };
+
+export interface arg1_callback_handleReadyStateChange{
+  data: any; 
+  headers: any; 
+  rawXhr: xhr_handleReadyStateChange; 
+}

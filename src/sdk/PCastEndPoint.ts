@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { response_closestEndPointResolver, xhr_handleReadyStateChange } from "../../typescript/src/sdk/PCastEndPoint";
+import { arg1_callback_handleReadyStateChange, response_closestEndPointResolver, xhr_handleReadyStateChange } from "../../typescript/src/sdk/PCastEndPoint";
 
 define('',[
     'phenix-web-assert',
@@ -114,7 +114,7 @@ define('',[
 
         xhr.addEventListener('readystatechange', _.bind(handleReadyStateChange, this, xhr, function(err: any, response: { data: string; }) {
             if (err) {
-                return callback(new Error('Failed to resolve an end point', err));
+                return callback(new Error(err));
             }
 
             var endPoints = response.data.split(',');
@@ -131,14 +131,13 @@ define('',[
 
     function getAndOpenVendorSpecificXmlHttpMethod(requestMethod: string, requestUrl: string) {
         var xhr = new XMLHttpRequest();
-
         if ('withCredentials' in xhr) {
             // Most browsers.
             xhr.open(requestMethod, requestUrl, true);
         } else if (typeof XDomainRequest !== 'undefined') {
             // IE8 & IE9
             // eslint-disable-next-line no-undef
-            xhr = new XDomainRequest();
+            xhr = new XDomainRequest ();
             xhr.open(requestMethod, requestUrl);
         } else {
             return;
@@ -147,7 +146,7 @@ define('',[
         return xhr;
     }
 
-    function handleReadyStateChange(xhr: xhr_handleReadyStateChange, callback: any) {
+    function handleReadyStateChange(xhr: xhr_handleReadyStateChange, callback: (arg0: null, arg1?: arg1_callback_handleReadyStateChange) => void) {
         if (xhr.readyState === 4 /* DONE */) {
             if (xhr.status === 200) {
                 var responseHeaders = getXhrResponseHeaders(xhr);
@@ -186,3 +185,5 @@ define('',[
 
     return PCastEndPoint;
 });
+
+

@@ -1,3 +1,4 @@
+
 export interface options_PCast{
   streamingSourceMapping?: any; 
   disableMultiplePCastInstanceWarning?: boolean; 
@@ -15,6 +16,7 @@ export interface options_PCast{
    metricsTransmitter?: any; 
    rtmp?: any; 
    features?: any; 
+   connectUri?: string;
 };
 
 export interface response_Authenticate{
@@ -96,7 +98,7 @@ export interface callback_StreamAddedListener{
   call: (
     arg0?: any, 
     arg1?: undefined, 
-    arg2?: string | undefined
+    arg2?: string 
     ) => void; 
 };
 
@@ -108,19 +110,18 @@ export interface peerConnection_setupStateListener{
 };
 
 export interface arg0_callback_createPublisher{
-   getStreamId: () => string | number; 
-   getStream: () => null; 
-   getStats: () => null; 
-   isActive: () => boolean; 
-   hasEnded: () => boolean; 
-   stop: (reason: any) => void; 
-   setPublisherEndedCallback: (callback: any) => void; 
-   setDataQualityChangedCallback: (callback: any) => void; 
-   getOptions: () => any; 
-   monitor: (options: any, callback: any) => void; 
-   getMonitor: () => null;
-   publisherEndedCallback: any;
-   dataQualityChangedCallback: any
+  getStreamId: () => string; 
+  getStream: () => null; 
+  getStats: () => null; 
+  isActive: () => boolean; 
+  hasEnded: () => boolean; 
+  stop: (reason: any) => void; 
+  setPublisherEndedCallback: (callback: any) => void; 
+  setDataQualityChangedCallback: (callback: any) => void; 
+  getOptions: () => any; 
+  monitor: (options: any, callback: any) => void; 
+  getMonitor: () => null; 
+  // publisherEndedCallback: () => any
 };
 
 export interface options_monitor{
@@ -169,4 +170,46 @@ export interface peerConnection_closePeerConnection{
   signalingState: string; 
   __closing: boolean; 
   close: () => void; 
+};
+
+export interface callback_PCast{
+  call: 
+  (arg0: any, 
+    arg1: any, 
+    arg2: string, 
+    arg3?: any) => void;
+};
+
+export interface createOptions_createPublisherPeerConnection{
+  receiveVideo: boolean; 
+  receiveAudio: boolean;
+};
+
+export interface callback_createPublisherPeerConnection{
+  call: 
+  (arg0: any, 
+    arg1: any, 
+    arg2?: any, 
+    arg3?: any) => void;
+};
+
+export interface callback_subscribe_PCast{
+  call: (
+    arg0: any, 
+    arg1: any, 
+    arg2: string, 
+    arg3?: null ) => void;
+};
+
+export interface arg2_callback_monitor{
+  reasons?: string; 
+  type?: string; 
+  message?: string;
+};
+
+export interface callback_createChunkedOrRtmpViewer{
+  call: (
+    arg0: any, 
+    arg1: undefined, 
+    arg2: string) => any; 
 };
