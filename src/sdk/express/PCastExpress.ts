@@ -227,7 +227,7 @@ define('',[
 
         if (options.monitor) {
             assert.isObject(options.monitor, 'options.monitor');
-            assert.isFunction(options.monitor.
+            assert.isFunction(options.monitor
             , 'options.monitor.callback');
 
             if (options.monitor.options) {
