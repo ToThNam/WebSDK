@@ -1,6 +1,6 @@
 export interface Options_AudioSpeakerDetector {
     uri?: string;
-    logger?: any; 
+    logger?: object; 
     audioContext?: any; 
 }
 export interface Meter_GetAudioVolumeMeters {

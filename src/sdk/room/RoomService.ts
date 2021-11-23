@@ -552,7 +552,7 @@ define('',[
         var that = this;
 
         this._protocol.getRoomInfo(roomId, alias,
-            function handleCreateRoomResponse(error: null, response: { status: string; room: any; members: any[]; }) {
+            function handleCreateRoomResponse(error: null, response: { status: string; room: object; members: any[]; }) {
                 if (error) {
                     that._logger.error('Request to get room info failed with error [%s]', error);
 
@@ -581,7 +581,7 @@ define('',[
 
         var validatedRoom = getValidRoomObject.call(that, room);
 
-        this._protocol.createRoom(validatedRoom, function handleCreateRoomResponse(error: null, response: { status: string; room: any; members: any[]; }) {
+        this._protocol.createRoom(validatedRoom, function handleCreateRoomResponse(error: null, response: { status: string; room: object; members: any[]; }) {
             if (error) {
                 that._logger.error('Creating room failed with error [%s]', error);
 

@@ -36,7 +36,7 @@ define('',[
     var defaultStreamWildcardTokenRefreshInterval = 300000;
     var streamingTypeCapabilities = ['streaming', 'rtmp'];
 
-    function RoomExpress(this: any, options: { pcastExpress: object; features: any; }) {
+    function RoomExpress(this: any, options: { pcastExpress: object; features: any[]; }) {
         assert.isObject(options, 'options');
 
         if (options.pcastExpress) {

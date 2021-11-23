@@ -210,13 +210,13 @@ define('',[
         this._members.setValue(newMembers);
     }
 
-    function mapMembers(members: any[], roomService: any) {
+    function mapMembers(members: any[], roomService: object) {
         return _.map(members, function(member: Member_MapMembers) {
             return new Member(roomService, member.state, member.sessionId, member.screenName, member.role, member.streams, member.lastUpdate);
         });
     }
 
-    function assertIsValidRoomType(type: any) {
+    function assertIsValidRoomType(type: string) {
         type = _.getEnumName(roomTypes, type);
 
         if (!type) {

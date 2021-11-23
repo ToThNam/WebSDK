@@ -31,7 +31,7 @@ define('',[
         this.init(roomService, state, sessionId, screenName, role, streams, lastUpdate);
     }
 
-    Member.prototype.init = function init(roomService: any, state: any, sessionId: string, screenName: string, role: string, streams: any[], lastUpdate: number) {
+    Member.prototype.init = function init(roomService: object, state: any, sessionId: string, screenName: string, role: string, streams: any[], lastUpdate: number) {
         assert.isObject(roomService, 'roomService');
         assert.isString(sessionId, 'sessionId');
         assert.isString(screenName, 'screenName');

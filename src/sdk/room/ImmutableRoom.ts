@@ -24,11 +24,11 @@ define('',[
 ], function(_, assert, observable, Room) {
     'use strict';
 
-    function ImmutableRoom(this: any, roomService: object, id: string, alias: string, name: string, description: string, type: string, members: any, bridgeId: string, pin: string) {
+    function ImmutableRoom(this: any, roomService: object, id: string, alias: string, name: string, description: string, type: string, members: any[], bridgeId: string, pin: string) {
         this.init(roomService, id, alias, name, description, type, members, bridgeId, pin);
     }
 
-    ImmutableRoom.prototype.init = function init(roomService: object, id: string, alias: string, name: string, description: string, type: string, members: any, bridgeId: string, pin: string) {
+    ImmutableRoom.prototype.init = function init(roomService: object, id: string, alias: string, name: string, description: string, type: string, members: any[], bridgeId: string, pin: string) {
         this._room = new Room(roomService, id, alias, name, description, type, members, bridgeId, pin);
 
         makeArrayOrObjectObservablesImmutable(this._room, [roomService]);

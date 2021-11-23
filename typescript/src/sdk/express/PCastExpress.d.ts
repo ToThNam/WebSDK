@@ -2,7 +2,7 @@ export interface options_PCastExpress{
     authToken: string; 
     adminApiProxyClient: 
     { createAuthenticationToken: any; }; 
-    onError: any; 
+    onError: ()=>void; 
     onlineTimeout: number; 
     reconnectOptions: { 
         maxOfflineTime: number; 
@@ -17,8 +17,8 @@ export interface options_getUserMedia{
     resolution: number; 
     frameRate: number; 
     aspectRatio: string; 
-    onResolveMedia: any; 
-    onScreenShare: any; 
+    onResolveMedia: ()=>void; 
+    onScreenShare: ()=>void; 
 }
 export interface options_publish{
     streamId:string,
@@ -37,7 +37,7 @@ export interface options_publishRemote{
     capabilities: any[]; 
     connectOptions: string[]; 
     mediaConstraints: object; 
-    videoElement: any; 
+    videoElement: object; 
     prerollSkipDuration: number; 
     monitor: { callback: any; options: object; };
     frameRate: { exact: number; max: number; };
@@ -50,7 +50,7 @@ export interface options_publishStreamToExternal{
     capabilities: any[]; 
     connectOptions: string[]; 
     mediaConstraints: object; 
-    videoElement: any; 
+    videoElement: object; 
     monitor: { callback: any; options: object; }; 
     streamToken: string; 
 }

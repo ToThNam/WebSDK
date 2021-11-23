@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { member_getMemberKey, member_getMostRecentMember, member_getNextMember, member_getNextMember_forEach, member_getSimilarMembers, member_isAlternate, member_isPrimary, mostRecentMember_getMostRecentMember } from "../../../typescript/src/sdk/express/MemberSelector";
+import { member_getSimilarMembers, member_getMemberKey, member_getNextMember, member_getNextMember_forEach, mostRecentMember_getMostRecentMember, member_getMostRecentMember, member_isPrimary, member_isAlternate } from "../../../typescript/src/sdk/express/MemberSelector";
+
 
 define('',[
     'phenix-web-lodash-light',
@@ -42,7 +43,7 @@ define('',[
         this.reset();
     }
 
-    MemberSelector.prototype.getNext = function getNext(members: any) {
+    MemberSelector.prototype.getNext = function getNext(members: any[]) {
         this._logger.info('Select member from [%s]', members);
 
         var newSelectedMember = getNextMember.call(this, members);
@@ -131,7 +132,7 @@ define('',[
         this.reset();
     };
 
-    MemberSelector.getSimilarMembers = function(screenName: string, optionalSessionId: string, members: any) {
+    MemberSelector.getSimilarMembers = function(screenName: string, optionalSessionId: string, members: any[]) {
         var otherMembers = _.filter(members, function(member:member_getSimilarMembers ) {
             return member.getObservableScreenName().getValue() !== screenName && (!optionalSessionId || member.getSessionId() !== optionalSessionId);
         });
@@ -216,7 +217,7 @@ define('',[
         }
     }
 
-    function getMostRecentMember(members: any) {
+    function getMostRecentMember(members: any[]) {
         return _.reduce(members, function(mostRecentMember: mostRecentMember_getMostRecentMember, member:member_getMostRecentMember) {
             if (!mostRecentMember) {
                 return member;

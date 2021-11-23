@@ -756,7 +756,7 @@ define('',[
     function getAuthTokenAndReAuthenticate(this: any) {
         var that = this;
 
-        this._adminApiProxyClient.createAuthenticationToken((error: { message: string; }, response: { status: string; authenticationToken: any; }) => {
+        this._adminApiProxyClient.createAuthenticationToken((error: { message: string; }, response: { status: string; authenticationToken: string; }) => {
             if (error && error.message === 'timeout') {
                 return onPCastStatusChange.call(that, error.message);
             }

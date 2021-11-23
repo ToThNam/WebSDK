@@ -5,5 +5,5 @@ export interface Channel_CreateChannel{
 }
 export interface Response_WrapResponse{ 
     room: any;
-    channel: any; 
+    channel: object; 
 }
