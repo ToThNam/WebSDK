@@ -18,3 +18,21 @@ export interface updatedPlayerConfig_ShakaRenderer{
       backoffFactor: number; }; 
     }; 
 };
+
+export interface config_loadPlayer{
+  abr: { 
+    defaultBandwidthEstimate: number; 
+  }; manifest: 
+  { retryParameters: 
+    { timeout: number; 
+    }; }; 
+    streaming: { 
+      rebufferingGoal: number; 
+      bufferingGoal: number; 
+      bufferBehind: number; 
+      retryParameters: { 
+        timeout: number; 
+        maxAttempts: number; 
+        backoffFactor: number;
+       }; }
+}

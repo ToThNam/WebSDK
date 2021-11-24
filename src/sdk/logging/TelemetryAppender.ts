@@ -55,13 +55,13 @@ define('',[
         return this._isEnabled;
     };
 
-    TelemetryAppender.prototype.setEnabled = function setEnabled(enabled: any) {
+    TelemetryAppender.prototype.setEnabled = function setEnabled(enabled: boolean) {
         assert.isBoolean(enabled, 'enabled');
 
         this._isEnabled = enabled;
     };
 
-    TelemetryAppender.prototype.log = function log(since: any, level: any, category: any, messages: any, sessionId: any, userId: any, environment: any, version: any, context: { level: number; }) {
+    TelemetryAppender.prototype.log = function log(since: any, level: string | number, category: string, messages: string[], sessionId: string, userId: string, environment: any, version: any, context: { level: number; }) {
         if (context.level < this._minLevel || !this._isEnabled) {
             return;
         }
@@ -77,7 +77,7 @@ define('',[
         addMessagesToRecords.call(this, level, category, messages);
     };
 
-    function addMessagesToRecords(this: any, level: any, category: any, messages: any[]) {
+    function addMessagesToRecords(this: any, level: string | number, category: string, messages: string[]) {
         this._batchHttpProtocol.addRecord({
             level: level,
             timestamp: _.isoString(),

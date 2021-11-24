@@ -34,7 +34,7 @@ define('',[
     // Restarts less than 100ms after foregrounding cause subsequent "pause" events on the video
     var restartRendererDelay = 200;
 
-    function PhenixRealTimeRenderer(this: any, streamId: string, streamSrc: any, streamTelemetry: any, options: any, logger: any) {
+    function PhenixRealTimeRenderer(this: any, streamId: string, streamSrc: string, streamTelemetry: any, options: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._streamSrc = streamSrc;

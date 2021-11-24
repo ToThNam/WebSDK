@@ -127,7 +127,7 @@ define('',[
         return newStats;
     }
 
-    function useFirstNumberValue(value1?: any , value2?: any , value3?: any , value4?: any , value5?: any) {
+    function useFirstNumberValue(value1?: any, value2?: any, value3?: any, value4?: any, value5?: any) {
         if (_.isNumber(value1)) {
             return value1;
         }

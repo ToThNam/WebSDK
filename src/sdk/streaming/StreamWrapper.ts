@@ -33,7 +33,7 @@ define('',[
 
         var that = this;
 
-        this._stream.on(streamEnums.streamEvents.playerEnded.name, function(reason: any) {
+        this._stream.on(streamEnums.streamEvents.playerEnded.name, function(reason: string) {
             that._logger.info('[%s] [%s] player ended.', that._stream.getStreamId(), that._type);
 
             that._playerEnded = true;
@@ -50,7 +50,7 @@ define('',[
         return 'Stream[' + (this._stream ? this._stream.getStreamId() : '') + ']';
     };
 
-    StreamWrapper.prototype.on = function(name: any, callback: any) {
+    StreamWrapper.prototype.on = function(name: string, callback: any) {
         return this._stream.on(name, callback);
     };
 

@@ -246,7 +246,7 @@ define('',[
         var pluginName = 'Shockwave Flash';
         var mimeType = 'application/x-shockwave-flash';
         var activeX = 'ShockwaveFlash.ShockwaveFlash';
-        var version: any = [0, 0, 0];
+        var version: any[] = [0, 0, 0];
 
         if (_.isBoolean(hasFlashPlugin)) {
             return hasFlashPlugin;

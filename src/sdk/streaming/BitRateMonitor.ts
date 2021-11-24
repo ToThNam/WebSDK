@@ -100,7 +100,7 @@ define('',[
         }, null);
     }
 
-    function getThresholdList(threshold: { sort: () => any[]; levels: number; }) {
+    function getThresholdList(threshold: { sort: () => number[]; levels: number; }) {
         var thresholds = [];
 
         if (_.isArray(threshold)) {

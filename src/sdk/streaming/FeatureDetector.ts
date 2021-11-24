@@ -30,12 +30,12 @@ define('',[
         streamEnums.types.hls.name
     ];
 
-    function FeatureDetector(this: any, features: any) {
+    function FeatureDetector(this: any, features: string[]) {
         features = features || defaultFeatures;
 
         assert.isArray(features, 'features');
 
-        _.forEach(features, function(feature: any, index: any) {
+        _.forEach(features, function(feature: string, index: any) {
             assert.isValidType(feature, streamEnums.types, 'FeatureType[' + index + ']');
         });
 
@@ -81,10 +81,10 @@ define('',[
         }
     };
 
-    FeatureDetector.mapPCastCapabilitiesToFeatures = function(capabilities: any) {
+    FeatureDetector.mapPCastCapabilitiesToFeatures = function(capabilities: string[]) {
         assert.isArray(capabilities, 'capabilities');
 
-        return _.reduce(capabilities, function(features: any, capability: any) {
+        return _.reduce(capabilities, function(features: string[], capability: string) {
             return features.concat(FeatureDetector.mapPCastCapabilityToFeatures(capability));
         }, []);
     };
@@ -119,7 +119,7 @@ define('',[
         return _.reduce(capabilities, removeDuplicates, []);
     };
 
-    FeatureDetector.prototype.getPreferredFeatureFromPublisherCapabilities = function(capabilities: any, excludeRealTime: any) {
+    FeatureDetector.prototype.getPreferredFeatureFromPublisherCapabilities = function(capabilities: string[] | number [], excludeRealTime: any) {
         assert.isArray(capabilities, 'capabilities');
 
         var preferredFeature = _.reduce(this._features, function(candidateFeature: any, feature: string) {
@@ -184,7 +184,7 @@ define('',[
         }
     }
 
-    function removeDuplicates(list: any, item: any) {
+    function removeDuplicates(list: any[], item: any) {
         if (!_.includes(list, item)) {
             list.push(item);
         }

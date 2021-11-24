@@ -87,7 +87,7 @@ define('',[
         }
     };
 
-    SessionTelemetry.prototype.setProperty = function(name: string | number, value: string) {
+    SessionTelemetry.prototype.setProperty = function(name: string , value: string) {
         assert.isStringNotEmpty(name, 'name');
         assert.isStringNotEmpty(value, 'value');
 
@@ -156,7 +156,7 @@ define('',[
         logMetric.call(this, 'Network effective type has changed to [%s] from [%s]', newNetworkType, previousNetworkType || 'New');
     }
 
-    function recordNetworkRTT(this: any, newValue?: any, oldValue?: number) {
+    function recordNetworkRTT(this: any, newValue?: number, oldValue?: number) {
         var newRTT = newValue || this._networkMonitor.getRoundTripTime();
         var oldRTT = oldValue || -1;
 
@@ -169,7 +169,7 @@ define('',[
         logMetric.call(this, 'Network RTT changed to [%s] from [%s]', newRTT, oldRTT);
     }
 
-    function recordNetworkDownlinkThroughputCapacity(this: any, newValue?: any, oldValue?: number) {
+    function recordNetworkDownlinkThroughputCapacity(this: any, newValue?: number, oldValue?: number) {
         var newCapacity = newValue || this._networkMonitor.getDownlinkThroughputCapacity();
         var oldCapacity = oldValue || -1;
 
