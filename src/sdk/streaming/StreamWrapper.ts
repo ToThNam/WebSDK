@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     './stream.json'
 ], function(_, assert, streamEnums) {
     'use strict';
 
-    function StreamWrapper(this: any, type: string, stream: object, logger: object) {
+    function StreamWrapper(type: string, stream: object, logger: object) {
         assert.isStringNotEmpty(type, 'type');
         assert.isObject(stream, 'stream');
         assert.isObject(logger, 'logger');

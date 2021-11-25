@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-define('',[
+//@ts-ignore
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-rtc',
@@ -24,7 +24,7 @@ define('',[
 ], function(_, assert, rtc, logging, proto, telemetryProto) {
     var loggingUrl = '/logs';
 
-    function TelemetryAppender(this: any, uri: string) {
+    function TelemetryAppender( uri: string) {
         assert.isString(uri, 'uri');
 
         this._domain = typeof location === 'object' ? location.hostname : rtc.browser + '-' + rtc.browserVersion + '-unknown';
@@ -77,7 +77,7 @@ define('',[
         addMessagesToRecords.call(this, level, category, messages);
     };
 
-    function addMessagesToRecords(this: any, level: any, category: any, messages: any[]) {
+    function addMessagesToRecords( level: any, category: any, messages: any[]) {
         this._batchHttpProtocol.addRecord({
             level: level,
             timestamp: _.isoString(),
@@ -93,7 +93,7 @@ define('',[
         });
     }
 
-    function onCapacity(this: any, deleteRecords: string) {
+    function onCapacity( deleteRecords: string) {
         this._batchHttpProtocol.addRecordToBeginning({
             level: 'Warn',
             timestamp: _.isoString(),

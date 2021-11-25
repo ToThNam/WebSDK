@@ -19,7 +19,7 @@ import { NewStats_LogNetworkStatsChange,
      Record_RecordMetricRecord 
     } from "../../../typescript/src/sdk/telemetry/SessionTelemetry";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-disposable',
@@ -32,7 +32,7 @@ define('',[
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
     var sdkVersion = '%SDKVERSION%' || '?';
 
-    function SessionTelemetry(this: any, logger: any, metricsTransmitter: any) {
+    function SessionTelemetry(logger: any, metricsTransmitter: any) {
         this._version = sdkVersion;
         this._sessionId = null;
         this._properties = {
@@ -121,7 +121,7 @@ define('',[
         logMetric.call(this, 'Session telemetry stopped');
     };
 
-    function recordForegroundState(this: any) {
+    function recordForegroundState() {
         var isForeground = applicationActivityDetector.isForeground();
         var timeSinceLastChange = applicationActivityDetector.getTimeSinceLastChange();
         var metric = isForeground ? 'ApplicationForeground' : 'ApplicationBackground';
@@ -131,7 +131,7 @@ define('',[
         logMetric.call(this, 'Session has started in the [%s] after [%s] ms', isForeground ? 'foreground' : 'background', timeSinceLastChange);
     }
 
-    function recordForegroundChange(this: any, isForeground: boolean, timeSinceLastChange: any) {
+    function recordForegroundChange(isForeground: boolean, timeSinceLastChange: any) {
         var metric = isForeground ? 'ApplicationForeground' : 'ApplicationBackground';
 
         this.recordMetric(metric, {uint64: timeSinceLastChange});
@@ -139,7 +139,7 @@ define('',[
         logMetric.call(this, 'Application has gone into the [%s] after [%s] ms', isForeground ? 'foreground' : 'background', timeSinceLastChange);
     }
 
-    function recordNetworkTypeState(this: any) {
+    function recordNetworkTypeState() {
         var type = this._networkMonitor.getEffectiveType();
 
         this.recordMetric('NetworkType', {string: type}, null, {resource: phenixRTC.browser});
@@ -147,7 +147,7 @@ define('',[
         logMetric.call(this, '[%s] has started with Network effective type of [%s]', this._sessionId ? 'Session' : 'Application', type);
     }
 
-    function recordNetworkTypeChange(this: any, newType: any, previousType: any) {
+    function recordNetworkTypeChange(newType: any, previousType: any) {
         var newNetworkType = newType || this._networkMonitor.getEffectiveType();
         var previousNetworkType = previousType;
 
@@ -156,7 +156,7 @@ define('',[
         logMetric.call(this, 'Network effective type has changed to [%s] from [%s]', newNetworkType, previousNetworkType || 'New');
     }
 
-    function recordNetworkRTT(this: any, newValue?: any, oldValue?: number) {
+    function recordNetworkRTT(newValue?: any, oldValue?: number) {
         var newRTT = newValue || this._networkMonitor.getRoundTripTime();
         var oldRTT = oldValue || -1;
 
@@ -169,7 +169,7 @@ define('',[
         logMetric.call(this, 'Network RTT changed to [%s] from [%s]', newRTT, oldRTT);
     }
 
-    function recordNetworkDownlinkThroughputCapacity(this: any, newValue?: any, oldValue?: number) {
+    function recordNetworkDownlinkThroughputCapacity(newValue?: any, oldValue?: number) {
         var newCapacity = newValue || this._networkMonitor.getDownlinkThroughputCapacity();
         var oldCapacity = oldValue || -1;
 
@@ -182,7 +182,7 @@ define('',[
         logMetric.call(this, 'Network downlink throughput capacity changed to [%s] from [%s]', newCapacity, oldCapacity);
     }
 
-    function logNetworkStatsChange(this: any, newStats: NewStats_LogNetworkStatsChange , oldStats: OldStats_LogNetworkStatsChange ) {
+    function logNetworkStatsChange(newStats: NewStats_LogNetworkStatsChange , oldStats: OldStats_LogNetworkStatsChange ) {
         if (oldStats.downlinkThroughputCapacity !== newStats.downlinkThroughputCapacity) {
             recordNetworkDownlinkThroughputCapacity.call(this, newStats.downlinkThroughputCapacity, oldStats.downlinkThroughputCapacity);
         }
@@ -196,7 +196,7 @@ define('',[
         }
     }
 
-    function logMetric(this: any, arg1?: string, arg2?: any, arg3?:any) {
+    function logMetric(arg1?: string, arg2?: any, arg3?:any) {
         var args = Array.prototype.slice.call(arguments);
 
         if (args.length === 0) {
@@ -217,7 +217,7 @@ define('',[
         return (now - start) / 1000;
     }
 
-    function recordMetricRecord(this: any, record: Record_RecordMetricRecord, since: any) {
+    function recordMetricRecord(record: Record_RecordMetricRecord, since: any) {
         assert.isStringNotEmpty(record.metric, 'record.metric');
 
         if (!this._sessionId) {
@@ -232,7 +232,7 @@ define('',[
         this._metricsTransmitter.submitMetric(record.metric, since, this._sessionId, null, this._version, annotatedRecord);
     }
 
-    function recordAllMetrics(this: any) {
+    function recordAllMetrics() {
         if (!this._sessionId) {
             return;
         }

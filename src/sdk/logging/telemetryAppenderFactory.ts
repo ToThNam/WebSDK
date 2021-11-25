@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     '../environment',
     './TelemetryAppender'
 ], function(_, assert, environment, TelemetryAppender) {
-    function TelemetryAppenderFactory(this: any) {
+    function TelemetryAppenderFactory() {
         this._telemetryAppenders = {};
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-proto',
@@ -23,7 +23,7 @@ define('',[
 ], function(_, assert, proto, rtc, telemetryProto) {
     var metricsUrl = '/metrics';
 
-    function MetricsTransmitter(this: any, uri: string, environment: any) {
+    function MetricsTransmitter(uri: string, environment: any) {
         assert.isString(uri, 'uri');
 
         this._domain = typeof location === 'object' ? location.hostname : rtc.browser + '-' + rtc.browserVersion + '-unknown';
@@ -66,7 +66,7 @@ define('',[
         addMetricToRecords.call(this, metric, value);
     };
 
-    function addMetricToRecords(this: any, metric: string, value: any) {
+    function addMetricToRecords(metric: string, value: any) {
         var record = _.assign({}, value, {
             metric: metric,
             timestamp: _.isoString(),
@@ -82,7 +82,7 @@ define('',[
         this._batchHttpProtocol.addRecord(record);
     }
 
-    function onCapacity(this: any, deleteRecords: any) {
+    function onCapacity(deleteRecords: any) {
         this._batchHttpProtocol.addRecordToBeginning({
             metric: 'MetricDropped',
             value: {uint64: deleteRecords},

@@ -16,7 +16,7 @@
 
 import { arg1_callback_PCastProtocol, authenticate_PCastProtocol, candidate_PCastProtocol, fetchRoomConversation_PCastProtocol, options_PCastProtocol, room_PCastProtocol, setupStream_PCastProtocol } from "../../typescript/src/sdk/PCastProtocol";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-observable',
@@ -29,7 +29,7 @@ define('',[
 
     var apiVersion = 5;
 
-    function PCastProtocol(this: any, uri: string, deviceId: string, version: string, logger: any) {
+    function PCastProtocol(uri: string, deviceId: string, version: string, logger: any) {
         assert.isStringNotEmpty(uri, 'uri');
         assert.isString(deviceId, 'deviceId');
         assert.isStringNotEmpty(version, 'version');

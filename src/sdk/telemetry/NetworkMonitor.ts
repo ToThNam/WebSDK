@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
     'phenix-web-disposable',
     'phenix-rtc'
 ], function(_, assert, event, disposable, rtc) {
-    function NetworkMonitor(this: any, logger: object) {
+    function NetworkMonitor(logger: object) {
         assert.isObject(logger, 'logger');
 
         this._logger = logger;
@@ -81,7 +81,7 @@ define('',[
         this._disposables.dispose();
     };
 
-    function getStats(this: any) {
+    function getStats() {
         return {
             downlinkThroughputCapacity: this.getDownlinkThroughputCapacity(),
             effectiveType: this.getEffectiveType(),
@@ -89,7 +89,7 @@ define('',[
         };
     }
 
-    function detectNetworkTypeChange(this: any) {
+    function detectNetworkTypeChange() {
         var that = this;
 
         navigator.connection.addEventListener('change', function() {

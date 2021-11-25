@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     '../environment',
     './MetricsTransmitter'
 ], function(_, assert, environment, MetricsTransmitter) {
-    function MetricsTransmitterFactory(this: any) {
+    function MetricsTransmitterFactory() {
         this._metricsTransmitters = {};
     }
 

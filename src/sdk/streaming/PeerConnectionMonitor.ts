@@ -21,7 +21,7 @@ import { monitorCallback_MonitorPeerConnection,
     track_PeerConnectionMonitor 
 } from "../../../typescript/src/sdk/streaming/PeerConnectionMonitor";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -41,7 +41,7 @@ define('',[
     var minEdgeMonitoringInterval = 6000;
     var minEdgeConditionCountForNotification = 2;
 
-    function PeerConnectionMonitor(this: any, name: string, peerConnection: object, logger: object) {
+    function PeerConnectionMonitor(name: string, peerConnection: object, logger: object) {
         assert.isString(name, 'name');
         assert.isObject(peerConnection, 'peerConnection');
         assert.isObject(logger, 'logger');
@@ -149,7 +149,7 @@ define('',[
         return 'PeerConnectionMonitor[' + this._name + ']';
     };
 
-    function monitorPeerConnection(this: any, name: string, peerConnection: peerConnection_MonitorPeerConnection, 
+    function monitorPeerConnection( name: string, peerConnection: peerConnection_MonitorPeerConnection, 
         options: options_PeerConnectionMonitor, activeCallback: () => any, 
         monitorCallback: (arg0: null, arg1: monitorCallback_MonitorPeerConnection) => any ) {
         var that = this;
@@ -161,7 +161,7 @@ define('',[
         function nextCheck() {
             var selector = null;
 
-            getStats.call(that, peerConnection, options, selector, activeCallback, function successCallback(this: any, report: any) {
+            getStats.call(that, peerConnection, options, selector, activeCallback, function successCallback( report: any) {
                 var hasFrameRate = false;
                 var hasVideoBitRate = false;
                 var hasAudioBitRate = false;
@@ -365,7 +365,7 @@ define('',[
         setTimeout(nextCheck, that._monitoringInterval);
     }
 
-    function getStats(this: any, peerConnection: any, options: { direction: string; }, selector: any, activeCallback: () => any, successCallback: (arg0: any) => void, errorCallback: (arg0: any) => void) {
+    function getStats(peerConnection: any, options: { direction: string; }, selector: any, activeCallback: () => any, successCallback: (arg0: any) => void, errorCallback: (arg0: any) => void) {
         if (!activeCallback()) {
             return this._logger.info('[%s] Finished monitoring of peer connection', this._name);
         }
@@ -450,7 +450,7 @@ define('',[
         return tracks;
     }
 
-    function areAllTracksOfTypePaused(this: any, kind: string, peerConnectionTracks: any) {
+    function areAllTracksOfTypePaused( kind: string, peerConnectionTracks: any) {
         var pcTracksOfType = _.filter(peerConnectionTracks, function(track: { kind: string; }) {
             return track.kind === kind;
         });

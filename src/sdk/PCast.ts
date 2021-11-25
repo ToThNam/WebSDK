@@ -46,7 +46,7 @@ import {
     callback_createChunkedOrRtmpViewer
 } from "../../typescript/src/sdk/Pcast";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-observable',
@@ -82,7 +82,7 @@ define('',[
     var roomOrChannelIdRegex = /^(?:room|channel)Id[:](.*)$/;
     var roomOrChannelAliasRegex = /^(?:room|channel)Alias[:](.*)$/;
 
-    function PCast(this: any, options: options_PCast) {
+    function PCast(options: options_PCast) {
         options = options || {};
 
         assert.isObject(options, 'options');
@@ -666,7 +666,7 @@ define('',[
         return aliasMatch ? aliasMatch[1] : null;
     };
 
-    function parseToken(this: any, streamToken: string) {
+    function parseToken(streamToken: string) {
         if (!_.startsWith(streamToken, 'DIGEST:')) {
             this._logger.warn('Failed to parse the `streamToken` [%s]', streamToken);
 
@@ -688,7 +688,7 @@ define('',[
         }
     }
 
-    function instantiateProtocol(this: any, uri: string) {
+    function instantiateProtocol(uri: string) {
         this._protocol = new PCastProtocol(uri, this._deviceId, this._version, this._logger);
 
         this._protocol.onEvent('connected', _.bind(connected, this));
@@ -711,7 +711,7 @@ define('',[
             this._sessionIdSubscription.dispose();
         }
 
-        var handleSessionIdChange = function(this: any, sessionId: string) {
+        var handleSessionIdChange = function(sessionId: string) {
             this._observableSessionId.setValue(sessionId);
         };
 
@@ -720,7 +720,7 @@ define('',[
         this._sessionTelemetrySubscription = this._protocol.getObservableSessionId().subscribe(_.bind(this._sessionTelemetry.setSessionId, this._sessionTelemetry));
     }
 
-    function connected(this: any) {
+    function connected() {
         var that = this;
 
         if (that._stopped) {
@@ -771,11 +771,11 @@ define('',[
         });
     }
 
-    function reconnecting(this: any) {
+    function reconnecting() {
         transitionToStatus.call(this, 'reconnecting');
     }
 
-    function reconnected(this: any, optionalReason?: string) {
+    function reconnected(optionalReason?: string) {
         if (optionalReason) {
             assert.isString('reason', optionalReason);
         }
@@ -787,7 +787,7 @@ define('',[
         reAuthenticate.call(this);
     }
 
-    function reAuthenticate(this: any) {
+    function reAuthenticate() {
         var that = this;
 
         if (that._stopped) {
@@ -836,7 +836,7 @@ define('',[
         });
     }
 
-    function disconnected(this: any) {
+    function disconnected() {
         if (areAllPeerConnectionsOffline.call(this) && this._observableStatus.getValue() === 'reconnecting') {
             this._logger.warn('[PCast] disconnected after attempting to reconnect. Going offline.');
 
@@ -849,7 +849,7 @@ define('',[
         transitionToStatus.call(this, 'offline');
     }
 
-    function areAllPeerConnectionsOffline(this: any) {
+    function areAllPeerConnectionsOffline() {
         return _.reduce(this._peerConnections, function(isOffline: any, peerConnection: peerConnection_areAllPeerConnectionsOffline) {
             if (!isOffline) {
                 return isOffline;
@@ -859,14 +859,14 @@ define('',[
         }, true);
     }
 
-    function streamEnded(this: any, event: event_streamEnded) {
+    function streamEnded(event: event_streamEnded) {
         var streamId = event.streamId;
         var reason = event.reason;
 
         return endStream.call(this, streamId, reason);
     }
 
-    function dataQuality(this: any, event: event_dataQuality) {
+    function dataQuality(event: event_dataQuality) {
         var streamId = event.streamId;
         var status = event.status;
         var reason = event.reason;
@@ -884,7 +884,7 @@ define('',[
         }
     }
 
-    function endStream(this: any, streamId: string , reason: string) {
+    function endStream(streamId: string , reason: string) {
         this._logger.info('[%s] Stream ended with reason [%s]', streamId, reason);
 
         var internalMediaStream = this._mediaStreams[streamId];
@@ -912,7 +912,7 @@ define('',[
         delete this._peerConnections[streamId];
     }
 
-    function setupStreamAddedListener(this: any, streamId: string , state: statesetup_StreamAddedListener , peerConnection: any, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, options: any,) {
+    function setupStreamAddedListener( streamId: string , state: statesetup_StreamAddedListener , peerConnection: any, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, options: any,) {
         var that = this;
         var added = false;
         var setupTimeoutId: NodeJS.Timeout;
@@ -1002,7 +1002,7 @@ define('',[
         _.addEventListener(peerConnection, 'track', onAddStream);
     }
 
-    function setupIceCandidateListener(this: any, streamId: string, peerConnection: any, callback: (arg0: any) => void) {
+    function setupIceCandidateListener( streamId: string, peerConnection: any, callback: (arg0: any) => void) {
         var that = this;
         var onIceCandidate = function onIceCandidate(event: { candidate: any; }) {
             var candidate = event.candidate;
@@ -1021,7 +1021,7 @@ define('',[
         _.addEventListener(peerConnection, 'icecandidate', onIceCandidate);
     }
 
-    function setupStateListener(this: any, streamId: string, peerConnection: peerConnection_setupStateListener) {
+    function setupStateListener(streamId: string, peerConnection: peerConnection_setupStateListener) {
         var that = this;
         var onNegotiationNeeded = function onNegotiationNeeded(event: any) { // eslint-disable-line no-unused-vars
             that._logger.info('[%s] Negotiation needed', streamId);
@@ -1050,7 +1050,7 @@ define('',[
         _.addEventListener(peerConnection, 'connectionstatechange', onConnectionStateChanged);
     }
 
-    function createPublisher(this: any, streamId: string , callback: any, streamOptions: any) {
+    function createPublisher(streamId: string , callback: any, streamOptions: any) {
         var that = this;
         var state = {stopped: false};
 
@@ -1137,7 +1137,7 @@ define('',[
         callback(publisher);
     }
 
-    function setEnvironmentCodecDefaults(this: any) {
+    function setEnvironmentCodecDefaults() {
         var that = this;
         var peerConnection = new phenixRTC.RTCPeerConnection();
 
@@ -1197,7 +1197,7 @@ define('',[
         }
     }
 
-    function setAudioState(this: any, done?: () => void) {
+    function setAudioState( done?: () => void) {
         var that = this;
 
         switch (phenixRTC.browser) {
@@ -1230,7 +1230,7 @@ define('',[
         }
     }
 
-    function createPublisherPeerConnection(this: any, peerConnectionConfig: any, mediaStream: { getTracks: () => any; }, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_createPublisherPeerConnection, streamOptions: any,createOptions: createOptions_createPublisherPeerConnection) {
+    function createPublisherPeerConnection(peerConnectionConfig: any, mediaStream: { getTracks: () => any; }, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_createPublisherPeerConnection, streamOptions: any,createOptions: createOptions_createPublisherPeerConnection) {
         var that = this;
         var state = {
             failed: false,
@@ -1559,7 +1559,7 @@ define('',[
         }, onFailure);
     }
 
-    function createViewerPeerConnection(this: any, peerConnectionConfig: any, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, createOptions: createOptions_createViewerPeerConnection) {
+    function createViewerPeerConnection(peerConnectionConfig: any, streamId: string, offerSdp: string, streamTelemetry: streamTelemetry_StreamAddedListener, callback: callback_StreamAddedListener, createOptions: createOptions_createViewerPeerConnection) {
         if (phenixRTC.browser === 'IE') {
             throw new Error('Subscribing in real-time not supported on IE');
         }
@@ -1683,21 +1683,21 @@ define('',[
         }, onFailure);
     }
 
-    function onSetLocalDescriptionSuccess(this: any, peerConnection: any) {
+    function onSetLocalDescriptionSuccess(peerConnection: any) {
         this._logger.debug('Set local description [%s] [%s]', _.get(peerConnection, ['localDescription', 'type']), _.get(peerConnection, ['localDescription', 'sdp']));
     }
 
-    function onSetRemoteDescriptionSuccess(this: any, peerConnection: any) {
+    function onSetRemoteDescriptionSuccess(peerConnection: any) {
         this._logger.debug('Set remote description [%s] [%s]', _.get(peerConnection, ['localDescription', 'type']), _.get(peerConnection, ['remoteDescription', 'sdp']));
     }
 
-    function onCreateAnswerSuccess(this: any, answerSdp: { sdp: any; }) {
+    function onCreateAnswerSuccess(answerSdp: { sdp: any; }) {
         this._logger.info('Created answer [%s]', answerSdp.sdp);
 
         return answerSdp;
     }
 
-    function setRemoteAnswer(this: any, streamId: string , answerSdp: { sdp: any; }, setRemoteAnswerCallback: any, onFailure:  any) {
+    function setRemoteAnswer( streamId: string , answerSdp: { sdp: any; }, setRemoteAnswerCallback: any, onFailure:  any) {
         var that = this;
 
         that._protocol.setAnswerDescription(streamId, answerSdp.sdp, function(error: any, response: response_setAnswerDescription ) {
@@ -1736,7 +1736,7 @@ define('',[
         });
     }
 
-    function onIceCandidate(this: any, streamId: string , candidate: any) {
+    function onIceCandidate(streamId: string , candidate: any) {
         var that = this;
         var iceCandidates = this._pendingIceCandidates[streamId];
 
@@ -1780,7 +1780,7 @@ define('',[
         }));
     }
 
-    function submitIceCandidates(this: any, streamId: string , options: string | any[]) {
+    function submitIceCandidates(streamId: string , options: string | any[]) {
         var iceCandidates = this._pendingIceCandidates[streamId] || [];
 
         if (iceCandidates.length === 0 && options.length === 0) {
@@ -1806,7 +1806,7 @@ define('',[
         });
     }
 
-    function createChunkedOrRtmpViewer(this: any, streamId: string, offerSdp: any, streamTelemetry: any, callback: callback_createChunkedOrRtmpViewer, options: options_createChunkedOrRtmpViewer) {
+    function createChunkedOrRtmpViewer( streamId: string, offerSdp: any, streamTelemetry: any, callback: callback_createChunkedOrRtmpViewer, options: options_createChunkedOrRtmpViewer) {
         var that = this;
 
         var rtmpQuery = /a=x-rtmp:(rtmp:\/\/[^\n]*)/m;
@@ -1894,7 +1894,7 @@ define('',[
         return callback.call(that, undefined, 'failed');
     }
 
-    function createLiveViewerOfKind(this: any, streamId: string , uri: string, kind: any, streamTelemetry: any, callback: any, options: any) {
+    function createLiveViewerOfKind(streamId: string , uri: string, kind: any, streamTelemetry: any, callback: any, options: any) {
         var that = this;
         var pending = 0;
         var shaka: any = null;
@@ -1997,7 +1997,7 @@ define('',[
         }
     }
 
-    function transitionToStatus(this: any, newStatus?: string, reason?: string | null, suppressCallback?: any) {
+    function transitionToStatus(newStatus?: string, reason?: string | null, suppressCallback?: any) {
         var oldStatus = this.getStatus();
 
         if (oldStatus !== newStatus && !(isOfflineStatus(oldStatus) && newStatus === 'offline')) {
@@ -2033,7 +2033,7 @@ define('',[
         return status === 'critical-network-issue' || status === 'offline';
     }
 
-    function closePeerConnection(this: any, streamId: string, peerConnection: peerConnection_closePeerConnection, reason: any) {
+    function closePeerConnection(streamId: string, peerConnection: peerConnection_closePeerConnection, reason: any) {
         if (peerConnection.signalingState === 'closed' || peerConnection.__closing) {
             this._logger.debug('[%s] Peer connection is already closed [%s]', streamId, reason);
 
@@ -2046,13 +2046,13 @@ define('',[
         peerConnection.__closing = true;
     }
 
-    function handleForeground(this: any) {
+    function handleForeground() {
         if (this._treatBackgroundAsOffline || this._reAuthenticateOnForeground) {
             reconnected.call(this, 'entered-foreground');
         }
     }
 
-    function handleBackground(this: any) {
+    function handleBackground() {
         if (this._treatBackgroundAsOffline) {
             transitionToStatus.call(this, 'offline', 'entered-background');
         }

@@ -19,7 +19,7 @@ import { Record_recordMetricRecord,
     Dimensions_addVideoDisplayDimensionsChangedCallback
 } from "../../../typescript/src/sdk/telemetry/StreamTelemetry";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-disposable',
@@ -30,7 +30,7 @@ define('',[
     var start = phenixRTC.global['__phenixPageLoadTime'] || phenixRTC.global['__pageLoadTime'] || _.now();
     var sdkVersion = '%SDKVERSION%' || '?';
 
-    function StreamTelemetry(this: any, sessionId: string, logger: any, metricsTransmitter: any) {
+    function StreamTelemetry(sessionId: string, logger: any, metricsTransmitter: any) {
         assert.isStringNotEmpty(sessionId, 'sessionId');
 
         this._version = sdkVersion;
@@ -290,7 +290,7 @@ define('',[
         return playingDisposable;
     };
 
-    function logMetric(this: any, arg1?: string, arg2?: any, arg3?:any) {
+    function logMetric(arg1?: string, arg2?: any, arg3?:any) {
         var args = Array.prototype.slice.call(arguments);
 
         if (args.length === 0) {
@@ -311,7 +311,7 @@ define('',[
         return (now - start) / 1000;
     }
 
-    function recordMetricRecord(this: any, record: Record_recordMetricRecord, since: any) {
+    function recordMetricRecord(record: Record_recordMetricRecord, since: any) {
         assert.isStringNotEmpty(record.metric, 'record.metric');
 
         var annotatedRecord = _.assign({}, this._properties, record);

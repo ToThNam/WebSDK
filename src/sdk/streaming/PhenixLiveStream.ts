@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -26,7 +26,7 @@ define('',[
 ], function(_, assert, event, rtc, ShakaRenderer, PhenixPlayerRenderer, FlashRenderer, streamEnums) {
     'use strict';
 
-    function PhenixLiveStream(this: any, type: any, streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, webPlayer: any, logger: any) {
+    function PhenixLiveStream(type: any, streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, webPlayer: any, logger: any) {
         this._type = type;
         this._streamId = streamId;
         this._uri = uri;

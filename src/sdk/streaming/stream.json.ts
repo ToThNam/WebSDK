@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
 ], function() {
     'use strict';
 

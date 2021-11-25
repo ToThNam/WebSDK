@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -34,7 +34,7 @@ define('',[
     // Restarts less than 100ms after foregrounding cause subsequent "pause" events on the video
     var restartRendererDelay = 200;
 
-    function PhenixRealTimeRenderer(this: any, streamId: string, streamSrc: any, streamTelemetry: any, options: any, logger: any) {
+    function PhenixRealTimeRenderer(streamId: string, streamSrc: string, streamTelemetry: any, options: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._streamSrc = streamSrc;
@@ -211,7 +211,7 @@ define('',[
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function stalling(this: any, event: { type: string; }) {
+    function stalling(event: { type: string; }) {
         var isLastBackgroundingRecent = (_.now() - this._lastBackgroundingTimestamp) < listenForPauseChangeAfterForegroundInterval;
 
         if (event.type === 'pause' && isLastBackgroundingRecent) {
@@ -223,11 +223,11 @@ define('',[
         this._logger.info('[%s] Loading Phenix Real-Time stream player stalling caused by [%s] event.', this._streamId, event.type);
     }
 
-    function ended(this: any) {
+    function ended() {
         this._logger.info('[%s] Phenix Real-Time stream ended.', this._streamId);
     }
 
-    function checkIfWasPlayingWhenGoingToBackground(this: any) {
+    function checkIfWasPlayingWhenGoingToBackground() {
         if (!this._element) {
             return;
         }
@@ -249,7 +249,7 @@ define('',[
         this._lastBackgroundingTimestamp = _.now();
     }
 
-    function resumeWhenEnteringForgeround(this: any) {
+    function resumeWhenEnteringForgeround() {
         if (!this._element) {
             return;
         }

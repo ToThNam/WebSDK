@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-rtc',
@@ -30,7 +30,7 @@ define('',[
         streamEnums.types.hls.name
     ];
 
-    function FeatureDetector(this: any, features: any) {
+    function FeatureDetector( features: any) {
         features = features || defaultFeatures;
 
         assert.isArray(features, 'features');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-logging',
@@ -32,7 +32,7 @@ define('',[
     var minTimeBeforeNextReload = 15000;
     var originStreamReadyDuration = 6000;
 
-    function PhenixPlayerRenderer(this: any, streamId: string, uri: string, streamTelemetry: any, options: any, webPlayer: any, logger: any) {
+    function PhenixPlayerRenderer(streamId: string, uri: string, streamTelemetry: any, options: any, webPlayer: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._manifestUri = encodeURI(uri).replace(/[#]/g, '%23');
@@ -202,7 +202,7 @@ define('',[
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function setupPlayer(this: any) {
+    function setupPlayer() {
         var that = this;
         var playerOptions = _.assign({bandwidthToStartAt: bandwidthAt720}, that._options);
 
@@ -232,7 +232,7 @@ define('',[
         _.addEventListener(that._player, 'error', _.bind(handleError, that));
     }
 
-    function handleError(this: any, e: any) {
+    function handleError(e: any) {
         if (canReload.call(this) && e && (e.code === 3 || e.severity === this._webPlayer.errors.severity.RECOVERABLE)) {
             this._logger.warn('Reloading unhealthy stream after error event [%s]', e);
 
@@ -242,7 +242,7 @@ define('',[
         this._namedEvents.fire(streamEnums.rendererEvents.error.name, ['phenix-player', e]);
     }
 
-    function reload(this: any) {
+    function reload() {
         this._player.dispose();
 
         this._player = null;
@@ -250,7 +250,7 @@ define('',[
         this.start(this._element);
     }
 
-    function reloadIfAble(this: any) {
+    function reloadIfAble() {
         if (!canReload.call(this)) {
             return;
         }
@@ -262,13 +262,13 @@ define('',[
         reload.call(this);
     }
 
-    function canReload(this: any) {
+    function canReload() {
         var hasElapsedMinTimeSinceLastReload = !this._lastReloadTime || _.now() - this._lastReloadTime > minTimeBeforeNextReload;
 
         return this._element && !this._waitForLastChunk && this._player && this._element.buffered.length !== 0 && hasElapsedMinTimeSinceLastReload;
     }
 
-    function onProgress(this: any) {
+    function onProgress() {
         this._lastProgress.time = _.now();
 
         if (this._element.buffered.length === 0) {
@@ -307,7 +307,7 @@ define('',[
         this._lastProgress.lastCurrentTime = this._element.currentTime;
     }
 
-    function stalled(this: any, event: { type: any; }) {
+    function stalled(event: { type: any; }) {
         var that = this;
 
         that._logger.info('[%s] Loading Phenix Live stream player stalled caused by [%s] event.', that._streamId, event.type);
@@ -333,11 +333,11 @@ define('',[
         }, timeoutForStallWithoutProgressToRestart);
     }
 
-    function getTimeoutOrMinimum(this: any) {
+    function getTimeoutOrMinimum() {
         return this._lastProgress.averageLength * 1.5 < 2000 ? 2000 : this._lastProgress.averageLength * 1.5;
     }
 
-    function ended(this: any) {
+    function ended() {
         this._logger.info('[%s] Phenix stream player ended.', this._streamId);
     }
 

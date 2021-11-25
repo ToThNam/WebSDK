@@ -16,7 +16,7 @@
 
 import { arg1_callback_handleReadyStateChange, response_closestEndPointResolver, xhr_handleReadyStateChange } from "../../typescript/src/sdk/PCastEndPoint";
 
-define('',[
+define([
     'phenix-web-assert',
     'phenix-web-lodash-light',
     'phenix-web-disposable',
@@ -24,7 +24,7 @@ define('',[
 ], function(assert, _, disposable, ClosestEndPointResolver) {
     'use strict';
 
-    function PCastEndPoint(this: any, version: string, baseUri: string, logger: object, sessionTelemetry: any) {
+    function PCastEndPoint(version: string, baseUri: string, logger: object, sessionTelemetry: any) {
         assert.isStringNotEmpty(version, 'version');
         assert.isStringNotEmpty(baseUri, 'baseUri');
         assert.isObject(logger, 'logger');
@@ -54,7 +54,7 @@ define('',[
         return 'PCastEndPoint[' + this._baseUri + ']';
     };
 
-    function resolveUri(this: any, baseUri: string , callback: any /* (error, {uri, roundTripTime}) */) {
+    function resolveUri(baseUri: string , callback: any /* (error, {uri, roundTripTime}) */) {
         var isWss = baseUri.lastIndexOf('wss:', 0) === 0;
         var isWs = baseUri.lastIndexOf('ws:', 0) === 0;
         var isHttps = baseUri.lastIndexOf('https:', 0) === 0;
@@ -107,7 +107,7 @@ define('',[
         }
     }
 
-    function getEndpoints(this: any, baseUri: string, callback: (arg0: any , arg1?: string[] ) => void) {
+    function getEndpoints(baseUri: string, callback: (arg0: any , arg1?: string[] ) => void) {
         var version = '%SDKVERSION%';
         var requestUrl = baseUri + '/pcast/endPoints?version=' + version + '&_=' + _.now();
         var xhr: any = getAndOpenVendorSpecificXmlHttpMethod('GET', requestUrl);

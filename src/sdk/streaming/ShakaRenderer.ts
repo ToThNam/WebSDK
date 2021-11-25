@@ -16,7 +16,7 @@
 
 import { elementToAttachTo_ShakaRenderer, updatedPlayerConfig_ShakaRenderer } from "../../../typescript/src/sdk/streaming/ShakaRenderer";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -31,7 +31,7 @@ define('',[
     var widevineServiceCertificate: null = null;
     var defaultBandwidthEstimateForPlayback = 2000000; // 2Mbps will select 720p by default
 
-    function ShakaRenderer(this: any, streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, logger: any) {
+    function ShakaRenderer(streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, logger: any) {
         this._logger = logger;
         this._streamId = streamId;
         this._manifestUri = encodeURI(uri).replace(/[#]/g, '%23');
@@ -99,7 +99,7 @@ define('',[
             loadPlayer(playerConfig);
         }
 
-        function loadPlayer(this: any, config: { abr: { defaultBandwidthEstimate: number; }; manifest: { retryParameters: { timeout: number; }; }; streaming: { rebufferingGoal: number; bufferingGoal: number; bufferBehind: number; retryParameters: { timeout: number; maxAttempts: number; backoffFactor: number; }; }; }) {
+        function loadPlayer(config: { abr: { defaultBandwidthEstimate: number; }; manifest: { retryParameters: { timeout: number; }; }; streaming: { rebufferingGoal: number; bufferingGoal: number; bufferBehind: number; retryParameters: { timeout: number; maxAttempts: number; backoffFactor: number; }; }; }) {
             that._player.configure(config);
 
             if (that._options.receiveAudio === false) {
@@ -243,7 +243,7 @@ define('',[
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function onProgress(this: any) {
+    function onProgress() {
         this._lastProgress.time = _.now();
 
         if (this._element.buffered.length === 0) {
@@ -268,7 +268,7 @@ define('',[
         this._lastProgress.buffered = bufferedEnd;
     }
 
-    function stalled(this: any) {
+    function stalled() {
         var that = this;
 
         that._logger.info('[%s] Loading Shaka live stream player stream stalled.', that._streamId);
@@ -284,15 +284,15 @@ define('',[
         }, getTimeoutOrMinimum.call(that));
     }
 
-    function getTimeoutOrMinimum(this: any) {
+    function getTimeoutOrMinimum() {
         return this._lastProgress.averageLength * 1.5 < 2000 ? 2000 : this._lastProgress.averageLength * 1.5;
     }
 
-    function ended(this: any) {
+    function ended() {
         this._logger.info('[%s] Shaka live stream player ended.', this._streamId);
     }
 
-    function checkBrowserSupportForWidevineDRM(this: any) {
+    function checkBrowserSupportForWidevineDRM() {
         var error;
 
         if (!_.isFunction(Uint8Array)) {
@@ -310,7 +310,7 @@ define('',[
         }
     }
 
-    function unwrapLicenseResponse(this: any, player: any) {
+    function unwrapLicenseResponse(player: any) {
         var that = this;
 
         player.getNetworkingEngine().registerResponseFilter(function(type: { toString: () => void; }, response: { data: any }) {
@@ -335,7 +335,7 @@ define('',[
         });
     }
 
-    function addDrmSpecificsToPlayerConfig(this: any, playerConfig: any, options: any, callback: any) {
+    function addDrmSpecificsToPlayerConfig(playerConfig: any, options: any, callback: any) {
         if (!playerConfig.drm) {
             playerConfig.drm = {};
         }

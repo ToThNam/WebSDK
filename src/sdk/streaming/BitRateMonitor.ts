@@ -16,7 +16,7 @@
 
 import { Arg0_Callback, Metrics } from "../../../typescript/src/sdk/streaming/BiRateMonitor";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert'
 ], function(_, assert) {
@@ -24,7 +24,7 @@ define('',[
 
     var maximumBitRateDefault = 3; // 3 x target bitrate
 
-    function BitRateMonitor(this: any, name: string, monitor: object, getLimit: any ) {
+    function BitRateMonitor( name: string, monitor: object, getLimit: any ) {
         assert.isStringNotEmpty(name, 'name');
         assert.isObject(monitor, 'monitor');
         assert.isFunction(getLimit, 'getLimit');

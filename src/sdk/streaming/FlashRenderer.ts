@@ -16,7 +16,7 @@
 
 import { Options_FlashRenderer,stat } from "../../../typescript/src/sdk/streaming/FlashRenderer";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-logging',
@@ -38,7 +38,7 @@ define('',[
         production: 'https://phenixrts.com/public/rtmp/' + mostRecentSwfFile
     };
 
-    function FlashRenderer(this: any, streamId: string, streamsInfo: any, streamTelemetry: any, options: Options_FlashRenderer, logger: any) {
+    function FlashRenderer(streamId: string, streamsInfo: any, streamTelemetry: any, options: Options_FlashRenderer, logger: any) {
         assert.isObject(options, 'options');
 
         if (options.env) {
@@ -191,17 +191,17 @@ define('',[
         return this._dimensionsChangedMonitor.addVideoDisplayDimensionsChangedCallback(callback, options);
     };
 
-    function handleError(this: any, e: any) {
+    function handleError( e: any) {
         this._namedEvents.fire(streamEnums.rendererEvents.error.name, ['flash-player', e]);
     }
 
-    function reload(this: any) {
+    function reload() {
         this._phenixVideo.destroy();
 
         this.start(this._originElement);
     }
 
-    function reloadIfAble(this: any) {
+    function reloadIfAble() {
         if (!canReload.call(this)) {
             return;
         }
@@ -213,13 +213,13 @@ define('',[
         reload.call(this);
     }
 
-    function canReload(this: any) {
+    function canReload() {
         var hasElapsedMinTimeSinceLastReload = !this._lastReloadTime || _.now() - this._lastReloadTime > minTimeBeforeNextReload;
 
         return this._playerElement && !this._waitForLastChunk && this._player && this._playerElement.buffered.length !== 0 && hasElapsedMinTimeSinceLastReload;
     }
 
-    function stalled(this: any, event: { type: any; }) {
+    function stalled( event: { type: any; }) {
         var that = this;
 
         that._logger.info('[%s] Loading flash player stalled caused by [%s] event.', that._streamId, event.type);
@@ -235,7 +235,7 @@ define('',[
         }, timeoutForStallWithoutProgressToRestart);
     }
 
-    function ended(this: any) {
+    function ended() {
         this._logger.info('[%s] Flash player ended.', this._streamId);
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('fs',[
+define([
 ], function() {
     'use strict';
 

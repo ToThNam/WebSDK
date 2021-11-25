@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-web-assert',
     'phenix-web-event',
@@ -32,7 +32,7 @@ define('',[
 
     var defaultIceConnectionTimeout = 12000;
 
-    function PhenixRealTimeStream(this: any, streamId: string, streamSrc: any, peerConnection: { remoteDescription: string; }, streamTelemetry: any, options: any, logger: any) {
+    function PhenixRealTimeStream(streamId: string, streamSrc: any, peerConnection: { remoteDescription: string; }, streamTelemetry: any, options: any, logger: any) {
         this._streamId = streamId;
         this._streamSrc = streamSrc;
         this._peerConnection = peerConnection;
@@ -271,7 +271,7 @@ define('',[
         return 'PhenixRealTimeStream[' + this._streamId + ']';
     };
 
-    function emitPendingBackgroundEvent(this: any) {
+    function emitPendingBackgroundEvent() {
         if (!this._backgroundMonitorEventCallback) {
             return;
         }
@@ -305,7 +305,7 @@ define('',[
         });
     }
 
-    function onIceConnectionChange(this: any) {
+    function onIceConnectionChange() {
         var that = this;
         var connectionState = this._peerConnection.iceConnectionState;
 

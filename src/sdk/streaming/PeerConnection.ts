@@ -26,7 +26,7 @@ import {
     StatsReport_ConvertStats 
 } from "../../../typescript/src/sdk/streaming/PeerConnection";
 
-define('',[
+define([
     'phenix-web-lodash-light',
     'phenix-rtc'
 ], function(_, rtc) {
