@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import { AdminApiProxyClientType, 
+    ChannelExpressOptions } 
+from "../typescript/src/web-sdk";
+//@ts-ignore
 define('phenix-web-sdk', [
     'phenix-rtc',
     'phenix-web-logging',
@@ -26,7 +30,7 @@ define('phenix-web-sdk', [
     './sdk/express/RoomExpress',
     './sdk/express/ChannelExpress',
     './sdk/AdminApiProxyClient'
-], function(rtc, logging, PCast, RoomService, AudioSpeakerDetector, BandwidthMonitor, UserMediaResolver, PCastExpress, RoomExpress, ChannelExpress, AdminApiProxyClient) {
+], function(rtc, logging, PCast, RoomService, AudioSpeakerDetector, BandwidthMonitor, UserMediaResolver, PCastExpress, RoomExpress, ChannelExpress: ChannelExpressOptions, AdminApiProxyClient: AdminApiProxyClientType) {
     'use strict';
 
     rtc.global.PhenixPCast = PCast;
