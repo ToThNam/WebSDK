@@ -188,7 +188,7 @@ define('',[
         return stat;
     };
 
-    PhenixPlayerRenderer.prototype.setDataQualityChangedCallback = function(callback: ()=> void) {
+    PhenixPlayerRenderer.prototype.setDataQualityChangedCallback = function(callback: any) {
         assert.isFunction(callback, 'callback');
 
         this.dataQualityChangedCallback = callback;

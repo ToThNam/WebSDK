@@ -16,8 +16,7 @@
 
 import { Record_recordMetricRecord, 
     video,trackedVideo,
-    Dimensions_addVideoDisplayDimensionsChangedCallback,
-    video_StreamTelemetry
+    Dimensions_addVideoDisplayDimensionsChangedCallback
 } from "../../../typescript/src/sdk/telemetry/StreamTelemetry";
 
 define('',[
@@ -49,7 +48,7 @@ define('',[
         logMetric.call(this, 'Stream initializing');
     }
 
-    StreamTelemetry.prototype.setProperty = function(name: string , value: string) {
+    StreamTelemetry.prototype.setProperty = function(name: string | number, value: string) {
         assert.isStringNotEmpty(name, 'name');
         assert.isStringNotEmpty(value, 'value');
 
@@ -185,7 +184,7 @@ define('',[
         return dimensionChangeDisposable;
     };
 
-    StreamTelemetry.prototype.recordRebuffering = function(video: video_StreamTelemetry) {
+    StreamTelemetry.prototype.recordRebuffering = function(video: { buffered: { length: number; end: (arg0: number) => boolean; }; }) {
         var that = this;
         var videoStalled: number | null;
         var lastProgress: boolean;

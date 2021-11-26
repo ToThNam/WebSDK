@@ -5,9 +5,8 @@ export interface Options_FlashRenderer{
 
 export interface stat{
   lag?: number;
-  networkState?: number;
-  video?: any;
   estimatedBandwidth: number;
+  networkState?: number;
   playTime: number;
-
+  video?: any;
 }

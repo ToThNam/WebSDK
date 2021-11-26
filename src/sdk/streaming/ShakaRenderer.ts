@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { config_loadPlayer, elementToAttachTo_ShakaRenderer, updatedPlayerConfig_ShakaRenderer } from "../../../typescript/src/sdk/streaming/ShakaRenderer";
+ import { elementToAttachTo_ShakaRenderer, updatedPlayerConfig_ShakaRenderer } from "../../../typescript/src/sdk/streaming/ShakaRenderer";
 
 define('',[
     'phenix-web-lodash-light',
@@ -28,7 +28,7 @@ define('',[
 ], function(_, assert, event, http, disposable, rtc, DimensionsChangedMonitor, streamEnums) {
     'use strict';
 
-    var widevineServiceCertificate: any = null;
+    var widevineServiceCertificate: null = null;
     var defaultBandwidthEstimateForPlayback = 2000000; // 2Mbps will select 720p by default
 
     function ShakaRenderer(this: any, streamId: string, uri: string, streamTelemetry: any, options: any, shaka: any, logger: any) {
@@ -99,7 +99,7 @@ define('',[
             loadPlayer(playerConfig);
         }
 
-        function loadPlayer(this: any, config: config_loadPlayer) {
+        function loadPlayer(this: any, config: { abr: { defaultBandwidthEstimate: number; }; manifest: { retryParameters: { timeout: number; }; }; streaming: { rebufferingGoal: number; bufferingGoal: number; bufferBehind: number; retryParameters: { timeout: number; maxAttempts: number; backoffFactor: number; }; }; }) {
             that._player.configure(config);
 
             if (that._options.receiveAudio === false) {

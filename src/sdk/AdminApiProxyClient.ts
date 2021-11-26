@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import { endpointPaths_setEndpointPaths,
-    defaultRequestOptions,
-    
- } from "../../typescript/src/sdk/AdminApiProxyClient";
+import { endpointPaths_setEndpointPaths } from "../../typescript/src/sdk/AdminApiProxyClient";
 
 define('',[
     'phenix-web-lodash-light',
@@ -29,7 +26,7 @@ define('',[
 
     var networkUnavailableCode = 0;
     var requestMaxTimeout = 20000;
-    var defaultRequestOptions: any = {
+    var defaultRequestOptions:any = {
         timeout: requestMaxTimeout,
         retryOptions: {
             backoff: 1.5,

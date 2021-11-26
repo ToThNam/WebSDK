@@ -32,7 +32,7 @@ define('',[
 
     var defaultIceConnectionTimeout = 12000;
 
-    function PhenixRealTimeStream(this: any, streamId: string, streamSrc: string, peerConnection: { remoteDescription: string; }, streamTelemetry: any, options: any, logger: any) {
+    function PhenixRealTimeStream(this: any, streamId: string, streamSrc: any, peerConnection: { remoteDescription: string; }, streamTelemetry: any, options: any, logger: any) {
         this._streamId = streamId;
         this._streamSrc = streamSrc;
         this._peerConnection = peerConnection;
@@ -176,7 +176,7 @@ define('',[
         }
     };
 
-    PhenixRealTimeStream.prototype.stop = function stop(reason: string) {
+    PhenixRealTimeStream.prototype.stop = function stop(reason: any) {
         if (!this.isActive()) {
             return;
         }
@@ -203,7 +203,7 @@ define('',[
 
         monitor.start(options, function activeCallback() {
             return that.isActive();
-        }, function monitorCallback(error: any, monitorEvent: { type: any; reasons: string[]; }): any {
+        }, function monitorCallback(error: any, monitorEvent: { type: any; reasons: any; }): any {
             if (error) {
                 that._logger.warn('[%s] Media stream monitor triggered unrecoverable error [%s]', that._streamId, error);
             }
